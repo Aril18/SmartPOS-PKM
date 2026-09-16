@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - SmartPOS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+            <nav>
+                <a href="index.html" class="active">
+                    Dashboard
+                </a>
+
+                <a href="../pos/index.html">
+                    Kasir / POS
+                </a>
+
+                <a href="../production/index.html">
+                    Produksi & Stok
+                </a>
+
+                <a href="../menu/index.html">
+                    Menu
+                </a>
+
+                <a href="../waste/index.html">
+                    Waste
+                </a>
+
+                <a href="../stock-opname/index.html">
+                    Stock Opname
+                </a>
+
+                <a href="../closing/index.html">
+                    Closing
+                </a>
+
+                <a href="../employee/index.html">
+                    Pegawai
+                </a>
+
+                <a href="../audit/index.html">
+                    Audit Aktivitas
+                </a>
+
+                <a href="../report/index.html">
+                    Laporan
+                </a>
+            </nav>
+
+            <button
+                onclick="logout()"
+                class="logout-btn"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- DASHBOARD CONTENT -->
+        <main class="dashboard-content">
+
+            <!-- HEADER -->
+            <header class="dashboard-header">
+
+                <div>
+                    <h1>Dashboard</h1>
+
+                    <p>
+                        Ringkasan kondisi usaha hari ini
+                    </p>
+                </div>
+
+                <div class="user-info">
+
+                    <span>
+                        Login sebagai
+                    </span>
+
+                    <strong id="namaUser">
+                        Pemilik Usaha
+                    </strong>
+
+                </div>
+
+            </header>
+
+
+            <!-- DASHBOARD CARDS -->
+            <section class="dashboard-cards">
+
+                <div class="card">
+                    <p>Omzet Hari Ini</p>
+
+                    <h2 id="omzetHariIni">
+                        Rp0
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Jumlah Transaksi</p>
+
+                    <h2 id="jumlahTransaksi">
+                        0
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Porsi Terjual</p>
+
+                    <h2 id="porsiTerjual">
+                        0
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Estimasi Stok Tersisa</p>
+
+                    <h2 id="stokTersisa">
+                        100 Porsi
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Waste Hari Ini</p>
+
+                    <h2 id="wasteHariIni">
+                        0 Porsi
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Transaksi Batal</p>
+
+                    <h2 id="jumlahVoid">
+                        0
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Selisih Stok</p>
+
+                    <h2 id="selisihStok">
+                        0 Porsi
+                    </h2>
+                </div>
+
+
+                <div class="card">
+                    <p>Selisih Kas</p>
+
+                    <h2 id="selisihKas">
+                        Rp0
+                    </h2>
+                </div>
+
+            </section>
+
+
+            <!-- MONITORING STOK -->
+            <section class="dashboard-section">
+
+                <h2>
+                    Monitoring Stok
+                </h2>
+
+                <div class="stock-container">
+
+                    <div class="stock-box">
+
+                        <p>
+                            Stok Awal
+                        </p>
+
+                        <h3 id="stokAwal">
+                            100 Porsi
+                        </h3>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <p>
+                            Terjual
+                        </p>
+
+                        <h3 id="stokTerjual">
+                            0 Porsi
+                        </h3>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <p>
+                            Waste
+                        </p>
+
+                        <h3 id="stokWaste">
+                            0 Porsi
+                        </h3>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <p>
+                            Stok Sistem
+                        </p>
+
+                        <h3 id="stokSistem">
+                            100 Porsi
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="stockAlert"
+                    class="stock-alert"
+                >
+                    STOK AMAN
+                </div>
+
+            </section>
+
+
+            <!-- AKTIVITAS TERBARU -->
+            <section class="dashboard-section">
+
+                <h2>
+                    Aktivitas Terbaru
+                </h2>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Pegawai</th>
+                                <th>Aktivitas</th>
+                                <th>Detail</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="auditTable">
+
+                            <tr>
+                                <td>08:10</td>
+                                <td>Made</td>
+                                <td>Login</td>
+                                <td>Login ke SmartPOS</td>
+                            </tr>
+
+                            <tr>
+                                <td>09:15</td>
+                                <td>Made</td>
+                                <td>Transaksi</td>
+                                <td>TRX-001 Rp75.000</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="Dashboard.js"></script>
+
+</body>
+
+</html>
