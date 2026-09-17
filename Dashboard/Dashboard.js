@@ -546,5 +546,9 @@ function logout() {
         "../index.html";
 }
 
-
+window.addEventListener("storage", function (event) {
+    if (event.key === STORAGE_KEY) {
+        location.reload();
+    }
+});
 renderDashboard();
