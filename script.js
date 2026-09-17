@@ -28,45 +28,173 @@ const seedData = {
       status: "AKTIF"
     }
   ],
+menus: [
+    {
+        id: 1,
+        code: "M001",
+        name: "Nasi Babi Guling Biasa",
+        category: "Paket Nasi",
+        price: 25000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 2,
+        code: "M002",
+        name: "Nasi Babi Guling Komplit",
+        category: "Paket Nasi",
+        price: 40000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 3,
+        code: "M003",
+        name: "Nasi Babi Guling Spesial",
+        category: "Paket Nasi",
+        price: 50000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 4,
+        code: "M004",
+        name: "Nasi Ayam Betutu",
+        category: "Paket Nasi",
+        price: 20000,
+        portionUsage: 0,
+        status: "TERSEDIA"
+    },
 
-  menus: [
     {
-      id: 1,
-      code: "M001",
-      name: "Nasi Babi Campur",
-      category: "Makanan",
-      price: 25000,
-      portionUsage: 1,
-      status: "TERSEDIA"
+        id: 5,
+        code: "M005",
+        name: "Daging Guling",
+        category: "Daging & Lauk",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
     },
     {
-      id: 2,
-      code: "M002",
-      name: "Nasi Babi Spesial",
-      category: "Makanan",
-      price: 35000,
-      portionUsage: 1.5,
-      status: "TERSEDIA"
+        id: 6,
+        code: "M006",
+        name: "Kulit",
+        category: "Daging & Lauk",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
     },
     {
-      id: 3,
-      code: "M003",
-      name: "Tambahan Daging",
-      category: "Tambahan",
-      price: 15000,
-      portionUsage: 0.5,
-      status: "TERSEDIA"
+        id: 7,
+        code: "M007",
+        name: "Urutan",
+        category: "Daging & Lauk",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
     },
     {
-      id: 4,
-      code: "M004",
-      name: "Air Mineral",
-      category: "Minuman",
-      price: 5000,
-      portionUsage: 0,
-      status: "TERSEDIA"
+        id: 8,
+        code: "M008",
+        name: "Sate",
+        category: "Daging & Lauk",
+        price: 50000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+
+    {
+        id: 9,
+        code: "M009",
+        name: "Daging Merah",
+        category: "Gorengan",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 10,
+        code: "M010",
+        name: "Iga Goreng",
+        category: "Gorengan",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 11,
+        code: "M011",
+        name: "Dendeng Manis",
+        category: "Gorengan",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 12,
+        code: "M012",
+        name: "Usus Goreng",
+        category: "Gorengan",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 13,
+        code: "M013",
+        name: "Paru Goreng",
+        category: "Gorengan",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 14,
+        code: "M014",
+        name: "Ati Goreng",
+        category: "Gorengan",
+        price: 30000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+
+    {
+        id: 15,
+        code: "M015",
+        name: "Sup Balung",
+        category: "Sayur & Pendamping",
+        price: 15000,
+        portionUsage: 1,
+        status: "TERSEDIA"
+    },
+    {
+        id: 16,
+        code: "M016",
+        name: "Sayur Gonda",
+        category: "Sayur & Pendamping",
+        price: 15000,
+        portionUsage: 0,
+        status: "TERSEDIA"
+    },
+    {
+        id: 17,
+        code: "M017",
+        name: "Lawar",
+        category: "Sayur & Pendamping",
+        price: 15000,
+        portionUsage: 0,
+        status: "TERSEDIA"
+    },
+    {
+        id: 18,
+        code: "M018",
+        name: "Sate Lilit Ayam",
+        category: "Daging & Lauk",
+        price: 30000,
+        portionUsage: 0,
+        status: "TERSEDIA"
     }
-  ],
+],
 
   production: [
     {
