@@ -37,15 +37,22 @@
 
     <div class="app-container">
 
-        <!-- SIDEBAR -->
+        <!-- ================================
+             SIDEBAR
+        ================================= -->
+
         <aside class="sidebar">
 
             <div class="logo">
-                <h2>SmartPOS</h2>
+
+                <h2>
+                    SmartPOS
+                </h2>
 
                 <p>
                     Sales & Stock Control
                 </p>
+
             </div>
 
 
@@ -58,6 +65,7 @@
                     Dashboard
                 </a>
 
+
                 <a
                     href="index.html"
                     class="active"
@@ -65,21 +73,26 @@
                     Kasir / POS
                 </a>
 
+
                 <a href="../production/index.html">
                     Produksi & Stok
                 </a>
+
 
                 <a href="../menu/index.html">
                     Menu
                 </a>
 
+
                 <a href="../waste/index.html">
                     Waste
                 </a>
 
+
                 <a href="../stock-opname/index.html">
                     Stock Opname
                 </a>
+
 
                 <a href="../closing/index.html">
                     Closing
@@ -87,6 +100,8 @@
 
             </nav>
 
+
+            <!-- USER LOGIN -->
 
             <div class="sidebar-user">
 
@@ -101,6 +116,8 @@
             </div>
 
 
+            <!-- LOGOUT -->
+
             <button
                 class="logout-btn"
                 onclick="logout()"
@@ -111,10 +128,18 @@
         </aside>
 
 
-        <!-- CONTENT -->
+
+        <!-- ================================
+             MAIN CONTENT
+        ================================= -->
+
         <main class="main-content">
 
-            <!-- HEADER -->
+
+            <!-- ================================
+                 HEADER
+            ================================= -->
+
             <header class="page-header">
 
                 <div>
@@ -132,6 +157,9 @@
 
                 <div class="header-info">
 
+
+                    <!-- KASIR -->
+
                     <div>
 
                         <span>
@@ -144,6 +172,8 @@
 
                     </div>
 
+
+                    <!-- STOK -->
 
                     <div>
 
@@ -162,11 +192,20 @@
             </header>
 
 
-            <!-- POS -->
+
+            <!-- ================================
+                 POS AREA
+            ================================= -->
+
             <div class="pos-layout">
 
-                <!-- DAFTAR MENU -->
+
+                <!-- ================================
+                     DAFTAR MENU
+                ================================= -->
+
                 <section class="menu-section">
+
 
                     <div class="section-header">
 
@@ -183,6 +222,8 @@
                         </div>
 
 
+                        <!-- SEARCH MENU -->
+
                         <input
                             type="text"
                             id="searchMenu"
@@ -191,6 +232,8 @@
 
                     </div>
 
+
+                    <!-- MENU AKAN DIRENDER JS -->
 
                     <div
                         id="menuList"
@@ -201,8 +244,15 @@
                 </section>
 
 
-                <!-- KERANJANG -->
+
+                <!-- ================================
+                     KERANJANG / PESANAN
+                ================================= -->
+
                 <section class="cart-section">
+
+
+                    <!-- HEADER CART -->
 
                     <div class="cart-header">
 
@@ -218,6 +268,7 @@
 
                         </div>
 
+
                         <button
                             class="clear-btn"
                             id="clearCartBtn"
@@ -228,6 +279,9 @@
                     </div>
 
 
+
+                    <!-- LIST PESANAN -->
+
                     <div
                         id="cartList"
                         class="cart-list"
@@ -235,7 +289,15 @@
                     </div>
 
 
+
+                    <!-- ================================
+                         SUMMARY
+                    ================================= -->
+
                     <div class="cart-summary">
+
+
+                        <!-- TOTAL ITEM -->
 
                         <div class="summary-row">
 
@@ -250,6 +312,8 @@
                         </div>
 
 
+                        <!-- PENGGUNAAN STOK -->
+
                         <div class="summary-row">
 
                             <span>
@@ -262,6 +326,8 @@
 
                         </div>
 
+
+                        <!-- TOTAL -->
 
                         <div class="summary-row total-row">
 
@@ -278,11 +344,17 @@
                     </div>
 
 
+
+                    <!-- ================================
+                         PAYMENT
+                    ================================= -->
+
                     <div class="payment-section">
 
                         <label for="paymentMethod">
                             Metode Pembayaran
                         </label>
+
 
                         <select id="paymentMethod">
 
@@ -307,6 +379,9 @@
                     </div>
 
 
+
+                    <!-- SIMPAN TRANSAKSI -->
+
                     <button
                         id="processBtn"
                         class="process-btn"
@@ -314,6 +389,9 @@
                         Simpan Transaksi
                     </button>
 
+
+
+                    <!-- MESSAGE -->
 
                     <div
                         id="messageBox"
@@ -326,8 +404,13 @@
             </div>
 
 
-            <!-- RIWAYAT TRANSAKSI -->
+
+            <!-- ================================
+                 RIWAYAT TRANSAKSI
+            ================================= -->
+
             <section class="history-section">
+
 
                 <div class="section-header">
 
@@ -346,6 +429,9 @@
                 </div>
 
 
+
+                <!-- TABLE -->
+
                 <div class="table-container">
 
                     <table>
@@ -353,17 +439,45 @@
                         <thead>
 
                             <tr>
-                                <th>Kode</th>
-                                <th>Waktu</th>
-                                <th>Kasir</th>
-                                <th>Item</th>
-                                <th>Pembayaran</th>
-                                <th>Total</th>
-                                <th>Status</th>
+
+                                <th>
+                                    Kode
+                                </th>
+
+                                <th>
+                                    Waktu
+                                </th>
+
+                                <th>
+                                    Kasir
+                                </th>
+
+                                <th>
+                                    Item
+                                </th>
+
+                                <th>
+                                    Pembayaran
+                                </th>
+
+                                <th>
+                                    Total
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Aksi
+                                </th>
+
                             </tr>
 
                         </thead>
 
+
+                        <!-- DATA DARI JAVASCRIPT -->
 
                         <tbody id="transactionTable">
                         </tbody>
@@ -378,6 +492,11 @@
 
     </div>
 
+
+
+    <!-- ================================
+         JAVASCRIPT
+    ================================= -->
 
     <script src="pos.js"></script>
 

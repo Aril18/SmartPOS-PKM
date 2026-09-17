@@ -1,19 +1,35 @@
 const STORAGE_KEY = "umkmControlDataV1";
 const SESSION_KEY = "umkmControlSessionV1";
 
+
+/* =========================================
+   SESSION USER
+========================================= */
+
 const currentUser =
     JSON.parse(
         localStorage.getItem(SESSION_KEY) || "null"
     );
 
+
+/* =========================================
+   CEK LOGIN
+========================================= */
+
 if (!currentUser) {
     window.location.href = "../index.html";
 }
+
+
+/* =========================================
+   AMBIL DATABASE
+========================================= */
 
 const db =
     JSON.parse(
         localStorage.getItem(STORAGE_KEY) || "{}"
     );
+
 
 db.users = db.users || [];
 db.menus = db.menus || [];
@@ -24,7 +40,17 @@ db.stockOpnames = db.stockOpnames || [];
 db.closings = db.closings || [];
 db.auditLogs = db.auditLogs || [];
 
+
+/* =========================================
+   CART
+========================================= */
+
 let cart = [];
+
+
+/* =========================================
+   SAVE DATABASE
+========================================= */
 
 function saveDB() {
     localStorage.setItem(
@@ -33,23 +59,38 @@ function saveDB() {
     );
 }
 
+
+/* =========================================
+   TANGGAL HARI INI
+========================================= */
+
 function todayISO() {
+
     const now = new Date();
 
-    const year = now.getFullYear();
+    const year =
+        now.getFullYear();
 
     const month =
-        String(now.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
 
     const day =
-        String(now.getDate())
-            .padStart(2, "0");
+        String(
+            now.getDate()
+        ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
 }
 
+
+/* =========================================
+   FORMAT RUPIAH
+========================================= */
+
 function formatRupiah(value) {
+
     return new Intl.NumberFormat(
         "id-ID",
         {
@@ -57,11 +98,20 @@ function formatRupiah(value) {
             currency: "IDR",
             minimumFractionDigits: 0
         }
-    ).format(Number(value || 0));
+    ).format(
+        Number(value || 0)
+    );
 }
 
+
+/* =========================================
+   FORMAT PORSI
+========================================= */
+
 function formatPortion(value) {
-    const number = Number(value || 0);
+
+    const number =
+        Number(value || 0);
 
     if (Number.isInteger(number)) {
         return number;
@@ -70,124 +120,262 @@ function formatPortion(value) {
     return number.toFixed(1);
 }
 
+
+/* =========================================
+   GET MENU
+========================================= */
+
 function getMenu(menuId) {
+
     return db.menus.find(
         menu =>
-            Number(menu.id) === Number(menuId)
+            Number(menu.id) ===
+            Number(menuId)
     );
 }
+
+
+/* =========================================
+   GET USER
+========================================= */
 
 function getUser(userId) {
+
     return db.users.find(
         user =>
-            Number(user.id) === Number(userId)
+            Number(user.id) ===
+            Number(userId)
     );
 }
 
-function addAudit(action, description) {
+
+/* =========================================
+   AUDIT LOG
+========================================= */
+
+function addAudit(
+    action,
+    description
+) {
+
     db.auditLogs.push({
+
         id: Date.now(),
-        userId: currentUser.id,
-        action: action,
-        description: description,
-        createdAt: new Date().toISOString()
+
+        userId:
+            currentUser.id,
+
+        action:
+            action,
+
+        description:
+            description,
+
+        createdAt:
+            new Date().toISOString()
+
     });
 
     saveDB();
 }
 
+
+/* =========================================
+   PRODUKSI HARI INI
+========================================= */
+
 function productionToday() {
-    const today = todayISO();
+
+    const today =
+        todayISO();
 
     return db.production.filter(
-        item => item.date === today
+        item =>
+            item.date === today
     );
 }
+
+
+/* =========================================
+   STOK AWAL
+========================================= */
 
 function initialStockToday() {
+
     return productionToday().reduce(
+
         (total, item) =>
             total +
-            Number(item.estimatedPortion || 0),
+            Number(
+                item.estimatedPortion || 0
+            ),
+
         0
+
     );
 }
+
+
+/* =========================================
+   TRANSAKSI VALID HARI INI
+========================================= */
 
 function validTransactionsToday() {
-    const today = todayISO();
+
+    const today =
+        todayISO();
 
     return db.transactions.filter(
+
         transaction =>
-            transaction.date === today &&
+            transaction.date === today
+            &&
             transaction.status !== "VOID"
+
     );
 }
 
+
+/* =========================================
+   PORSI TERJUAL
+========================================= */
+
 function soldPortionsToday() {
+
     return validTransactionsToday().reduce(
+
         (total, transaction) => {
+
             const items =
                 transaction.items || [];
 
+
             const portions =
                 items.reduce(
-                    (subtotal, item) => {
+
+                    (
+                        subtotal,
+                        item
+                    ) => {
+
                         const menu =
-                            getMenu(item.menuId);
+                            getMenu(
+                                item.menuId
+                            );
+
 
                         const portionUsage =
                             Number(
-                                item.portionUsageAtSale ??
-                                menu?.portionUsage ??
+
+                                item.portionUsageAtSale
+                                ??
+                                menu?.portionUsage
+                                ??
                                 0
+
                             );
 
+
                         return (
-                            subtotal +
+                            subtotal
+                            +
                             (
-                                Number(item.quantity || 0) *
+                                Number(
+                                    item.quantity || 0
+                                )
+                                *
                                 portionUsage
                             )
                         );
+
                     },
+
                     0
+
                 );
 
+
             return total + portions;
+
         },
+
         0
+
     );
 }
 
+
+/* =========================================
+   WASTE HARI INI
+========================================= */
+
 function wastePortionsToday() {
-    const today = todayISO();
+
+    const today =
+        todayISO();
+
 
     return db.waste
-        .filter(item => {
-            if (item.date) {
-                return item.date === today;
-            }
 
-            if (item.createdAt) {
-                return (
-                    item.createdAt.substring(0, 10) === today
-                );
-            }
+        .filter(
+            item => {
 
-            return false;
-        })
+                if (item.date) {
+
+                    return (
+                        item.date === today
+                    );
+
+                }
+
+
+                if (item.createdAt) {
+
+                    return (
+                        item.createdAt
+                            .substring(
+                                0,
+                                10
+                            )
+                        === today
+                    );
+
+                }
+
+
+                return false;
+
+            }
+        )
+
         .reduce(
+
             (total, item) =>
-                total +
+
+                total
+                +
                 (
-                    Number(item.quantity || 0) *
-                    Number(item.portionUsage ?? 1)
+                    Number(
+                        item.quantity || 0
+                    )
+                    *
+                    Number(
+                        item.portionUsage ?? 1
+                    )
                 ),
+
             0
+
         );
 }
 
+
+/* =========================================
+   STOK SISTEM
+========================================= */
+
 function expectedStockToday() {
+
     return (
         initialStockToday()
         -
@@ -197,316 +385,555 @@ function expectedStockToday() {
     );
 }
 
+
+/* =========================================
+   MENU TERSEDIA
+========================================= */
+
 function availableMenus() {
+
     return db.menus.filter(
         menu =>
             menu.status === "TERSEDIA"
     );
 }
 
+
+/* =========================================
+   RENDER USER
+========================================= */
+
 function renderUser() {
+
     document
-        .getElementById("namaKasir")
+        .getElementById(
+            "namaKasir"
+        )
         .textContent =
         currentUser.name;
 
+
     document
-        .getElementById("sidebarUser")
+        .getElementById(
+            "sidebarUser"
+        )
         .textContent =
         currentUser.name;
+
 
     const dashboardLink =
         document.getElementById(
             "dashboardLink"
         );
 
+
     if (
+        dashboardLink &&
         currentUser.role !== "OWNER"
     ) {
+
         dashboardLink.style.display =
             "none";
+
     }
 }
 
+
+/* =========================================
+   RENDER STOK
+========================================= */
+
 function renderStock() {
+
     const stock =
         expectedStockToday();
 
+
     document
-        .getElementById("stokSistem")
+        .getElementById(
+            "stokSistem"
+        )
         .textContent =
         `${formatPortion(stock)} Porsi`;
 }
 
-function renderMenu(keyword = "") {
+
+/* =========================================
+   RENDER MENU
+========================================= */
+
+function renderMenu(
+    keyword = ""
+) {
+
     const menuList =
         document.getElementById(
             "menuList"
         );
 
+
     menuList.innerHTML = "";
+
 
     const filteredMenus =
         availableMenus().filter(
+
             menu =>
+
                 menu.name
                     .toLowerCase()
                     .includes(
                         keyword.toLowerCase()
                     )
+
                 ||
+
                 menu.category
                     .toLowerCase()
                     .includes(
                         keyword.toLowerCase()
                     )
+
         );
+
 
     if (
         filteredMenus.length === 0
     ) {
-        menuList.innerHTML =
-            "<p>Menu tidak ditemukan.</p>";
+
+        menuList.innerHTML = `
+            <p>
+                Menu tidak ditemukan.
+            </p>
+        `;
 
         return;
     }
 
-    filteredMenus.forEach(menu => {
-        const card =
-            document.createElement("div");
 
-        card.className =
-            "menu-card";
+    filteredMenus.forEach(
+        menu => {
 
-        card.innerHTML = `
-            <div class="menu-category">
-                ${menu.category}
-            </div>
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-            <div class="menu-name">
-                ${menu.name}
-            </div>
 
-            <div class="menu-price">
-                ${formatRupiah(menu.price)}
-            </div>
+            card.className =
+                "menu-card";
 
-            <div class="menu-portion">
-                Penggunaan stok:
-                ${formatPortion(menu.portionUsage)}
-                porsi
-            </div>
-        `;
 
-        card.addEventListener(
-            "click",
-            () => addToCart(menu.id)
-        );
+            card.innerHTML = `
 
-        menuList.appendChild(card);
-    });
+                <div class="menu-category">
+                    ${menu.category}
+                </div>
+
+
+                <div class="menu-name">
+                    ${menu.name}
+                </div>
+
+
+                <div class="menu-price">
+                    ${formatRupiah(
+                        menu.price
+                    )}
+                </div>
+
+
+                <div class="menu-portion">
+                    Penggunaan stok:
+                    ${formatPortion(
+                        menu.portionUsage
+                    )}
+                    porsi
+                </div>
+
+            `;
+
+
+            card.addEventListener(
+                "click",
+                () => {
+
+                    addToCart(
+                        menu.id
+                    );
+
+                }
+            );
+
+
+            menuList.appendChild(
+                card
+            );
+
+        }
+    );
 }
 
-function addToCart(menuId) {
+
+/* =========================================
+   ADD TO CART
+========================================= */
+
+function addToCart(
+    menuId
+) {
+
     const menu =
         getMenu(menuId);
 
-    if (!menu) return;
+
+    if (!menu) {
+        return;
+    }
+
 
     const existing =
         cart.find(
+
             item =>
                 Number(item.menuId)
                 ===
                 Number(menuId)
+
         );
 
+
     if (existing) {
+
         existing.quantity++;
-    } else {
-        cart.push({
-            menuId: menu.id,
-            name: menu.name,
-            price: Number(menu.price),
-            quantity: 1,
-            portionUsage:
-                Number(menu.portionUsage || 0)
-        });
+
     }
+
+    else {
+
+        cart.push({
+
+            menuId:
+                menu.id,
+
+            name:
+                menu.name,
+
+            price:
+                Number(
+                    menu.price
+                ),
+
+            quantity:
+                1,
+
+            portionUsage:
+                Number(
+                    menu.portionUsage || 0
+                )
+
+        });
+
+    }
+
 
     renderCart();
 }
+
+
+/* =========================================
+   CHANGE QUANTITY
+========================================= */
 
 function changeQuantity(
     menuId,
     change
 ) {
+
     const item =
         cart.find(
+
             item =>
                 Number(item.menuId)
                 ===
                 Number(menuId)
+
         );
 
-    if (!item) return;
+
+    if (!item) {
+        return;
+    }
+
 
     item.quantity += change;
 
-    if (item.quantity <= 0) {
+
+    if (
+        item.quantity <= 0
+    ) {
+
         cart =
             cart.filter(
+
                 cartItem =>
-                    Number(cartItem.menuId)
+                    Number(
+                        cartItem.menuId
+                    )
                     !==
                     Number(menuId)
+
             );
+
     }
+
 
     renderCart();
 }
 
+
+/* =========================================
+   CART TOTAL
+========================================= */
+
 function cartTotal() {
+
     return cart.reduce(
+
         (total, item) =>
             total +
             (
-                Number(item.price) *
+                Number(item.price)
+                *
                 Number(item.quantity)
             ),
+
         0
+
     );
 }
+
+
+/* =========================================
+   TOTAL ITEM
+========================================= */
 
 function cartItemCount() {
+
     return cart.reduce(
+
         (total, item) =>
             total +
-            Number(item.quantity),
+            Number(
+                item.quantity
+            ),
+
         0
+
     );
 }
 
+
+/* =========================================
+   PENGGUNAAN PORSI CART
+========================================= */
+
 function cartPortionUsage() {
+
     return cart.reduce(
+
         (total, item) =>
             total +
             (
-                Number(item.quantity) *
-                Number(item.portionUsage)
+                Number(
+                    item.quantity
+                )
+                *
+                Number(
+                    item.portionUsage
+                )
             ),
+
         0
+
     );
 }
 
+
+/* =========================================
+   RENDER CART
+========================================= */
+
 function renderCart() {
+
     const cartList =
         document.getElementById(
             "cartList"
         );
 
+
     cartList.innerHTML = "";
 
-    if (cart.length === 0) {
+
+    if (
+        cart.length === 0
+    ) {
+
         cartList.innerHTML = `
+
             <div class="empty-cart">
                 Belum ada menu dipilih.
             </div>
+
         `;
-    } else {
-        cart.forEach(item => {
-            const cartItem =
-                document.createElement(
-                    "div"
-                );
 
-            cartItem.className =
-                "cart-item";
-
-            cartItem.innerHTML = `
-                <div class="cart-item-top">
-                    <div>
-                        <div class="cart-item-name">
-                            ${item.name}
-                        </div>
-
-                        <div class="cart-item-price">
-                            ${formatRupiah(item.price)}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="cart-item-bottom">
-
-                    <div class="quantity-control">
-
-                        <button
-                            onclick="changeQuantity(${item.menuId}, -1)"
-                        >
-                            -
-                        </button>
-
-                        <div class="quantity-number">
-                            ${item.quantity}
-                        </div>
-
-                        <button
-                            onclick="changeQuantity(${item.menuId}, 1)"
-                        >
-                            +
-                        </button>
-
-                    </div>
-
-                    <div class="item-subtotal">
-                        ${formatRupiah(
-                            item.price *
-                            item.quantity
-                        )}
-                    </div>
-
-                </div>
-            `;
-
-            cartList.appendChild(
-                cartItem
-            );
-        });
     }
 
+    else {
+
+        cart.forEach(
+            item => {
+
+                const cartItem =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                cartItem.className =
+                    "cart-item";
+
+
+                cartItem.innerHTML = `
+
+                    <div class="cart-item-top">
+
+                        <div>
+
+                            <div class="cart-item-name">
+                                ${item.name}
+                            </div>
+
+
+                            <div class="cart-item-price">
+                                ${formatRupiah(
+                                    item.price
+                                )}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="cart-item-bottom">
+
+                        <div class="quantity-control">
+
+                            <button
+                                onclick="changeQuantity(
+                                    ${item.menuId},
+                                    -1
+                                )"
+                            >
+                                -
+                            </button>
+
+
+                            <div class="quantity-number">
+                                ${item.quantity}
+                            </div>
+
+
+                            <button
+                                onclick="changeQuantity(
+                                    ${item.menuId},
+                                    1
+                                )"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+
+                        <div class="item-subtotal">
+
+                            ${formatRupiah(
+                                item.price
+                                *
+                                item.quantity
+                            )}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                cartList.appendChild(
+                    cartItem
+                );
+
+            }
+        );
+
+    }
+
+
     document
-        .getElementById("totalItem")
+        .getElementById(
+            "totalItem"
+        )
         .textContent =
         cartItemCount();
 
+
     document
-        .getElementById("totalPortion")
+        .getElementById(
+            "totalPortion"
+        )
         .textContent =
         `${formatPortion(
             cartPortionUsage()
         )} Porsi`;
 
+
     document
-        .getElementById("grandTotal")
+        .getElementById(
+            "grandTotal"
+        )
         .textContent =
         formatRupiah(
             cartTotal()
         );
 }
 
+
+/* =========================================
+   GENERATE TRANSACTION CODE
+========================================= */
+
 function generateTransactionCode() {
-    const date =
-        todayISO().replaceAll(
-            "-",
-            ""
-        );
+
+    const today =
+        todayISO()
+            .replaceAll(
+                "-",
+                ""
+            );
+
 
     const transactionsToday =
         db.transactions.filter(
+
             transaction =>
                 transaction.date ===
                 todayISO()
+
         );
+
 
     const number =
         String(
@@ -516,27 +943,40 @@ function generateTransactionCode() {
             "0"
         );
 
+
     return (
-        `TRX-${date}-${number}`
+        `TRX-${today}-${number}`
     );
 }
+
+
+/* =========================================
+   MESSAGE
+========================================= */
 
 function showMessage(
     message,
     type = "success"
 ) {
+
     const box =
         document.getElementById(
             "messageBox"
         );
 
+
     box.style.display =
         "block";
+
 
     box.textContent =
         message;
 
-    if (type === "success") {
+
+    if (
+        type === "success"
+    ) {
+
         box.style.background =
             "#dcfce7";
 
@@ -545,7 +985,11 @@ function showMessage(
 
         box.style.border =
             "1px solid #bbf7d0";
-    } else {
+
+    }
+
+    else {
+
         box.style.background =
             "#fee2e2";
 
@@ -554,19 +998,34 @@ function showMessage(
 
         box.style.border =
             "1px solid #fecaca";
+
     }
+
 
     setTimeout(
         () => {
+
             box.style.display =
                 "none";
+
         },
+
         4000
+
     );
 }
 
+
+/* =========================================
+   SIMPAN TRANSAKSI
+========================================= */
+
 function processTransaction() {
-    if (cart.length === 0) {
+
+    if (
+        cart.length === 0
+    ) {
+
         showMessage(
             "Belum ada menu dalam pesanan.",
             "error"
@@ -575,25 +1034,34 @@ function processTransaction() {
         return;
     }
 
+
     const stock =
         expectedStockToday();
+
 
     const requiredPortion =
         cartPortionUsage();
 
+
     if (
         requiredPortion > stock
     ) {
+
         showMessage(
+
             `Stok tidak cukup. Stok tersedia ${formatPortion(stock)} porsi.`,
+
             "error"
+
         );
 
         return;
     }
 
+
     const transactionCode =
         generateTransactionCode();
+
 
     const paymentMethod =
         document
@@ -602,8 +1070,11 @@ function processTransaction() {
             )
             .value;
 
+
     const transaction = {
-        id: Date.now(),
+
+        id:
+            Date.now(),
 
         transactionCode:
             transactionCode,
@@ -615,7 +1086,8 @@ function processTransaction() {
             todayISO(),
 
         createdAt:
-            new Date().toISOString(),
+            new Date()
+                .toISOString(),
 
         paymentMethod:
             paymentMethod,
@@ -629,6 +1101,7 @@ function processTransaction() {
         items:
             cart.map(
                 item => ({
+
                     menuId:
                         item.menuId,
 
@@ -642,38 +1115,56 @@ function processTransaction() {
                         item.price,
 
                     subtotal:
-                        item.price *
+                        item.price
+                        *
                         item.quantity,
 
                     portionUsageAtSale:
                         item.portionUsage
+
                 })
             )
+
     };
+
 
     db.transactions.push(
         transaction
     );
 
+
     saveDB();
 
+
     addAudit(
+
         "CREATE_TRANSACTION",
+
         `${transactionCode} ${formatRupiah(
             transaction.total
         )}`
+
     );
 
+
     showMessage(
+
         `${transactionCode} berhasil disimpan.`,
+
         "success"
+
     );
+
 
     cart = [];
 
+
     renderCart();
+
     renderStock();
+
     renderTransactions();
+
 
     document
         .getElementById(
@@ -683,15 +1174,30 @@ function processTransaction() {
         generateTransactionCode();
 }
 
+
+/* =========================================
+   TRANSAKSI HARI INI
+========================================= */
+
 function transactionsToday() {
+
     return db.transactions
+
         .filter(
+
             transaction =>
                 transaction.date ===
                 todayISO()
+
         )
+
         .sort(
-            (a, b) =>
+
+            (
+                a,
+                b
+            ) =>
+
                 new Date(
                     b.createdAt || 0
                 )
@@ -699,70 +1205,105 @@ function transactionsToday() {
                 new Date(
                     a.createdAt || 0
                 )
+
         );
 }
 
+
+/* =========================================
+   RENDER TRANSAKSI
+========================================= */
+
 function renderTransactions() {
+
     const table =
         document.getElementById(
             "transactionTable"
         );
 
+
     table.innerHTML = "";
+
 
     const transactions =
         transactionsToday();
 
+
     if (
         transactions.length === 0
     ) {
+
         table.innerHTML = `
+
             <tr>
+
                 <td
-                    colspan="7"
+                    colspan="8"
                     style="
                         text-align:center;
                         color:#9ca3af;
                     "
                 >
+
                     Belum ada transaksi hari ini.
+
                 </td>
+
             </tr>
+
         `;
 
         return;
     }
 
+
     transactions.forEach(
         transaction => {
+
             const cashier =
                 getUser(
                     transaction.cashierId
                 );
 
+
             const itemCount =
                 (
                     transaction.items || []
-                ).reduce(
-                    (total, item) =>
-                        total +
+                )
+                .reduce(
+
+                    (
+                        total,
+                        item
+                    ) =>
+
+                        total
+                        +
                         Number(
                             item.quantity || 0
                         ),
+
                     0
+
                 );
 
-            let time = "-";
+
+            let time =
+                "-";
+
 
             if (
                 transaction.createdAt
             ) {
+
                 time =
                     new Date(
                         transaction.createdAt
                     )
                     .toLocaleTimeString(
+
                         "id-ID",
+
                         {
                             hour:
                                 "2-digit",
@@ -770,23 +1311,65 @@ function renderTransactions() {
                             minute:
                                 "2-digit"
                         }
+
                     );
+
             }
+
 
             const statusClass =
                 transaction.status ===
                 "VOID"
+
                     ?
                     "status-void"
+
                     :
                     "status-success";
+
+
+            /* =================================
+               TOMBOL VOID
+            ================================= */
+
+            let actionButton = "";
+
+
+            if (
+                transaction.status ===
+                "VOID"
+            ) {
+
+                actionButton = `
+                    <span class="void-info">
+                        Dibatalkan
+                    </span>
+                `;
+
+            }
+
+            else {
+
+                actionButton = `
+                    <button
+                        class="void-btn"
+                        onclick="voidTransaction(${transaction.id})"
+                    >
+                        Batalkan
+                    </button>
+                `;
+
+            }
+
 
             const row =
                 document.createElement(
                     "tr"
                 );
 
+
             row.innerHTML = `
+
                 <td>
                     ${transaction.transactionCode}
                 </td>
@@ -808,87 +1391,358 @@ function renderTransactions() {
                 </td>
 
                 <td>
-                    ${formatRupiah(transaction.total)}
+                    ${formatRupiah(
+                        transaction.total
+                    )}
                 </td>
 
                 <td>
+
                     <span class="${statusClass}">
                         ${transaction.status}
                     </span>
+
                 </td>
+
+                <td>
+                    ${actionButton}
+                </td>
+
             `;
+
 
             table.appendChild(
                 row
             );
+
         }
     );
 }
 
-function clearCart() {
-    if (cart.length === 0) {
+
+/* =========================================
+   VOID TRANSACTION
+========================================= */
+
+function voidTransaction(
+    transactionId
+) {
+
+    const transaction =
+        db.transactions.find(
+            item =>
+                Number(item.id) ===
+                Number(transactionId)
+        );
+
+
+    if (!transaction) {
+
+        showMessage(
+            "Transaksi tidak ditemukan.",
+            "error"
+        );
+
         return;
     }
+
+
+    if (
+        transaction.status ===
+        "VOID"
+    ) {
+
+        showMessage(
+            "Transaksi ini sudah dibatalkan.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const choice =
+        prompt(
+`Pilih alasan pembatalan:
+
+1. Salah input menu
+2. Salah jumlah
+3. Pelanggan membatalkan
+4. Kesalahan pembayaran
+5. Lainnya
+
+Masukkan angka 1 - 5:`
+        );
+
+
+    if (
+        choice === null
+    ) {
+
+        return;
+    }
+
+
+    const reasons = {
+
+        "1":
+            "Salah input menu",
+
+        "2":
+            "Salah jumlah",
+
+        "3":
+            "Pelanggan membatalkan",
+
+        "4":
+            "Kesalahan pembayaran",
+
+        "5":
+            "Lainnya"
+
+    };
+
+
+    let reason =
+        reasons[choice];
+
+
+    if (!reason) {
+
+        showMessage(
+            "Pilihan alasan tidak valid.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (
+        choice === "5"
+    ) {
+
+        const customReason =
+            prompt(
+                "Tuliskan alasan pembatalan:"
+            );
+
+
+        if (
+            !customReason ||
+            customReason.trim() === ""
+        ) {
+
+            showMessage(
+                "Alasan pembatalan wajib diisi.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        reason =
+            customReason.trim();
+    }
+
+
+    const confirmed =
+        confirm(
+            `Batalkan transaksi ${transaction.transactionCode}?\n\nAlasan: ${reason}`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    transaction.status =
+        "VOID";
+
+
+    transaction.voidReason =
+        reason;
+
+
+    transaction.voidedAt =
+        new Date()
+            .toISOString();
+
+
+    transaction.voidedBy =
+        currentUser.id;
+
+
+    saveDB();
+
+
+    addAudit(
+
+        "VOID_TRANSACTION",
+
+        `${transaction.transactionCode} dibatalkan - ${reason}`
+
+    );
+
+
+    showMessage(
+
+        `${transaction.transactionCode} berhasil dibatalkan.`,
+
+        "success"
+
+    );
+
+
+    renderTransactions();
+
+    renderStock();
+}
+
+
+/* =========================================
+   CLEAR CART
+========================================= */
+
+function clearCart() {
+
+    if (
+        cart.length === 0
+    ) {
+
+        return;
+    }
+
 
     const confirmed =
         confirm(
             "Kosongkan semua pesanan?"
         );
 
+
     if (!confirmed) {
+
         return;
     }
 
+
     cart = [];
+
 
     renderCart();
 }
 
+
+/* =========================================
+   LOGOUT
+========================================= */
+
 function logout() {
+
     localStorage.removeItem(
         SESSION_KEY
     );
 
+
     window.location.href =
         "../index.html";
 }
+
+
+/* =========================================
+   EVENT SEARCH
+========================================= */
 
 document
     .getElementById(
         "searchMenu"
     )
     .addEventListener(
+
         "input",
+
         function () {
+
             renderMenu(
                 this.value
             );
+
         }
+
     );
+
+
+/* =========================================
+   EVENT CLEAR CART
+========================================= */
 
 document
     .getElementById(
         "clearCartBtn"
     )
     .addEventListener(
+
         "click",
+
         clearCart
+
     );
+
+
+/* =========================================
+   EVENT PROCESS
+========================================= */
 
 document
     .getElementById(
         "processBtn"
     )
     .addEventListener(
+
         "click",
+
         processTransaction
+
     );
 
+
+/* =========================================
+   UPDATE JIKA LOCAL STORAGE BERUBAH
+========================================= */
+
+window.addEventListener(
+    "storage",
+    function (event) {
+
+        if (
+            event.key === STORAGE_KEY
+        ) {
+
+            location.reload();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   INITIAL RENDER
+========================================= */
+
 renderUser();
+
 renderStock();
+
 renderMenu();
+
 renderCart();
+
 renderTransactions();
+
 
 document
     .getElementById(

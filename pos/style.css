@@ -782,4 +782,36 @@ td {
     .section-header input {
         width: 100%;
     }
+    /* ================================
+   VOID TRANSACTION
+================================ */
+
+.void-btn {
+    border: 1px solid #fecaca;
+    background: #fff1f2;
+    color: #dc2626;
+
+    padding: 7px 10px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    transition: 0.2s;
+}
+
+.void-btn:hover {
+    background: #fee2e2;
+}
+
+.void-info {
+    color: #9ca3af;
+
+    font-size: 10px;
+}
 }
