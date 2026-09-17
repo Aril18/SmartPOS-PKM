@@ -37,95 +37,11 @@
 
     <div class="app-container">
 
-        <!-- ================================
-             SIDEBAR
-        ================================= -->
-
-        <aside class="sidebar">
-
-            <div class="logo">
-
-                <h2>
-                    SmartPOS
-                </h2>
-
-                <p>
-                    Sales & Stock Control
-                </p>
-
-            </div>
-
-
-            <nav>
-
-                <a
-                    href="../Dashboard/index.html"
-                    id="dashboardLink"
-                >
-                    Dashboard
-                </a>
-
-
-                <a
-                    href="index.html"
-                    class="active"
-                >
-                    Kasir / POS
-                </a>
-
-
-                <a href="../production/index.html">
-                    Produksi & Stok
-                </a>
-
-
-                <a href="../menu/index.html">
-                    Menu
-                </a>
-
-
-                <a href="../waste/index.html">
-                    Waste
-                </a>
-
-
-                <a href="../stock-opname/index.html">
-                    Stock Opname
-                </a>
-
-
-                <a href="../closing/index.html">
-                    Closing
-                </a>
-
-            </nav>
-
-
-            <!-- USER LOGIN -->
-
-            <div class="sidebar-user">
-
-                <span>
-                    Login sebagai
-                </span>
-
-                <strong id="sidebarUser">
-                    -
-                </strong>
-
-            </div>
-
-
-            <!-- LOGOUT -->
-
-            <button
-                class="logout-btn"
-                onclick="logout()"
-            >
-                Logout
-            </button>
-
-        </aside>
+     <aside
+    class="sidebar"
+    id="appSidebar"
+>
+</aside>
 
 
 
@@ -540,7 +456,11 @@
          JAVASCRIPT
     ================================= -->
 
-    <script src="pos.js"></script>
+    <script src="../shared/database.js"></script>
+
+<script src="../shared/sidebar.js"></script>
+
+<script src="pos.js"></script>
 
 </body>
 

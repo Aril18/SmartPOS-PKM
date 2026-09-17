@@ -398,12 +398,9 @@ function availableMenus() {
     );
 
 }
-
-
 /* =========================================
-   RENDER USER
+   RENDER USER & ROLE ACCESS
 ========================================= */
-
 function renderUser() {
 
     document
@@ -422,19 +419,35 @@ function renderUser() {
         currentUser.name;
 
 
-    const dashboardLink =
-        document.getElementById(
-            "dashboardLink"
+    const ownerOnlyMenus =
+        document.querySelectorAll(
+            ".owner-only"
         );
 
 
     if (
-        dashboardLink &&
-        currentUser.role !== "OWNER"
+        currentUser.role === "KASIR"
     ) {
 
-        dashboardLink.style.display =
-            "none";
+        ownerOnlyMenus.forEach(
+            menu => {
+
+                menu.style.display =
+                    "none";
+
+            }
+        );
+
+    } else {
+
+        ownerOnlyMenus.forEach(
+            menu => {
+
+                menu.style.display =
+                    "";
+
+            }
+        );
 
     }
 
@@ -1776,13 +1789,57 @@ window.addEventListener(
 
     }
 );
+/* =========================================
+   ROLE BASED SIDEBAR
+========================================= */
 
+function applyRoleNavigation() {
+
+    const role =
+        String(
+            currentUser?.role || ""
+        ).toUpperCase();
+
+
+    const ownerOnlyMenus =
+        document.querySelectorAll(
+            ".owner-only"
+        );
+
+
+    ownerOnlyMenus.forEach(
+        menu => {
+
+            if (
+                role === "OWNER"
+            ) {
+
+                menu.style.removeProperty(
+                    "display"
+                );
+
+            } else {
+
+                menu.style.setProperty(
+                    "display",
+                    "none",
+                    "important"
+                );
+
+            }
+
+        }
+    );
+
+}
 
 /* =========================================
    INITIAL RENDER
 ========================================= */
 
 renderUser();
+
+applyRoleNavigation();
 
 renderStock();
 
