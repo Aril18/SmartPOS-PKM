@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Closing - SmartPOS</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="./style.css"
+    >
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+
+                <h2>SmartPOS</h2>
+
+                <p>
+                    Sales & Stock Control
+                </p>
+
+            </div>
+
+
+            <nav>
+
+                <a
+                    href="../Dashboard/index.html"
+                    class="owner-only"
+                >
+                    Dashboard
+                </a>
+
+                <a href="../pos/index.html">
+                    Kasir / POS
+                </a>
+
+                <a
+                    href="../production/index.html"
+                    class="owner-only"
+                >
+                    Produksi & Stok
+                </a>
+
+                <a
+                    href="../menu/index.html"
+                    class="owner-only"
+                >
+                    Menu
+                </a>
+
+                <a href="../waste/index.html">
+                    Waste
+                </a>
+
+                <a
+                    href="../stock-opname/index.html"
+                    class="owner-only"
+                >
+                    Stock Opname
+                </a>
+
+                <a
+                    href="index.html"
+                    class="active"
+                >
+                    Closing
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-user">
+
+                <span>
+                    Login sebagai
+                </span>
+
+                <strong id="sidebarUser">
+                    -
+                </strong>
+
+            </div>
+
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+
+        <!-- MAIN CONTENT -->
+
+        <main class="main-content">
+
+
+            <!-- HEADER -->
+
+            <header class="page-header">
+
+                <div>
+
+                    <h1>
+                        Closing Kasir
+                    </h1>
+
+                    <p>
+                        Rekonsiliasi penjualan dan kas fisik
+                    </p>
+
+                </div>
+
+
+                <div class="header-info">
+
+                    <div>
+
+                        <span>
+                            Kasir
+                        </span>
+
+                        <strong id="namaUser">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Tanggal
+                        </span>
+
+                        <strong id="tanggalHariIni">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- SUMMARY -->
+
+            <section class="summary-grid">
+
+                <div class="summary-card">
+
+                    <p>
+                        Penjualan Tunai
+                    </p>
+
+                    <h2 id="cashSales">
+                        Rp0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Penjualan Non Tunai
+                    </p>
+
+                    <h2 id="nonCashSales">
+                        Rp0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Transaksi Valid
+                    </p>
+
+                    <h2 id="transactionCount">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Transaksi VOID
+                    </p>
+
+                    <h2 id="voidCount">
+                        0
+                    </h2>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- CLOSING FORM -->
+
+            <section class="content-card">
+
+                <div class="section-title">
+
+                    <div>
+
+                        <h2>
+                            Rekonsiliasi Kas
+                        </h2>
+
+                        <p>
+                            Masukkan jumlah uang tunai fisik yang terdapat di kas
+                        </p>
+
+                    </div>
+
+                    <span
+                        id="closingStatusBadge"
+                        class="status-badge open"
+                    >
+                        Belum Closing
+                    </span>
+
+                </div>
+
+
+                <div class="cash-comparison">
+
+                    <div class="cash-box">
+
+                        <span>
+                            Kas Menurut Sistem
+                        </span>
+
+                        <strong id="systemCash">
+                            Rp0
+                        </strong>
+
+                        <small>
+                            Berdasarkan transaksi tunai kasir
+                        </small>
+
+                    </div>
+
+
+                    <div class="comparison-symbol">
+                        VS
+                    </div>
+
+
+                    <div class="cash-box">
+
+                        <span>
+                            Kas Fisik
+                        </span>
+
+                        <strong id="physicalCashPreview">
+                            Rp0
+                        </strong>
+
+                        <small>
+                            Berdasarkan hasil hitung uang kas
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    id="closingForm"
+                    class="closing-form"
+                >
+
+                    <div class="form-group">
+
+                        <label for="physicalCash">
+                            Kas Fisik
+                        </label>
+
+                        <input
+                            type="number"
+                            id="physicalCash"
+                            min="0"
+                            step="1000"
+                            placeholder="Contoh: 500000"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="notes">
+                            Catatan Closing
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            rows="4"
+                            placeholder="Opsional..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div
+                        id="differenceBox"
+                        class="difference-box neutral"
+                    >
+
+                        <div>
+
+                            <span>
+                                Selisih Kas
+                            </span>
+
+                            <small id="differenceDescription">
+                                Masukkan kas fisik untuk melihat selisih
+                            </small>
+
+                        </div>
+
+                        <strong id="cashDifference">
+                            Rp0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="prototype-note">
+
+                        <strong>
+                            Catatan prototype:
+                        </strong>
+
+                        Perhitungan mengasumsikan kas awal laci Rp0
+                        dan belum terdapat pencatatan pengeluaran kas.
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="closingBtn"
+                        class="save-btn"
+                    >
+                        Simpan Closing
+                    </button>
+
+                </form>
+
+
+                <div
+                    id="messageBox"
+                    class="message-box"
+                >
+                </div>
+
+            </section>
+
+
+
+            <!-- HISTORY -->
+
+            <section class="content-card">
+
+                <div class="section-title">
+
+                    <div>
+
+                        <h2>
+                            Riwayat Closing Hari Ini
+                        </h2>
+
+                        <p>
+                            Hasil rekonsiliasi kas yang sudah disimpan
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Kasir</th>
+                                <th>Kas Sistem</th>
+                                <th>Kas Fisik</th>
+                                <th>Selisih</th>
+                                <th>Status</th>
+                                <th>Catatan</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="closingTable">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="./closing.js"></script>
+
+</body>
+
+</html>
