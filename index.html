@@ -24,67 +24,140 @@
 
         <div class="login-card">
 
-            <div class="brand-mark">
-                SP
+    <div class="brand-mark">
+        SP
+    </div>
+
+    <h1>
+        SmartPOS
+    </h1>
+
+    <p class="muted">
+        Sistem Pengendalian Penjualan dan Stok UMKM
+    </p>
+
+
+    <!-- ROLE -->
+
+    <div class="login-role-title">
+        Masuk sebagai
+    </div>
+
+
+    <div class="role-selector">
+
+        <button
+            type="button"
+            class="role-option active"
+            data-role="KASIR"
+        >
+
+            <span class="role-icon">
+                👤
+            </span>
+
+            <div>
+
+                <strong>
+                    Pegawai
+                </strong>
+
+                <small>
+                    Kasir & operasional
+                </small>
+
             </div>
 
-            <h1>SmartPOS</h1>
+        </button>
 
-            <p class="muted">
-                Sistem Pengendalian Penjualan dan Stok UMKM.
-            </p>
 
-            <form id="loginForm" class="form-stack">
+        <button
+            type="button"
+            class="role-option"
+            data-role="OWNER"
+        >
 
-                <div class="form-group">
+            <span class="role-icon">
+                👑
+            </span>
 
-                    <label for="username">
-                        Username
-                    </label>
+            <div>
 
-                    <input
-                        id="username"
-                        type="text"
-                        placeholder="Masukkan username"
-                        required
-                    >
+                <strong>
+                    Owner
+                </strong>
 
-                </div>
+                <small>
+                    Pengelolaan usaha
+                </small>
 
-                <div class="form-group">
+            </div>
 
-                    <label for="password">
-                        Password
-                    </label>
+        </button>
 
-                    <input
-                        id="password"
-                        type="password"
-                        placeholder="Masukkan password"
-                        required
-                    >
+    </div>
 
-                </div>
 
-                <button
-                    class="btn btn-primary btn-block"
-                    type="submit"
-                >
-                    Login
-                </button>
+    <form
+        id="loginForm"
+        class="form-stack"
+    >
 
-                <p
-                    id="loginError"
-                    class="form-error"
-                ></p>
+        <div class="form-group">
 
-            </form>
+            <label for="username">
+                Username
+            </label>
+
+            <input
+                id="username"
+                type="text"
+                placeholder="Masukkan username"
+                autocomplete="username"
+                required
+            >
 
         </div>
 
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                id="password"
+                type="password"
+                placeholder="Masukkan password"
+                autocomplete="current-password"
+                required
+            >
+
+        </div>
+
+
+        <button
+            class="btn btn-primary btn-block"
+            type="submit"
+        >
+            Login sebagai Pegawai
+        </button>
+
+
+        <p
+            id="loginError"
+            class="form-error"
+        >
+        </p>
+
+    </form>
+
+</div>
     </section>
 
-    <script src="script.js"></script>
+  <script src="shared/database.js"></script>
+<script src="script.js"></script>
 
 </body>
 
