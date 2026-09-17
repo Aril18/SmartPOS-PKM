@@ -743,8 +743,6 @@ td {
         position: static;
     }
 }
-
-
 @media (max-width: 768px) {
 
     .sidebar {
@@ -753,15 +751,12 @@ td {
 
     .main-content {
         margin-left: 200px;
-
         padding: 20px;
     }
 
     .page-header {
         align-items: flex-start;
-
         flex-direction: column;
-
         gap: 15px;
     }
 
@@ -775,19 +770,23 @@ td {
 
     .section-header {
         align-items: flex-start;
-
         flex-direction: column;
     }
 
     .section-header input {
         width: 100%;
     }
-    /* ================================
+
+}
+
+
+/* =========================================
    VOID TRANSACTION
-================================ */
+========================================= */
 
 .void-btn {
     border: 1px solid #fecaca;
+
     background: #fff1f2;
     color: #dc2626;
 
@@ -814,4 +813,135 @@ td {
 
     font-size: 10px;
 }
+
+
+/* =========================================
+   CATEGORY FILTER
+========================================= */
+
+.category-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 4px;
+    margin-bottom: 20px;
+
+    padding: 6px;
+
+    width: fit-content;
+    max-width: 100%;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+}
+
+
+/* CATEGORY BUTTON */
+
+.category-btn {
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: 1px solid transparent;
+
+    outline: none;
+
+    background: transparent;
+    color: #64748b;
+
+    padding: 9px 15px;
+
+    border-radius: 9px;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: all 0.2s ease;
+}
+
+
+/* HOVER */
+
+.category-btn:hover {
+    background: #ffffff;
+
+    color: #2563eb;
+
+    border-color: #bfdbfe;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 3px 8px
+        rgba(15, 23, 42, 0.06);
+}
+
+
+/* ACTIVE */
+
+.category-btn.active {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 4px 12px
+        rgba(37, 99, 235, 0.22);
+}
+
+
+/* ACTIVE HOVER */
+
+.category-btn.active:hover {
+    background: #1d4ed8;
+
+    color: #ffffff;
+
+    border-color: #1d4ed8;
+}
+
+
+/* =========================================
+   CATEGORY RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .category-filter {
+        width: 100%;
+
+        flex-wrap: nowrap;
+
+        overflow-x: auto;
+
+        scrollbar-width: none;
+    }
+
+    .category-filter::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-btn {
+        flex-shrink: 0;
+
+        padding: 9px 13px;
+
+        font-size: 11px;
+    }
+
+
 }

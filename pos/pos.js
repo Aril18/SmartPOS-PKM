@@ -30,7 +30,6 @@ const db =
         localStorage.getItem(STORAGE_KEY) || "{}"
     );
 
-
 db.users = db.users || [];
 db.menus = db.menus || [];
 db.production = db.production || [];
@@ -42,10 +41,14 @@ db.auditLogs = db.auditLogs || [];
 
 
 /* =========================================
-   CART
+   CART & FILTER
 ========================================= */
 
 let cart = [];
+
+let activeCategory = "Semua";
+
+let currentSearch = "";
 
 
 /* =========================================
@@ -53,15 +56,17 @@ let cart = [];
 ========================================= */
 
 function saveDB() {
+
     localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify(db)
     );
+
 }
 
 
 /* =========================================
-   TANGGAL HARI INI
+   TANGGAL
 ========================================= */
 
 function todayISO() {
@@ -82,6 +87,7 @@ function todayISO() {
         ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
+
 }
 
 
@@ -101,6 +107,7 @@ function formatRupiah(value) {
     ).format(
         Number(value || 0)
     );
+
 }
 
 
@@ -118,6 +125,7 @@ function formatPortion(value) {
     }
 
     return number.toFixed(1);
+
 }
 
 
@@ -132,6 +140,7 @@ function getMenu(menuId) {
             Number(menu.id) ===
             Number(menuId)
     );
+
 }
 
 
@@ -146,6 +155,7 @@ function getUser(userId) {
             Number(user.id) ===
             Number(userId)
     );
+
 }
 
 
@@ -177,6 +187,7 @@ function addAudit(
     });
 
     saveDB();
+
 }
 
 
@@ -193,6 +204,7 @@ function productionToday() {
         item =>
             item.date === today
     );
+
 }
 
 
@@ -213,6 +225,7 @@ function initialStockToday() {
         0
 
     );
+
 }
 
 
@@ -233,6 +246,7 @@ function validTransactionsToday() {
             transaction.status !== "VOID"
 
     );
+
 }
 
 
@@ -249,32 +263,24 @@ function soldPortionsToday() {
             const items =
                 transaction.items || [];
 
-
             const portions =
                 items.reduce(
 
-                    (
-                        subtotal,
-                        item
-                    ) => {
+                    (subtotal, item) => {
 
                         const menu =
                             getMenu(
                                 item.menuId
                             );
 
-
                         const portionUsage =
                             Number(
-
                                 item.portionUsageAtSale
                                 ??
                                 menu?.portionUsage
                                 ??
                                 0
-
                             );
-
 
                         return (
                             subtotal
@@ -294,7 +300,6 @@ function soldPortionsToday() {
 
                 );
 
-
             return total + portions;
 
         },
@@ -302,6 +307,7 @@ function soldPortionsToday() {
         0
 
     );
+
 }
 
 
@@ -314,34 +320,26 @@ function wastePortionsToday() {
     const today =
         todayISO();
 
-
     return db.waste
 
         .filter(
             item => {
 
                 if (item.date) {
-
-                    return (
-                        item.date === today
-                    );
-
+                    return item.date === today;
                 }
-
 
                 if (item.createdAt) {
 
                     return (
-                        item.createdAt
-                            .substring(
-                                0,
-                                10
-                            )
+                        item.createdAt.substring(
+                            0,
+                            10
+                        )
                         === today
                     );
 
                 }
-
 
                 return false;
 
@@ -367,6 +365,7 @@ function wastePortionsToday() {
             0
 
         );
+
 }
 
 
@@ -383,6 +382,7 @@ function expectedStockToday() {
         -
         wastePortionsToday()
     );
+
 }
 
 
@@ -396,6 +396,7 @@ function availableMenus() {
         menu =>
             menu.status === "TERSEDIA"
     );
+
 }
 
 
@@ -436,6 +437,7 @@ function renderUser() {
             "none";
 
     }
+
 }
 
 
@@ -448,13 +450,13 @@ function renderStock() {
     const stock =
         expectedStockToday();
 
-
     document
         .getElementById(
             "stokSistem"
         )
         .textContent =
         `${formatPortion(stock)} Porsi`;
+
 }
 
 
@@ -462,38 +464,70 @@ function renderStock() {
    RENDER MENU
 ========================================= */
 
-function renderMenu(
-    keyword = ""
-) {
+function renderMenu() {
 
     const menuList =
         document.getElementById(
             "menuList"
         );
 
-
     menuList.innerHTML = "";
 
 
     const filteredMenus =
         availableMenus().filter(
+            menu => {
 
-            menu =>
+                const menuName =
+                    String(
+                        menu.name || ""
+                    )
+                    .toLowerCase();
 
-                menu.name
-                    .toLowerCase()
-                    .includes(
-                        keyword.toLowerCase()
+
+                const menuCategory =
+                    String(
+                        menu.category || ""
+                    )
+                    .toLowerCase();
+
+
+                const keyword =
+                    currentSearch
+                    .toLowerCase();
+
+
+                const matchesSearch =
+
+                    menuName.includes(
+                        keyword
                     )
 
-                ||
+                    ||
 
-                menu.category
-                    .toLowerCase()
-                    .includes(
-                        keyword.toLowerCase()
-                    )
+                    menuCategory.includes(
+                        keyword
+                    );
 
+
+                const matchesCategory =
+
+                    activeCategory ===
+                    "Semua"
+
+                    ||
+
+                    menu.category ===
+                    activeCategory;
+
+
+                return (
+                    matchesSearch
+                    &&
+                    matchesCategory
+                );
+
+            }
         );
 
 
@@ -502,12 +536,23 @@ function renderMenu(
     ) {
 
         menuList.innerHTML = `
-            <p>
+
+            <div
+                style="
+                    grid-column: 1 / -1;
+                    text-align: center;
+                    color: #9ca3af;
+                    padding: 40px;
+                    font-size: 13px;
+                "
+            >
                 Menu tidak ditemukan.
-            </p>
+            </div>
+
         `;
 
         return;
+
     }
 
 
@@ -518,7 +563,6 @@ function renderMenu(
                 document.createElement(
                     "div"
                 );
-
 
             card.className =
                 "menu-card";
@@ -537,18 +581,22 @@ function renderMenu(
 
 
                 <div class="menu-price">
+
                     ${formatRupiah(
                         menu.price
                     )}
+
                 </div>
 
 
                 <div class="menu-portion">
+
                     Penggunaan stok:
                     ${formatPortion(
                         menu.portionUsage
                     )}
                     porsi
+
                 </div>
 
             `;
@@ -572,6 +620,57 @@ function renderMenu(
 
         }
     );
+
+}
+
+
+/* =========================================
+   FILTER KATEGORI
+========================================= */
+
+function setupCategoryFilter() {
+
+    const buttons =
+        document.querySelectorAll(
+            ".category-btn"
+        );
+
+
+    buttons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    activeCategory =
+                        this.dataset.category;
+
+
+                    buttons.forEach(
+                        item => {
+
+                            item.classList.remove(
+                                "active"
+                            );
+
+                        }
+                    );
+
+
+                    this.classList.add(
+                        "active"
+                    );
+
+
+                    renderMenu();
+
+                }
+            );
+
+        }
+    );
+
 }
 
 
@@ -579,9 +678,7 @@ function renderMenu(
    ADD TO CART
 ========================================= */
 
-function addToCart(
-    menuId
-) {
+function addToCart(menuId) {
 
     const menu =
         getMenu(menuId);
@@ -594,12 +691,9 @@ function addToCart(
 
     const existing =
         cart.find(
-
             item =>
-                Number(item.menuId)
-                ===
+                Number(item.menuId) ===
                 Number(menuId)
-
         );
 
 
@@ -607,9 +701,7 @@ function addToCart(
 
         existing.quantity++;
 
-    }
-
-    else {
+    } else {
 
         cart.push({
 
@@ -638,6 +730,7 @@ function addToCart(
 
 
     renderCart();
+
 }
 
 
@@ -652,12 +745,9 @@ function changeQuantity(
 
     const item =
         cart.find(
-
             item =>
-                Number(item.menuId)
-                ===
+                Number(item.menuId) ===
                 Number(menuId)
-
         );
 
 
@@ -675,20 +765,19 @@ function changeQuantity(
 
         cart =
             cart.filter(
-
                 cartItem =>
                     Number(
                         cartItem.menuId
                     )
                     !==
                     Number(menuId)
-
             );
 
     }
 
 
     renderCart();
+
 }
 
 
@@ -711,6 +800,7 @@ function cartTotal() {
         0
 
     );
+
 }
 
 
@@ -731,6 +821,7 @@ function cartItemCount() {
         0
 
     );
+
 }
 
 
@@ -757,6 +848,7 @@ function cartPortionUsage() {
         0
 
     );
+
 }
 
 
@@ -770,7 +862,6 @@ function renderCart() {
         document.getElementById(
             "cartList"
         );
-
 
     cartList.innerHTML = "";
 
@@ -787,9 +878,7 @@ function renderCart() {
 
         `;
 
-    }
-
-    else {
+    } else {
 
         cart.forEach(
             item => {
@@ -816,9 +905,11 @@ function renderCart() {
 
 
                             <div class="cart-item-price">
+
                                 ${formatRupiah(
                                     item.price
                                 )}
+
                             </div>
 
                         </div>
@@ -908,11 +999,12 @@ function renderCart() {
         formatRupiah(
             cartTotal()
         );
+
 }
 
 
 /* =========================================
-   GENERATE TRANSACTION CODE
+   GENERATE KODE TRANSAKSI
 ========================================= */
 
 function generateTransactionCode() {
@@ -927,11 +1019,9 @@ function generateTransactionCode() {
 
     const transactionsToday =
         db.transactions.filter(
-
             transaction =>
                 transaction.date ===
                 todayISO()
-
         );
 
 
@@ -947,6 +1037,7 @@ function generateTransactionCode() {
     return (
         `TRX-${today}-${number}`
     );
+
 }
 
 
@@ -986,9 +1077,7 @@ function showMessage(
         box.style.border =
             "1px solid #bbf7d0";
 
-    }
-
-    else {
+    } else {
 
         box.style.background =
             "#fee2e2";
@@ -1011,8 +1100,8 @@ function showMessage(
         },
 
         4000
-
     );
+
 }
 
 
@@ -1032,6 +1121,7 @@ function processTransaction() {
         );
 
         return;
+
     }
 
 
@@ -1048,14 +1138,12 @@ function processTransaction() {
     ) {
 
         showMessage(
-
             `Stok tidak cukup. Stok tersedia ${formatPortion(stock)} porsi.`,
-
             "error"
-
         );
 
         return;
+
     }
 
 
@@ -1137,22 +1225,16 @@ function processTransaction() {
 
 
     addAudit(
-
         "CREATE_TRANSACTION",
-
         `${transactionCode} ${formatRupiah(
             transaction.total
         )}`
-
     );
 
 
     showMessage(
-
         `${transactionCode} berhasil disimpan.`,
-
         "success"
-
     );
 
 
@@ -1172,6 +1254,7 @@ function processTransaction() {
         )
         .textContent =
         generateTransactionCode();
+
 }
 
 
@@ -1184,20 +1267,13 @@ function transactionsToday() {
     return db.transactions
 
         .filter(
-
             transaction =>
                 transaction.date ===
                 todayISO()
-
         )
 
         .sort(
-
-            (
-                a,
-                b
-            ) =>
-
+            (a, b) =>
                 new Date(
                     b.createdAt || 0
                 )
@@ -1205,8 +1281,8 @@ function transactionsToday() {
                 new Date(
                     a.createdAt || 0
                 )
-
         );
+
 }
 
 
@@ -1254,6 +1330,7 @@ function renderTransactions() {
         `;
 
         return;
+
     }
 
 
@@ -1271,25 +1348,16 @@ function renderTransactions() {
                     transaction.items || []
                 )
                 .reduce(
-
-                    (
-                        total,
-                        item
-                    ) =>
-
-                        total
-                        +
+                    (total, item) =>
+                        total +
                         Number(
                             item.quantity || 0
                         ),
-
                     0
-
                 );
 
 
-            let time =
-                "-";
+            let time = "-";
 
 
             if (
@@ -1301,17 +1369,11 @@ function renderTransactions() {
                         transaction.createdAt
                     )
                     .toLocaleTimeString(
-
                         "id-ID",
-
                         {
-                            hour:
-                                "2-digit",
-
-                            minute:
-                                "2-digit"
+                            hour: "2-digit",
+                            minute: "2-digit"
                         }
-
                     );
 
             }
@@ -1320,17 +1382,11 @@ function renderTransactions() {
             const statusClass =
                 transaction.status ===
                 "VOID"
-
                     ?
                     "status-void"
-
                     :
                     "status-success";
 
-
-            /* =================================
-               TOMBOL VOID
-            ================================= */
 
             let actionButton = "";
 
@@ -1346,9 +1402,7 @@ function renderTransactions() {
                     </span>
                 `;
 
-            }
-
-            else {
+            } else {
 
                 actionButton = `
                     <button
@@ -1391,9 +1445,11 @@ function renderTransactions() {
                 </td>
 
                 <td>
+
                     ${formatRupiah(
                         transaction.total
                     )}
+
                 </td>
 
                 <td>
@@ -1417,6 +1473,7 @@ function renderTransactions() {
 
         }
     );
+
 }
 
 
@@ -1444,6 +1501,7 @@ function voidTransaction(
         );
 
         return;
+
     }
 
 
@@ -1458,6 +1516,7 @@ function voidTransaction(
         );
 
         return;
+
     }
 
 
@@ -1480,6 +1539,7 @@ Masukkan angka 1 - 5:`
     ) {
 
         return;
+
     }
 
 
@@ -1515,6 +1575,7 @@ Masukkan angka 1 - 5:`
         );
 
         return;
+
     }
 
 
@@ -1539,11 +1600,13 @@ Masukkan angka 1 - 5:`
             );
 
             return;
+
         }
 
 
         reason =
             customReason.trim();
+
     }
 
 
@@ -1554,7 +1617,6 @@ Masukkan angka 1 - 5:`
 
 
     if (!confirmed) {
-
         return;
     }
 
@@ -1580,26 +1642,21 @@ Masukkan angka 1 - 5:`
 
 
     addAudit(
-
         "VOID_TRANSACTION",
-
         `${transaction.transactionCode} dibatalkan - ${reason}`
-
     );
 
 
     showMessage(
-
         `${transaction.transactionCode} berhasil dibatalkan.`,
-
         "success"
-
     );
 
 
     renderTransactions();
 
     renderStock();
+
 }
 
 
@@ -1612,7 +1669,6 @@ function clearCart() {
     if (
         cart.length === 0
     ) {
-
         return;
     }
 
@@ -1624,7 +1680,6 @@ function clearCart() {
 
 
     if (!confirmed) {
-
         return;
     }
 
@@ -1633,6 +1688,7 @@ function clearCart() {
 
 
     renderCart();
+
 }
 
 
@@ -1649,6 +1705,7 @@ function logout() {
 
     window.location.href =
         "../index.html";
+
 }
 
 
@@ -1661,17 +1718,15 @@ document
         "searchMenu"
     )
     .addEventListener(
-
         "input",
-
         function () {
 
-            renderMenu(
-                this.value
-            );
+            currentSearch =
+                this.value.trim();
+
+            renderMenu();
 
         }
-
     );
 
 
@@ -1684,16 +1739,13 @@ document
         "clearCartBtn"
     )
     .addEventListener(
-
         "click",
-
         clearCart
-
     );
 
 
 /* =========================================
-   EVENT PROCESS
+   EVENT SIMPAN TRANSAKSI
 ========================================= */
 
 document
@@ -1701,11 +1753,8 @@ document
         "processBtn"
     )
     .addEventListener(
-
         "click",
-
         processTransaction
-
     );
 
 
@@ -1736,6 +1785,8 @@ window.addEventListener(
 renderUser();
 
 renderStock();
+
+setupCategoryFilter();
 
 renderMenu();
 
