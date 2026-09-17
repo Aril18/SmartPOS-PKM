@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Waste - SmartPOS</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+            <nav>
+
+                <a
+                    href="../Dashboard/index.html"
+                    class="owner-only"
+                >
+                    Dashboard
+                </a>
+
+                <a href="../pos/index.html">
+                    Kasir / POS
+                </a>
+
+                <a
+                    href="../production/index.html"
+                    class="owner-only"
+                >
+                    Produksi & Stok
+                </a>
+
+                <a
+                    href="../menu/index.html"
+                    class="owner-only"
+                >
+                    Menu
+                </a>
+
+                <a
+                    href="index.html"
+                    class="active"
+                >
+                    Waste
+                </a>
+
+                <a
+                    href="../stock-opname/index.html"
+                    class="owner-only"
+                >
+                    Stock Opname
+                </a>
+
+                <a href="../closing/index.html">
+                    Closing
+                </a>
+
+            </nav>
+
+            <div class="sidebar-user">
+
+                <span>
+                    Login sebagai
+                </span>
+
+                <strong id="sidebarUser">
+                    -
+                </strong>
+
+            </div>
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <main class="main-content">
+
+            <header class="page-header">
+
+                <div>
+
+                    <h1>
+                        Waste
+                    </h1>
+
+                    <p>
+                        Catat bahan atau makanan yang terbuang
+                    </p>
+
+                </div>
+
+                <div class="header-info">
+
+                    <div>
+                        <span>Petugas</span>
+
+                        <strong id="namaUser">
+                            -
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Stok Sistem</span>
+
+                        <strong id="stokSistem">
+                            0 Porsi
+                        </strong>
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <section class="summary-grid">
+
+                <div class="summary-card">
+                    <p>Waste Hari Ini</p>
+
+                    <h2 id="wasteHariIni">
+                        0 Porsi
+                    </h2>
+                </div>
+
+
+                <div class="summary-card">
+                    <p>Jumlah Catatan Waste</p>
+
+                    <h2 id="jumlahWaste">
+                        0
+                    </h2>
+                </div>
+
+
+                <div class="summary-card">
+                    <p>Stok Sebelum Waste</p>
+
+                    <h2 id="stokSebelumWaste">
+                        0 Porsi
+                    </h2>
+                </div>
+
+
+                <div class="summary-card">
+                    <p>Stok Tersisa</p>
+
+                    <h2 id="stokTersisa">
+                        0 Porsi
+                    </h2>
+                </div>
+
+            </section>
+
+
+            <section class="content-card">
+
+                <div class="section-title">
+
+                    <h2>
+                        Catat Waste
+                    </h2>
+
+                    <p>
+                        Waste akan otomatis mengurangi stok sistem
+                    </p>
+
+                </div>
+
+
+                <form
+                    id="wasteForm"
+                    class="waste-form"
+                >
+
+                    <div class="form-group">
+
+                        <label for="wasteItem">
+                            Item / Menu
+                        </label>
+
+                        <select
+                            id="wasteItem"
+                            required
+                        >
+
+                            <option value="">
+                                Pilih item
+                            </option>
+
+                            <option value="GENERAL_STOCK">
+                                Stok Daging / Porsi Umum
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="quantity">
+                            Jumlah
+                        </label>
+
+                        <input
+                            id="quantity"
+                            type="number"
+                            min="0.1"
+                            step="0.1"
+                            placeholder="Contoh: 2"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="reason">
+                            Alasan Waste
+                        </label>
+
+                        <select
+                            id="reason"
+                            required
+                        >
+
+                            <option value="">
+                                Pilih alasan
+                            </option>
+
+                            <option value="Rusak / tidak layak jual">
+                                Rusak / tidak layak jual
+                            </option>
+
+                            <option value="Jatuh / tumpah">
+                                Jatuh / tumpah
+                            </option>
+
+                            <option value="Sisa produksi">
+                                Sisa produksi
+                            </option>
+
+                            <option value="Salah produksi">
+                                Salah produksi
+                            </option>
+
+                            <option value="Kualitas tidak sesuai">
+                                Kualitas tidak sesuai
+                            </option>
+
+                            <option value="Lainnya">
+                                Lainnya
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div
+                        class="form-group"
+                        id="customReasonGroup"
+                        style="display:none;"
+                    >
+
+                        <label for="customReason">
+                            Alasan lainnya
+                        </label>
+
+                        <input
+                            id="customReason"
+                            type="text"
+                            placeholder="Tuliskan alasan"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group full-width">
+
+                        <label for="notes">
+                            Catatan
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            rows="3"
+                            placeholder="Opsional..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="stock-impact full-width">
+
+                        <span>
+                            Dampak terhadap stok
+                        </span>
+
+                        <strong id="stockImpact">
+                            0 Porsi
+                        </strong>
+
+                    </div>
+
+
+                    <div class="full-width">
+
+                        <button
+                            type="submit"
+                            class="save-btn"
+                        >
+                            Simpan Waste
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <div
+                    id="messageBox"
+                    class="message-box"
+                >
+                </div>
+
+            </section>
+
+
+            <section class="content-card">
+
+                <div class="section-title">
+
+                    <h2>
+                        Waste Hari Ini
+                    </h2>
+
+                    <p>
+                        Riwayat waste yang telah dicatat
+                    </p>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Petugas</th>
+                                <th>Item</th>
+                                <th>Jumlah</th>
+                                <th>Dampak Stok</th>
+                                <th>Alasan</th>
+                                <th>Catatan</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="wasteTable">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="waste.js"></script>
+
+</body>
+
+</html>
