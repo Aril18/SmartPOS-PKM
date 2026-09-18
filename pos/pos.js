@@ -38,8 +38,94 @@ db.waste = db.waste || [];
 db.stockOpnames = db.stockOpnames || [];
 db.closings = db.closings || [];
 db.auditLogs = db.auditLogs || [];
+/* =========================================
+   API CONFIG
+========================================= */
+
+const API_URL =
+    "http://localhost:3000";
 
 
+/* =========================================
+   LOAD MENU DARI MYSQL
+========================================= */
+
+async function loadMenusFromAPI() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/menus`
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Gagal mengambil menu dari server."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Gagal mengambil menu."
+            );
+
+        }
+
+
+        db.menus =
+            result.data.map(
+                menu => ({
+
+                    ...menu,
+
+                    price:
+                        Number(menu.price),
+
+                    portionUsage:
+                        Number(menu.portionUsage)
+
+                })
+            );
+
+
+        console.log(
+            "✅ MENU MYSQL:",
+            db.menus
+        );
+
+
+        renderMenu();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Gagal mengambil menu MySQL:",
+            error
+        );
+
+
+        showMessage(
+            "Menu gagal dimuat dari database.",
+            "error"
+        );
+
+    }
+
+}
+    
 /* =========================================
    CART & FILTER
 ========================================= */
@@ -399,60 +485,25 @@ function availableMenus() {
 
 }
 /* =========================================
-   RENDER USER & ROLE ACCESS
+   RENDER USER
 ========================================= */
+
 function renderUser() {
 
-    document
-        .getElementById(
+    const namaKasir =
+        document.getElementById(
             "namaKasir"
-        )
-        .textContent =
-        currentUser.name;
-
-
-    document
-        .getElementById(
-            "sidebarUser"
-        )
-        .textContent =
-        currentUser.name;
-
-
-    const ownerOnlyMenus =
-        document.querySelectorAll(
-            ".owner-only"
         );
 
 
-    if (
-        currentUser.role === "KASIR"
-    ) {
+    if (namaKasir) {
 
-        ownerOnlyMenus.forEach(
-            menu => {
-
-                menu.style.display =
-                    "none";
-
-            }
-        );
-
-    } else {
-
-        ownerOnlyMenus.forEach(
-            menu => {
-
-                menu.style.display =
-                    "";
-
-            }
-        );
+        namaKasir.textContent =
+            currentUser.name;
 
     }
 
 }
-
 
 /* =========================================
    RENDER STOK
@@ -1832,29 +1883,35 @@ function applyRoleNavigation() {
     );
 
 }
-
 /* =========================================
-   INITIAL RENDER
+   INITIALIZE POS
 ========================================= */
 
-renderUser();
+async function initializePOS() {
 
-applyRoleNavigation();
+    renderUser();
 
-renderStock();
+    setupCategoryFilter();
 
-setupCategoryFilter();
+    renderCart();
 
-renderMenu();
-
-renderCart();
-
-renderTransactions();
+    renderTransactions();
 
 
-document
-    .getElementById(
-        "transactionCode"
-    )
-    .textContent =
-    generateTransactionCode();
+    await loadMenusFromAPI();
+
+
+    renderStock();
+
+
+    document
+        .getElementById(
+            "transactionCode"
+        )
+        .textContent =
+        generateTransactionCode();
+
+}
+
+
+initializePOS();
