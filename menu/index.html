@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Menu - SmartPOS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="menu-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+        <nav>
+    <a href="../Dashboard/index.html">
+        Dashboard
+    </a>
+
+    <a href="../pos/index.html">
+        Kasir / POS
+    </a>
+
+    <a href="../produksi/index.html">
+        Produksi &amp; Stok
+    </a>
+
+    <a href="../menu/index.html">
+        Menu
+    </a>
+
+    <a href="../waste/index.html">
+        Waste
+    </a>
+
+    <a href="../stock-opname/index.html">
+        Stock Opname
+    </a>
+
+    <a href="../closing/index.html">
+        Closing
+    </a>
+
+    <a href="../pegawai/index.html">
+        Pegawai
+    </a>
+
+    <a href="../audit/index.html">
+        Audit Aktivitas
+    </a>
+
+    <a href="../laporan/index.html">
+        Laporan
+    </a>
+</nav>
+
+            <button
+                type="button"
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- CONTENT -->
+        <main class="menu-content">
+
+            <!-- HEADER -->
+            <header class="menu-header">
+
+                <div>
+
+                    <h1>
+                        Menu
+                    </h1>
+
+                    <p>
+                        Kelola menu, harga, dan penggunaan stok
+                    </p>
+
+                </div>
+
+                <div class="user-info">
+
+                    <span>
+                        Login sebagai
+                    </span>
+
+                    <strong id="namaUser">
+                        Pemilik Usaha
+                    </strong>
+
+                </div>
+
+            </header>
+
+
+            <!-- RINGKASAN -->
+            <section class="summary-cards">
+
+                <div class="summary-card">
+
+                    <p>
+                        Total Menu
+                    </p>
+
+                    <h2 id="totalMenu">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Menu Tersedia
+                    </p>
+
+                    <h2 id="menuTersedia">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Tidak Tersedia
+                    </p>
+
+                    <h2 id="menuTidakTersedia">
+                        0
+                    </h2>
+
+                </div>
+
+            </section>
+
+
+            <!-- FORM MENU -->
+            <section class="menu-section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2 id="formTitle">
+                            Tambah Menu
+                        </h2>
+
+                        <p>
+                            Masukkan informasi menu yang dijual
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form id="menuForm">
+
+                    <input
+                        type="hidden"
+                        id="menuId"
+                    >
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group">
+
+                            <label for="menuCode">
+                                Kode Menu
+                            </label>
+
+                            <input
+                                type="text"
+                                id="menuCode"
+                                placeholder="Contoh: M001"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="menuName">
+                                Nama Menu
+                            </label>
+
+                            <input
+                                type="text"
+                                id="menuName"
+                                placeholder="Contoh: Nasi Babi Campur"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="menuCategory">
+                                Kategori
+                            </label>
+
+                            <select
+                                id="menuCategory"
+                                required
+                            >
+
+                                <option value="">
+                                    Pilih kategori
+                                </option>
+
+                                <option value="Paket Nasi">
+                                    Paket Nasi
+                                </option>
+
+                                <option value="Daging & Lauk">
+                                    Daging & Lauk
+                                </option>
+
+                                <option value="Gorengan">
+                                    Gorengan
+                                </option>
+
+                                <option value="Sayur & Pendamping">
+                                    Sayur & Pendamping
+                                </option>
+
+                                <option value="Minuman">
+                                    Minuman
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="menuPrice">
+                                Harga
+                            </label>
+
+                            <input
+                                type="number"
+                                id="menuPrice"
+                                placeholder="Contoh: 25000"
+                                min="0"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="portionUsage">
+                                Penggunaan Stok / Porsi
+                            </label>
+
+                            <input
+                                type="number"
+                                id="portionUsage"
+                                placeholder="Contoh: 1"
+                                min="0"
+                                step="0.25"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="menuStatus">
+                                Status
+                            </label>
+
+                            <select
+                                id="menuStatus"
+                                required
+                            >
+
+                                <option value="TERSEDIA">
+                                    TERSEDIA
+                                </option>
+
+                                <option value="TIDAK TERSEDIA">
+                                    TIDAK TERSEDIA
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="save-button"
+                        >
+                            Simpan Menu
+                        </button>
+
+                        <button
+                            type="button"
+                            id="cancelButton"
+                            class="cancel-button"
+                            onclick="cancelEdit()"
+                        >
+                            Batal
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- DAFTAR MENU -->
+            <section class="menu-section">
+
+                <div class="section-header table-header">
+
+                    <div>
+
+                        <h2>
+                            Daftar Menu
+                        </h2>
+
+                        <p>
+                            Daftar menu yang digunakan pada SmartPOS
+                        </p>
+
+                    </div>
+
+
+                    <input
+                        type="text"
+                        id="searchMenu"
+                        class="search-input"
+                        placeholder="Cari menu..."
+                    >
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Kode</th>
+                                <th>Nama Menu</th>
+                                <th>Kategori</th>
+                                <th>Harga</th>
+                                <th>Pemakaian Stok</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="menuTable">
+
+                            <tr>
+
+                                <td colspan="7">
+                                    Belum ada menu.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="menu.js"></script>
+
+</body>
+
+</html>

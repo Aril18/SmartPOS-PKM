@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pegawai - SmartPOS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="employee-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+   <nav>
+    <a href="../Dashboard/index.html">
+        Dashboard
+    </a>
+
+    <a href="../pos/index.html">
+        Kasir / POS
+    </a>
+
+    <a href="../produksi/index.html">
+        Produksi &amp; Stok
+    </a>
+
+    <a href="../menu/index.html">
+        Menu
+    </a>
+
+    <a href="../waste/index.html">
+        Waste
+    </a>
+
+    <a href="../stock-opname/index.html">
+        Stock Opname
+    </a>
+
+    <a href="../closing/index.html">
+        Closing
+    </a>
+
+    <a href="../pegawai/index.html">
+        Pegawai
+    </a>
+
+    <a href="../audit/index.html">
+        Audit Aktivitas
+    </a>
+
+    <a href="../laporan/index.html">
+        Laporan
+    </a>
+</nav>
+
+
+            <div class="sidebar-user">
+
+                <span>
+                    Login sebagai
+                </span>
+
+                <strong id="sidebarUser">
+                    Pemilik Usaha
+                </strong>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- CONTENT -->
+        <main class="employee-content">
+
+            <!-- HEADER -->
+            <header class="page-header">
+
+                <div>
+
+                    <h1>
+                        Pegawai
+                    </h1>
+
+                    <p>
+                        Kelola akun pengguna SmartPOS
+                    </p>
+
+                </div>
+
+
+                <div class="user-info">
+
+                    <span>
+                        Login sebagai
+                    </span>
+
+                    <strong id="namaUser">
+                        Pemilik Usaha
+                    </strong>
+
+                </div>
+
+            </header>
+
+
+            <!-- SUMMARY -->
+            <section class="summary-cards">
+
+                <div class="summary-card">
+
+                    <p>
+                        Total Pegawai
+                    </p>
+
+                    <h2 id="totalPegawai">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Pegawai Aktif
+                    </p>
+
+                    <h2 id="pegawaiAktif">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Total Kasir
+                    </p>
+
+                    <h2 id="totalKasir">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Owner
+                    </p>
+
+                    <h2 id="totalOwner">
+                        0
+                    </h2>
+
+                </div>
+
+            </section>
+
+
+            <!-- FORM PEGAWAI -->
+            <section class="employee-section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2 id="formTitle">
+                            Tambah Pegawai
+                        </h2>
+
+                        <p>
+                            Tambahkan akun baru untuk pengguna SmartPOS
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form id="employeeForm">
+
+                    <input
+                        type="hidden"
+                        id="employeeId"
+                    >
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group">
+
+                            <label for="employeeName">
+                                Nama Pegawai
+                            </label>
+
+                            <input
+                                type="text"
+                                id="employeeName"
+                                placeholder="Contoh: Made"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="employeeUsername">
+                                Username
+                            </label>
+
+                            <input
+                                type="text"
+                                id="employeeUsername"
+                                placeholder="Contoh: made"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="employeePassword">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="employeePassword"
+                                placeholder="Masukkan password"
+                            >
+
+                            <small id="passwordHelp">
+                                Password wajib untuk pegawai baru.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="employeeRole">
+                                Role
+                            </label>
+
+                            <select
+                                id="employeeRole"
+                                required
+                            >
+
+                                <option value="KASIR">
+                                    KASIR
+                                </option>
+
+                                <option value="OWNER">
+                                    OWNER
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="employeeStatus">
+                                Status
+                            </label>
+
+                            <select
+                                id="employeeStatus"
+                                required
+                            >
+
+                                <option value="AKTIF">
+                                    AKTIF
+                                </option>
+
+                                <option value="NONAKTIF">
+                                    NONAKTIF
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="save-button"
+                        >
+                            Simpan Pegawai
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="cancelButton"
+                            class="cancel-button"
+                            onclick="cancelEdit()"
+                        >
+                            Batal
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- DAFTAR PEGAWAI -->
+            <section class="employee-section">
+
+                <div class="section-header table-header">
+
+                    <div>
+
+                        <h2>
+                            Daftar Pegawai
+                        </h2>
+
+                        <p>
+                            Daftar akun yang memiliki akses ke SmartPOS
+                        </p>
+
+                    </div>
+
+
+                    <input
+                        type="text"
+                        id="searchEmployee"
+                        class="search-input"
+                        placeholder="Cari pegawai..."
+                    >
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="employeeTable">
+
+                            <tr>
+                                <td colspan="6">
+                                    Belum ada data pegawai.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="pegawai.js"></script>
+
+</body>
+
+</html>

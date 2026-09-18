@@ -1,0 +1,526 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+.report-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+
+    background: #111827;
+
+    padding: 28px 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.logo {
+    margin-bottom: 35px;
+}
+
+.logo h2 {
+    color: #ffffff;
+
+    font-size: 24px;
+
+    margin-bottom: 5px;
+}
+
+.logo p {
+    color: #9ca3af;
+
+    font-size: 12px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    flex: 1;
+}
+
+.sidebar nav a {
+    display: block;
+
+    text-decoration: none;
+
+    color: #cbd5e1;
+
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: 0.2s;
+}
+
+.sidebar nav a:hover {
+    background: #1f2937;
+
+    color: #ffffff;
+}
+
+.sidebar nav a.active {
+    background: #2563eb;
+
+    color: #ffffff;
+}
+
+.sidebar-user {
+    display: flex;
+    flex-direction: column;
+
+    padding-top: 18px;
+
+    margin-top: 20px;
+    margin-bottom: 15px;
+
+    border-top: 1px solid #374151;
+}
+
+.sidebar-user span {
+    color: #9ca3af;
+
+    font-size: 11px;
+
+    margin-bottom: 5px;
+}
+
+.sidebar-user strong {
+    color: #ffffff;
+
+    font-size: 13px;
+}
+
+.logout-btn {
+    width: 100%;
+
+    border: none;
+
+    background: #fee2e2;
+
+    color: #dc2626;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.report-content {
+    margin-left: 250px;
+
+    width: calc(100% - 250px);
+
+    padding: 32px;
+
+    min-height: 100vh;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: #ffffff;
+
+    padding: 22px 25px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    font-size: 26px;
+
+    color: #111827;
+
+    margin-bottom: 5px;
+}
+
+.page-header p {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+
+    text-align: right;
+}
+
+.user-info span {
+    color: #9ca3af;
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+}
+
+.user-info strong {
+    font-size: 14px;
+
+    color: #111827;
+}
+
+
+/* =========================================
+   FILTER
+========================================= */
+
+.report-section {
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 24px;
+
+    margin-bottom: 25px;
+}
+
+.filter-row {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-end;
+
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.form-group label {
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+.form-group input {
+    min-width: 240px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #2563eb;
+}
+
+.print-button {
+    border: none;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.print-button:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================
+   PRINT TITLE
+========================================= */
+
+.print-title {
+    display: none;
+
+    margin-bottom: 25px;
+}
+
+.print-title h2 {
+    margin-bottom: 5px;
+}
+
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+.summary-cards {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 22px;
+}
+
+.summary-card p {
+    color: #6b7280;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+}
+
+.summary-card h2 {
+    color: #111827;
+
+    font-size: 22px;
+}
+
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    color: #111827;
+
+    font-size: 18px;
+
+    margin-bottom: 5px;
+}
+
+.section-header p {
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   STOCK
+========================================= */
+
+.stock-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.stock-box {
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.stock-box span {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+.stock-box strong {
+    color: #111827;
+
+    font-size: 18px;
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+table thead {
+    background: #f8fafc;
+}
+
+table th {
+    text-align: left;
+
+    padding: 13px 15px;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+table td {
+    padding: 14px 15px;
+
+    color: #374151;
+
+    font-size: 12px;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+table tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.status-valid {
+    color: #166534;
+
+    font-weight: 600;
+}
+
+.status-void {
+    color: #dc2626;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stock-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+/* =========================================
+   PRINT
+========================================= */
+
+@media print {
+
+    body {
+        background: #ffffff;
+    }
+
+    .sidebar,
+    .page-header,
+    .no-print {
+        display: none !important;
+    }
+
+    .report-content {
+        margin-left: 0;
+
+        width: 100%;
+
+        padding: 0;
+    }
+
+    .print-title {
+        display: block;
+    }
+
+    .summary-card,
+    .report-section {
+        box-shadow: none;
+
+        break-inside: avoid;
+    }
+
+}

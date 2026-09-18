@@ -48,7 +48,7 @@
 
         {
             name: "Produksi & Stok",
-            href: "../production/index.html",
+            href: "../produksi &/index.html",
             match: "/production/"
         },
 
@@ -78,7 +78,7 @@
 
         {
             name: "Pegawai",
-            href: "../employee/index.html",
+            href: "../laporan/index.html",
             match: "/employee/"
         },
 
