@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Laporan - SmartPOS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="report-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+            <nav>
+
+                <a href="../Dashboard/index.html">
+                    Dashboard
+                </a>
+
+                <a href="../pos/index.html">
+                    Kasir / POS
+                </a>
+
+                <a href="../produksi/index.html">
+                    Produksi & Stok
+                </a>
+
+                <a href="../menu/index.html">
+                    Menu
+                </a>
+
+                <a href="../waste/index.html">
+                    Waste
+                </a>
+
+                <a href="../stock-opname/index.html">
+                    Stock Opname
+                </a>
+
+                <a href="../closing/index.html">
+                    Closing
+                </a>
+
+                <a href="../pegawai/index.html">
+                    Pegawai
+                </a>
+
+                <a href="../audit/index.html">
+                    Audit Aktivitas
+                </a>
+
+                <a href="index.html" class="active">
+                    Laporan
+                </a>
+
+            </nav>
+
+            <div class="sidebar-user">
+
+                <span>
+                    Login sebagai
+                </span>
+
+                <strong id="sidebarUser">
+                    Pemilik Usaha
+                </strong>
+
+            </div>
+
+            <button
+                type="button"
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- CONTENT -->
+        <main class="report-content">
+
+            <!-- HEADER -->
+            <header class="page-header">
+
+                <div>
+
+                    <h1>
+                        Laporan
+                    </h1>
+
+                    <p>
+                        Ringkasan penjualan, stok, dan aktivitas usaha
+                    </p>
+
+                </div>
+
+
+                <div class="user-info">
+
+                    <span>
+                        Login sebagai
+                    </span>
+
+                    <strong id="namaUser">
+                        Pemilik Usaha
+                    </strong>
+
+                </div>
+
+            </header>
+
+
+            <!-- FILTER -->
+            <section class="report-section no-print">
+
+                <div class="filter-row">
+
+                    <div class="form-group">
+
+                        <label for="reportDate">
+                            Pilih Tanggal Laporan
+                        </label>
+
+                        <input
+                            type="date"
+                            id="reportDate"
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="print-button"
+                        onclick="printReport()"
+                    >
+                        Cetak Laporan
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- JUDUL CETAK -->
+            <section class="print-title">
+
+                <h2>
+                    Laporan Harian SmartPOS
+                </h2>
+
+                <p id="reportDateTitle">
+                    -
+                </p>
+
+            </section>
+
+
+            <!-- SUMMARY PENJUALAN -->
+            <section class="summary-cards">
+
+                <div class="summary-card">
+
+                    <p>
+                        Total Omzet
+                    </p>
+
+                    <h2 id="totalOmzet">
+                        Rp0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Transaksi Valid
+                    </p>
+
+                    <h2 id="totalTransaksi">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Penjualan Tunai
+                    </p>
+
+                    <h2 id="penjualanTunai">
+                        Rp0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Penjualan Non Tunai
+                    </p>
+
+                    <h2 id="penjualanNonTunai">
+                        Rp0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Transaksi VOID
+                    </p>
+
+                    <h2 id="totalVoid">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Porsi Terjual
+                    </p>
+
+                    <h2 id="porsiTerjual">
+                        0 Porsi
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Waste
+                    </p>
+
+                    <h2 id="totalWaste">
+                        0 Porsi
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Stok Sistem
+                    </p>
+
+                    <h2 id="stokSistem">
+                        0 Porsi
+                    </h2>
+
+                </div>
+
+            </section>
+
+
+            <!-- REKAP STOK -->
+            <section class="report-section">
+
+                <div class="section-header">
+
+                    <h2>
+                        Rekap Stok
+                    </h2>
+
+                    <p>
+                        Ringkasan pergerakan stok berdasarkan tanggal laporan
+                    </p>
+
+                </div>
+
+
+                <div class="stock-grid">
+
+                    <div class="stock-box">
+
+                        <span>
+                            Produksi
+                        </span>
+
+                        <strong id="stokProduksi">
+                            0 Porsi
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <span>
+                            Terjual
+                        </span>
+
+                        <strong id="stokTerjual">
+                            0 Porsi
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <span>
+                            Waste
+                        </span>
+
+                        <strong id="stokWaste">
+                            0 Porsi
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <span>
+                            Stok Sistem
+                        </span>
+
+                        <strong id="stokAkhir">
+                            0 Porsi
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <span>
+                            Selisih Stock Opname
+                        </span>
+
+                        <strong id="selisihStok">
+                            0 Porsi
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-box">
+
+                        <span>
+                            Selisih Kas
+                        </span>
+
+                        <strong id="selisihKas">
+                            Rp0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- RIWAYAT TRANSAKSI -->
+            <section class="report-section">
+
+                <div class="section-header">
+
+                    <h2>
+                        Transaksi
+                    </h2>
+
+                    <p>
+                        Daftar transaksi berdasarkan tanggal laporan
+                    </p>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Kode</th>
+                                <th>Waktu</th>
+                                <th>Kasir</th>
+                                <th>Item</th>
+                                <th>Pembayaran</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="transactionTable">
+
+                            <tr>
+                                <td colspan="7">
+                                    Belum ada transaksi.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="laporan.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Audit Aktivitas - SmartPOS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="audit-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+ <nav>
+    <a href="../Dashboard/index.html">
+        Dashboard
+    </a>
+
+    <a href="../pos/index.html">
+        Kasir / POS
+    </a>
+
+    <a href="../produksi/index.html">
+        Produksi &amp; Stok
+    </a>
+
+    <a href="../menu/index.html">
+        Menu
+    </a>
+
+    <a href="../waste/index.html">
+        Waste
+    </a>
+
+    <a href="../stock-opname/index.html">
+        Stock Opname
+    </a>
+
+    <a href="../closing/index.html">
+        Closing
+    </a>
+
+    <a href="../pegawai/index.html">
+        Pegawai
+    </a>
+
+    <a href="../audit/index.html">
+        Audit Aktivitas
+    </a>
+
+    <a href="../laporan/index.html">
+        Laporan
+    </a>
+</nav>
+
+
+            <div class="sidebar-user">
+
+                <span>
+                    Login sebagai
+                </span>
+
+                <strong id="sidebarUser">
+                    Pemilik Usaha
+                </strong>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- CONTENT -->
+        <main class="audit-content">
+
+            <!-- HEADER -->
+            <header class="page-header">
+
+                <div>
+
+                    <h1>
+                        Audit Aktivitas
+                    </h1>
+
+                    <p>
+                        Riwayat aktivitas pengguna di dalam SmartPOS
+                    </p>
+
+                </div>
+
+
+                <div class="user-info">
+
+                    <span>
+                        Login sebagai
+                    </span>
+
+                    <strong id="namaUser">
+                        Pemilik Usaha
+                    </strong>
+
+                </div>
+
+            </header>
+
+
+            <!-- SUMMARY -->
+            <section class="summary-cards">
+
+                <div class="summary-card">
+
+                    <p>
+                        Total Aktivitas
+                    </p>
+
+                    <h2 id="totalAktivitas">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Aktivitas Hari Ini
+                    </p>
+
+                    <h2 id="aktivitasHariIni">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Login Hari Ini
+                    </p>
+
+                    <h2 id="loginHariIni">
+                        0
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <p>
+                        Transaksi Hari Ini
+                    </p>
+
+                    <h2 id="transaksiHariIni">
+                        0
+                    </h2>
+
+                </div>
+
+            </section>
+
+
+            <!-- FILTER -->
+            <section class="audit-section">
+
+                <div class="section-header">
+
+                    <h2>
+                        Filter Aktivitas
+                    </h2>
+
+                    <p>
+                        Cari aktivitas berdasarkan pegawai, aktivitas, atau tanggal
+                    </p>
+
+                </div>
+
+
+                <div class="filter-grid">
+
+                    <div class="form-group">
+
+                        <label for="searchAudit">
+                            Cari
+                        </label>
+
+                        <input
+                            type="text"
+                            id="searchAudit"
+                            placeholder="Cari pegawai atau detail..."
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="filterAction">
+                            Aktivitas
+                        </label>
+
+                        <select id="filterAction">
+
+                            <option value="">
+                                Semua Aktivitas
+                            </option>
+
+                            <option value="LOGIN">
+                                LOGIN
+                            </option>
+
+                            <option value="TRANSAKSI">
+                                TRANSAKSI
+                            </option>
+
+                            <option value="PRODUKSI">
+                                PRODUKSI
+                            </option>
+
+                            <option value="TAMBAH MENU">
+                                TAMBAH MENU
+                            </option>
+
+                            <option value="UPDATE MENU">
+                                UPDATE MENU
+                            </option>
+
+                            <option value="STOCK OPNAME">
+                                STOCK OPNAME
+                            </option>
+
+                            <option value="TAMBAH PEGAWAI">
+                                TAMBAH PEGAWAI
+                            </option>
+
+                            <option value="UPDATE PEGAWAI">
+                                UPDATE PEGAWAI
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="filterUser">
+                            Pegawai
+                        </label>
+
+                        <select id="filterUser">
+
+                            <option value="">
+                                Semua Pegawai
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="filterDate">
+                            Tanggal
+                        </label>
+
+                        <input
+                            type="date"
+                            id="filterDate"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="reset-button"
+                    onclick="resetFilter()"
+                >
+                    Reset Filter
+                </button>
+
+            </section>
+
+
+            <!-- TABLE -->
+            <section class="audit-section">
+
+                <div class="section-header">
+
+                    <h2>
+                        Riwayat Aktivitas
+                    </h2>
+
+                    <p>
+                        Semua aktivitas pengguna yang tercatat oleh sistem
+                    </p>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Pegawai</th>
+                                <th>Role</th>
+                                <th>Aktivitas</th>
+                                <th>Detail</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="auditTable">
+
+                            <tr>
+                                <td colspan="6">
+                                    Belum ada aktivitas.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="audit.js"></script>
+
+</body>
+
+</html>

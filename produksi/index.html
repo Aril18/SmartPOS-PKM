@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Produksi & Stok - SmartPOS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="production-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>SmartPOS</h2>
+                <p>Sales & Stock Control</p>
+            </div>
+
+           <nav>
+    <a href="../Dashboard/index.html">
+        Dashboard
+    </a>
+
+    <a href="../pos/index.html">
+        Kasir / POS
+    </a>
+
+    <a href="../produksi/index.html">
+        Produksi &amp; Stok
+    </a>
+
+    <a href="../menu/index.html">
+        Menu
+    </a>
+
+    <a href="../waste/index.html">
+        Waste
+    </a>
+
+    <a href="../stock-opname/index.html">
+        Stock Opname
+    </a>
+
+    <a href="../closing/index.html">
+        Closing
+    </a>
+
+    <a href="../pegawai/index.html">
+        Pegawai
+    </a>
+
+    <a href="../audit/index.html">
+        Audit Aktivitas
+    </a>
+
+    <a href="../laporan/index.html">
+        Laporan
+    </a>
+</nav>
+
+            <button
+                class="logout-btn"
+                type="button"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- CONTENT -->
+        <main class="production-content">
+
+            <!-- HEADER -->
+            <header class="production-header">
+
+                <div>
+                    <h1>Produksi & Stok</h1>
+
+                    <p>
+                        Kelola produksi dan stok harian
+                    </p>
+                </div>
+
+                <div class="user-info">
+
+                    <span>
+                        Login sebagai
+                    </span>
+
+                    <strong id="namaUser">
+                        Pemilik Usaha
+                    </strong>
+
+                </div>
+
+            </header>
+
+
+            <!-- STOCK CARDS -->
+            <section class="stock-cards">
+
+                <div class="stock-card">
+                    <p>Stok Awal</p>
+                    <h2 id="stokAwal">0 Porsi</h2>
+                </div>
+
+                <div class="stock-card">
+                    <p>Terjual</p>
+                    <h2 id="stokTerjual">0 Porsi</h2>
+                </div>
+
+                <div class="stock-card">
+                    <p>Waste</p>
+                    <h2 id="stokWaste">0 Porsi</h2>
+                </div>
+
+                <div class="stock-card">
+                    <p>Stok Sistem</p>
+                    <h2 id="stokSistem">0 Porsi</h2>
+                </div>
+
+            </section>
+
+
+            <!-- STATUS STOK -->
+            <section class="production-section">
+
+                <div
+                    id="stockAlert"
+                    class="stock-alert"
+                >
+                    STOK HABIS
+                </div>
+
+            </section>
+
+
+            <!-- INPUT PRODUKSI -->
+            <section class="production-section">
+
+                <div class="section-header">
+                    <h2>Input Produksi</h2>
+
+                    <p>
+                        Masukkan hasil produksi hari ini
+                    </p>
+                </div>
+
+
+                <form id="productionForm">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label for="productionDate">
+                                Tanggal Produksi
+                            </label>
+
+                            <input
+                                type="date"
+                                id="productionDate"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="ingredient">
+                                Bahan / Produk
+                            </label>
+
+                            <input
+                                type="text"
+                                id="ingredient"
+                                placeholder="Contoh: Daging matang"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="stockWeight">
+                                Berat Produksi (Kg)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="stockWeight"
+                                min="0.1"
+                                step="0.1"
+                                placeholder="Contoh: 50"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="estimatedPortion">
+                                Estimasi Porsi
+                            </label>
+
+                            <input
+                                type="number"
+                                id="estimatedPortion"
+                                min="1"
+                                step="0.5"
+                                placeholder="Contoh: 100"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="notes">
+                            Catatan
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            rows="4"
+                            placeholder="Contoh: Produksi pagi"
+                        ></textarea>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        Simpan Produksi
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- RIWAYAT PRODUKSI -->
+            <section class="production-section">
+
+                <div class="section-header">
+                    <h2>Riwayat Produksi</h2>
+
+                    <p>
+                        Data produksi yang telah disimpan
+                    </p>
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Bahan / Produk</th>
+                                <th>Berat</th>
+                                <th>Estimasi Porsi</th>
+                                <th>Catatan</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="productionTable">
+
+                            <tr>
+                                <td colspan="5">
+                                    Belum ada data produksi.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="produksi.js"></script>
+
+</body>
+
+</html>
