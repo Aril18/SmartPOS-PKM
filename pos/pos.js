@@ -116,7 +116,7 @@ async function loadMenusFromAPI() {
             error
         );
 
-
+        
         showMessage(
             "Menu gagal dimuat dari database.",
             "error"
@@ -125,7 +125,7 @@ async function loadMenusFromAPI() {
     }
 
 }
-    
+
 /* =========================================
    CART & FILTER
 ========================================= */
