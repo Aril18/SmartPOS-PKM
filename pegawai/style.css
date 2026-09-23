@@ -5,10 +5,15 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     background: #f5f7fb;
     color: #1f2937;
 }
+
+
+/* =========================================
+   EMPLOYEE CONTAINER
+========================================= */
 
 .employee-container {
     display: flex;
@@ -37,6 +42,9 @@ body {
     bottom: 0;
 }
 
+
+/* LOGO */
+
 .logo {
     margin-bottom: 35px;
 }
@@ -55,6 +63,11 @@ body {
 
     font-size: 12px;
 }
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
 
 .sidebar nav {
     display: flex;
@@ -92,31 +105,24 @@ body {
     color: #ffffff;
 }
 
+
+/* =========================================
+   SIDEBAR USER
+========================================= */
+
+/*
+   Disembunyikan agar tampilan sidebar
+   sama seperti Dashboard.
+*/
+
 .sidebar-user {
-    display: flex;
-    flex-direction: column;
-
-    padding-top: 18px;
-
-    margin-top: 20px;
-    margin-bottom: 15px;
-
-    border-top: 1px solid #374151;
+    display: none;
 }
 
-.sidebar-user span {
-    font-size: 11px;
 
-    color: #9ca3af;
-
-    margin-bottom: 5px;
-}
-
-.sidebar-user strong {
-    color: #ffffff;
-
-    font-size: 13px;
-}
+/* =========================================
+   LOGOUT
+========================================= */
 
 .logout-btn {
     width: 100%;
@@ -134,6 +140,8 @@ body {
     font-weight: 600;
 
     cursor: pointer;
+
+    transition: 0.2s;
 }
 
 .logout-btn:hover {
@@ -142,7 +150,7 @@ body {
 
 
 /* =========================================
-   CONTENT
+   EMPLOYEE CONTENT
 ========================================= */
 
 .employee-content {
@@ -162,6 +170,7 @@ body {
 
 .page-header {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
 
@@ -171,19 +180,20 @@ body {
 
     border-radius: 14px;
 
-    border: 1px solid #e5e7eb;
-
     margin-bottom: 25px;
 
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e5e7eb;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 }
 
 .page-header h1 {
     font-size: 26px;
-
-    color: #111827;
+    font-weight: 700;
 
     margin-bottom: 5px;
+
+    color: #111827;
 }
 
 .page-header p {
@@ -192,19 +202,24 @@ body {
     color: #6b7280;
 }
 
+
+/* =========================================
+   USER INFO
+========================================= */
+
 .user-info {
     display: flex;
     flex-direction: column;
 
     text-align: right;
+
+    gap: 3px;
 }
 
 .user-info span {
     color: #9ca3af;
 
-    font-size: 11px;
-
-    margin-bottom: 4px;
+    font-size: 12px;
 }
 
 .user-info strong {
@@ -215,7 +230,7 @@ body {
 
 
 /* =========================================
-   SUMMARY
+   SUMMARY CARDS
 ========================================= */
 
 .summary-cards {
@@ -237,7 +252,22 @@ body {
 
     padding: 22px;
 
+    min-height: 115px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    transition: 0.2s;
+
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
 }
 
 .summary-card p {
@@ -252,11 +282,12 @@ body {
     color: #111827;
 
     font-size: 24px;
+    font-weight: 700;
 }
 
 
 /* =========================================
-   SECTION
+   EMPLOYEE SECTION
 ========================================= */
 
 .employee-section {
@@ -278,17 +309,17 @@ body {
 }
 
 .section-header h2 {
-    color: #111827;
-
     font-size: 18px;
+
+    color: #111827;
 
     margin-bottom: 5px;
 }
 
 .section-header p {
-    color: #6b7280;
-
     font-size: 13px;
+
+    color: #6b7280;
 }
 
 .table-header {
@@ -344,7 +375,13 @@ body {
 
     font-size: 13px;
 
+    font-family: "Inter", sans-serif;
+
+    color: #1f2937;
+
     outline: none;
+
+    transition: 0.2s;
 }
 
 .form-group input:focus,
@@ -357,8 +394,13 @@ body {
 .form-group small {
     color: #9ca3af;
 
-    font-size: 10px;
+    font-size: 11px;
 }
+
+
+/* =========================================
+   FORM ACTIONS
+========================================= */
 
 .form-actions {
     display: flex;
@@ -379,7 +421,11 @@ body {
     font-size: 13px;
     font-weight: 600;
 
+    font-family: "Inter", sans-serif;
+
     cursor: pointer;
+
+    transition: 0.2s;
 }
 
 .save-button:hover {
@@ -399,7 +445,11 @@ body {
     font-size: 13px;
     font-weight: 600;
 
+    font-family: "Inter", sans-serif;
+
     cursor: pointer;
+
+    transition: 0.2s;
 }
 
 .cancel-button:hover {
@@ -422,11 +472,15 @@ body {
 
     font-size: 12px;
 
+    font-family: "Inter", sans-serif;
+
     outline: none;
 }
 
 .search-input:focus {
     border-color: #2563eb;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
 }
 
 
@@ -453,11 +507,13 @@ table thead {
 table th {
     text-align: left;
 
-    padding: 13px 15px;
-
     color: #6b7280;
 
-    font-size: 11px;
+    font-size: 12px;
+
+    font-weight: 600;
+
+    padding: 13px 15px;
 
     border-bottom: 1px solid #e5e7eb;
 }
@@ -465,9 +521,9 @@ table th {
 table td {
     padding: 14px 15px;
 
-    color: #374151;
+    font-size: 13px;
 
-    font-size: 12px;
+    color: #374151;
 
     border-bottom: 1px solid #f1f5f9;
 }
@@ -484,11 +540,11 @@ table tbody tr:hover {
 .status {
     display: inline-block;
 
-    padding: 5px 9px;
+    padding: 6px 10px;
 
     border-radius: 20px;
 
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
 }
 
@@ -512,11 +568,11 @@ table tbody tr:hover {
 .role-badge {
     display: inline-block;
 
-    padding: 5px 9px;
+    padding: 6px 10px;
 
     border-radius: 20px;
 
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
 
     background: #dbeafe;
@@ -526,7 +582,7 @@ table tbody tr:hover {
 
 
 /* =========================================
-   BUTTON EDIT
+   EDIT BUTTON
 ========================================= */
 
 .edit-button {
@@ -536,14 +592,18 @@ table tbody tr:hover {
 
     color: #1d4ed8;
 
-    padding: 7px 11px;
+    padding: 7px 12px;
 
     border-radius: 6px;
 
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
 
+    font-family: "Inter", sans-serif;
+
     cursor: pointer;
+
+    transition: 0.2s;
 }
 
 .edit-button:hover {
@@ -555,18 +615,46 @@ table tbody tr:hover {
    RESPONSIVE
 ========================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
 
     .summary-cards {
         grid-template-columns: repeat(2, 1fr);
     }
-
 }
 
-@media (max-width: 800px) {
+
+@media (max-width: 768px) {
+
+    .sidebar {
+        width: 200px;
+    }
+
+    .employee-content {
+        margin-left: 200px;
+
+        width: calc(100% - 200px);
+
+        padding: 20px;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
 
     .form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .user-info {
+        text-align: left;
     }
 
     .table-header {
@@ -578,5 +666,4 @@ table tbody tr:hover {
     .search-input {
         width: 100%;
     }
-
 }
