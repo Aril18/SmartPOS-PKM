@@ -5,7 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Produksi & Stok - SmartPOS</title>
+    <title>Produksi &amp; Stok - SmartPOS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -22,47 +30,51 @@
                 <p>Sales & Stock Control</p>
             </div>
 
-           <nav>
-    <a href="../Dashboard/index.html">
-        Dashboard
-    </a>
 
-    <a href="../pos/index.html">
-        Kasir / POS
-    </a>
+            <nav>
 
-    <a href="../produksi/index.html">
-        Produksi &amp; Stok
-    </a>
+                <a href="../Dashboard/index.html">
+                    Dashboard
+                </a>
 
-    <a href="../menu/index.html">
-        Menu
-    </a>
+                <a href="../pos/index.html">
+                    Kasir / POS
+                </a>
 
-    <a href="../waste/index.html">
-        Waste
-    </a>
+                <a href="index.html" class="active">
+                    Produksi &amp; Stok
+                </a>
 
-    <a href="../stock-opname/index.html">
-        Stock Opname
-    </a>
+                <a href="../menu/index.html">
+                    Menu
+                </a>
 
-    <a href="../closing/index.html">
-        Closing
-    </a>
+                <a href="../waste/index.html">
+                    Waste
+                </a>
 
-    <a href="../pegawai/index.html">
-        Pegawai
-    </a>
+                <a href="../stock-opname/index.html">
+                    Stock Opname
+                </a>
 
-    <a href="../audit/index.html">
-        Audit Aktivitas
-    </a>
+                <a href="../closing/index.html">
+                    Closing
+                </a>
 
-    <a href="../laporan/index.html">
-        Laporan
-    </a>
-</nav>
+                <a href="../pegawai/index.html">
+                    Pegawai
+                </a>
+
+                <a href="../audit/index.html">
+                    Audit Aktivitas
+                </a>
+
+                <a href="../laporan/index.html">
+                    Laporan
+                </a>
+
+            </nav>
+
 
             <button
                 class="logout-btn"
@@ -82,12 +94,17 @@
             <header class="production-header">
 
                 <div>
-                    <h1>Produksi & Stok</h1>
+
+                    <h1>
+                        Produksi &amp; Stok
+                    </h1>
 
                     <p>
                         Kelola produksi dan stok harian
                     </p>
+
                 </div>
+
 
                 <div class="user-info">
 
@@ -108,23 +125,54 @@
             <section class="stock-cards">
 
                 <div class="stock-card">
-                    <p>Stok Awal</p>
-                    <h2 id="stokAwal">0 Porsi</h2>
+
+                    <p>
+                        Stok Awal
+                    </p>
+
+                    <h2 id="stokAwal">
+                        0 Porsi
+                    </h2>
+
                 </div>
 
-                <div class="stock-card">
-                    <p>Terjual</p>
-                    <h2 id="stokTerjual">0 Porsi</h2>
-                </div>
 
                 <div class="stock-card">
-                    <p>Waste</p>
-                    <h2 id="stokWaste">0 Porsi</h2>
+
+                    <p>
+                        Terjual
+                    </p>
+
+                    <h2 id="stokTerjual">
+                        0 Porsi
+                    </h2>
+
                 </div>
 
+
                 <div class="stock-card">
-                    <p>Stok Sistem</p>
-                    <h2 id="stokSistem">0 Porsi</h2>
+
+                    <p>
+                        Waste
+                    </p>
+
+                    <h2 id="stokWaste">
+                        0 Porsi
+                    </h2>
+
+                </div>
+
+
+                <div class="stock-card">
+
+                    <p>
+                        Stok Sistem
+                    </p>
+
+                    <h2 id="stokSistem">
+                        0 Porsi
+                    </h2>
+
                 </div>
 
             </section>
@@ -147,17 +195,22 @@
             <section class="production-section">
 
                 <div class="section-header">
-                    <h2>Input Produksi</h2>
+
+                    <h2>
+                        Input Produksi
+                    </h2>
 
                     <p>
                         Masukkan hasil produksi hari ini
                     </p>
+
                 </div>
 
 
                 <form id="productionForm">
 
                     <div class="form-grid">
+
 
                         <div class="form-group">
 
@@ -259,11 +312,15 @@
             <section class="production-section">
 
                 <div class="section-header">
-                    <h2>Riwayat Produksi</h2>
+
+                    <h2>
+                        Riwayat Produksi
+                    </h2>
 
                     <p>
                         Data produksi yang telah disimpan
                     </p>
+
                 </div>
 
 
@@ -272,6 +329,7 @@
                     <table>
 
                         <thead>
+
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Bahan / Produk</th>
@@ -279,14 +337,18 @@
                                 <th>Estimasi Porsi</th>
                                 <th>Catatan</th>
                             </tr>
+
                         </thead>
+
 
                         <tbody id="productionTable">
 
                             <tr>
+
                                 <td colspan="5">
                                     Belum ada data produksi.
                                 </td>
+
                             </tr>
 
                         </tbody>
@@ -300,6 +362,7 @@
         </main>
 
     </div>
+
 
     <script src="produksi.js"></script>
 

@@ -5,10 +5,15 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     background: #f5f7fb;
     color: #1f2937;
 }
+
+
+/* =========================================
+   STOCK OPNAME CONTAINER
+========================================= */
 
 .stock-opname-container {
     display: flex;
@@ -21,12 +26,12 @@ body {
 ========================================= */
 
 .sidebar {
-    width: 170px;
+    width: 250px;
     min-height: 100vh;
 
     background: #111827;
 
-    padding: 20px 14px;
+    padding: 28px 20px;
 
     display: flex;
     flex-direction: column;
@@ -37,72 +42,96 @@ body {
     bottom: 0;
 }
 
+
+/* LOGO */
+
 .logo {
-    margin-bottom: 25px;
+    margin-bottom: 35px;
 }
 
 .logo h2 {
     color: #ffffff;
 
-    font-size: 17px;
+    font-size: 24px;
+    font-weight: 700;
 
-    margin-bottom: 4px;
+    margin-bottom: 5px;
 }
 
 .logo p {
     color: #9ca3af;
 
-    font-size: 8px;
+    font-size: 12px;
 }
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
 
 .sidebar nav {
     display: flex;
     flex-direction: column;
 
-    gap: 5px;
+    gap: 7px;
 
     flex: 1;
 }
 
 .sidebar nav a {
+    display: block;
+
     text-decoration: none;
 
-    color: #ffffff;
+    color: #cbd5e1;
 
-    padding: 10px;
+    padding: 12px 14px;
 
-    border-radius: 6px;
+    border-radius: 8px;
 
-    font-size: 10px;
+    font-size: 14px;
+    font-weight: 500;
 
     transition: 0.2s;
 }
 
 .sidebar nav a:hover {
     background: #1f2937;
+    color: #ffffff;
 }
 
 .sidebar nav a.active {
     background: #2563eb;
+    color: #ffffff;
 }
+
+
+/* =========================================
+   LOGOUT
+========================================= */
 
 .logout-btn {
     width: 100%;
 
     border: none;
 
-    padding: 9px;
-
     background: #fee2e2;
-
     color: #dc2626;
 
-    border-radius: 6px;
+    padding: 12px;
 
-    font-size: 10px;
+    border-radius: 8px;
+
+    font-size: 13px;
     font-weight: 600;
 
     cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    background: #fecaca;
 }
 
 
@@ -111,11 +140,11 @@ body {
 ========================================= */
 
 .stock-opname-content {
-    margin-left: 170px;
+    margin-left: 250px;
 
-    width: calc(100% - 170px);
+    width: calc(100% - 250px);
 
-    padding: 22px;
+    padding: 32px;
 
     min-height: 100vh;
 }
@@ -127,56 +156,67 @@ body {
 
 .page-header {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
 
     background: #ffffff;
 
-    padding: 18px;
+    padding: 22px 25px;
+
+    border-radius: 14px;
+
+    margin-bottom: 25px;
 
     border: 1px solid #e5e7eb;
 
-    border-radius: 10px;
-
-    margin-bottom: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 }
 
 .page-header h1 {
-    font-size: 22px;
+    font-size: 26px;
+    font-weight: 700;
+
+    margin-bottom: 5px;
 
     color: #111827;
-
-    margin-bottom: 4px;
 }
 
 .page-header p {
-    color: #6b7280;
+    font-size: 14px;
 
-    font-size: 11px;
+    color: #6b7280;
 }
+
+
+/* =========================================
+   USER INFO
+========================================= */
 
 .user-info {
     display: flex;
     flex-direction: column;
 
     text-align: right;
+
+    gap: 3px;
 }
 
 .user-info span {
     color: #9ca3af;
 
-    font-size: 9px;
+    font-size: 12px;
 }
 
 .user-info strong {
     color: #111827;
 
-    font-size: 11px;
+    font-size: 14px;
 }
 
 
 /* =========================================
-   SUMMARY
+   SUMMARY CARDS
 ========================================= */
 
 .summary-cards {
@@ -184,33 +224,51 @@ body {
 
     grid-template-columns: repeat(4, 1fr);
 
-    gap: 14px;
+    gap: 18px;
 
-    margin-bottom: 18px;
+    margin-bottom: 25px;
 }
 
 .summary-card {
     background: #ffffff;
 
-    padding: 18px;
-
     border: 1px solid #e5e7eb;
 
-    border-radius: 10px;
+    border-radius: 14px;
+
+    padding: 22px;
+
+    min-height: 115px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    transition: 0.2s;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
 }
 
 .summary-card p {
     color: #6b7280;
 
-    font-size: 10px;
+    font-size: 13px;
 
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .summary-card h2 {
     color: #111827;
 
-    font-size: 18px;
+    font-size: 24px;
+    font-weight: 700;
 }
 
 
@@ -221,21 +279,25 @@ body {
 .opname-section {
     background: #ffffff;
 
-    padding: 20px;
-
     border: 1px solid #e5e7eb;
 
-    border-radius: 10px;
+    border-radius: 14px;
 
-    margin-bottom: 18px;
+    padding: 24px;
+
+    margin-bottom: 25px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
 }
 
 .section-header {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .section-header h2 {
-    font-size: 16px;
+    font-size: 18px;
+
+    color: #111827;
 
     margin-bottom: 5px;
 }
@@ -243,7 +305,7 @@ body {
 .section-header p {
     color: #6b7280;
 
-    font-size: 10px;
+    font-size: 13px;
 }
 
 
@@ -256,42 +318,54 @@ body {
 
     grid-template-columns: repeat(2, 1fr);
 
-    gap: 15px;
+    gap: 18px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
 
-    gap: 6px;
+    gap: 7px;
 
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .form-group label {
-    font-size: 10px;
+    font-size: 13px;
 
     font-weight: 600;
+
+    color: #374151;
 }
 
 .form-group input,
 .form-group textarea {
     width: 100%;
 
-    padding: 10px;
+    padding: 11px 12px;
 
     border: 1px solid #d1d5db;
 
-    border-radius: 6px;
+    border-radius: 8px;
 
-    font-size: 11px;
+    background: #ffffff;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 13px;
+
+    color: #1f2937;
 
     outline: none;
+
+    transition: 0.2s;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
     border-color: #2563eb;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
 }
 
 .form-group input[readonly] {
@@ -306,13 +380,13 @@ body {
 ========================================= */
 
 .status-box {
-    padding: 11px 13px;
+    padding: 14px 16px;
 
-    border-radius: 6px;
+    border-radius: 9px;
 
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
 }
 
@@ -349,17 +423,20 @@ body {
     border: none;
 
     background: #2563eb;
-
     color: #ffffff;
 
-    padding: 10px 18px;
+    padding: 11px 18px;
 
-    border-radius: 6px;
+    border-radius: 8px;
 
-    font-size: 11px;
+    font-family: "Inter", sans-serif;
+
+    font-size: 13px;
     font-weight: 600;
 
     cursor: pointer;
+
+    transition: 0.2s;
 }
 
 .save-button:hover {
@@ -390,23 +467,28 @@ table thead {
 table th {
     text-align: left;
 
-    padding: 11px;
-
     color: #6b7280;
 
-    font-size: 9px;
+    font-size: 12px;
+    font-weight: 600;
+
+    padding: 13px 15px;
 
     border-bottom: 1px solid #e5e7eb;
 }
 
 table td {
-    padding: 11px;
+    padding: 14px 15px;
 
-    font-size: 10px;
+    font-size: 13px;
 
     color: #374151;
 
     border-bottom: 1px solid #f1f5f9;
+}
+
+table tbody tr:hover {
+    background: #f8fafc;
 }
 
 
@@ -414,13 +496,45 @@ table td {
    RESPONSIVE
 ========================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
 
     .summary-cards {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+
+@media (max-width: 768px) {
+
+    .sidebar {
+        width: 200px;
+    }
+
+    .stock-opname-content {
+        margin-left: 200px;
+
+        width: calc(100% - 200px);
+
+        padding: 20px;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
 
     .form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .user-info {
+        text-align: left;
     }
 }

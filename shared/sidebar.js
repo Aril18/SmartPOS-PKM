@@ -48,8 +48,8 @@
 
         {
             name: "Produksi & Stok",
-            href: "../produksi &/index.html",
-            match: "/production/"
+            href: "../produksi/index.html",
+            match: "/produksi/"
         },
 
         {
@@ -78,8 +78,8 @@
 
         {
             name: "Pegawai",
-            href: "../laporan/index.html",
-            match: "/employee/"
+            href: "../pegawai/index.html",
+            match: "/pegawai/"
         },
 
         {
@@ -90,8 +90,8 @@
 
         {
             name: "Laporan",
-            href: "../report/index.html",
-            match: "/report/"
+            href: "../laporan/index.html",
+            match: "/laporan/"
         }
 
     ];
