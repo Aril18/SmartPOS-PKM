@@ -131,6 +131,116 @@ app.get(
 
     }
 );
+// =====================================================
+// POST TRANSACTION
+// =====================================================
+app.post("/api/transactions", async (req, res) => {
+    const connection = await pool.getConnection();
+
+    try {
+        const {
+            transactionCode,
+            cashierId,
+            paymentMethod,
+            total,
+            items
+        } = req.body;
+
+        // Validasi dasar
+        if (
+            !transactionCode ||
+            !cashierId ||
+            !paymentMethod ||
+            !Array.isArray(items) ||
+            items.length === 0
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Data transaksi tidak lengkap"
+            });
+        }
+
+        await connection.beginTransaction();
+
+        // 1. Simpan transaksi utama
+        const [transactionResult] = await connection.query(
+            `
+            INSERT INTO transactions
+            (
+                transaction_code,
+                cashier_id,
+                transaction_date,
+                payment_method,
+                total,
+                status
+            )
+            VALUES (?, ?, NOW(), ?, ?, 'SUCCESS')
+            `,
+            [
+                transactionCode,
+                cashierId,
+                paymentMethod,
+                total
+            ]
+        );
+
+        const transactionId = transactionResult.insertId;
+
+        // 2. Simpan setiap item transaksi
+        for (const item of items) {
+            const subtotal =
+                Number(item.price) * Number(item.quantity);
+
+            await connection.query(
+                `
+                INSERT INTO transaction_items
+                (
+                    transaction_id,
+                    menu_id,
+                    quantity,
+                    price,
+                    portion_usage,
+                    subtotal
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                `,
+                [
+                    transactionId,
+                    item.menuId,
+                    item.quantity,
+                    item.price,
+                    item.portionUsage || 0,
+                    subtotal
+                ]
+            );
+        }
+
+        await connection.commit();
+
+        res.status(201).json({
+            success: true,
+            message: "Transaksi berhasil disimpan",
+            transactionId,
+            transactionCode
+        });
+
+    } catch (error) {
+        await connection.rollback();
+
+        console.error("❌ Transaction Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Gagal menyimpan transaksi",
+            error: error.message
+        });
+
+    } finally {
+        connection.release();
+    }
+});
+
+
 
 /* =========================================
    SERVER
