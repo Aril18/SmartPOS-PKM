@@ -1,14 +1,19 @@
 (function () {
 
-    const STORAGE_KEY =
-        "umkmControlDataV1";
+    /* =========================================
+       CONFIG
+    ========================================= */
 
     const SESSION_KEY =
         "umkmControlSessionV1";
 
 
+    const API_URL =
+        "http://localhost:3000";
+
+
     /* =========================================
-       DATE
+       TODAY
     ========================================= */
 
     function todayISO() {
@@ -16,870 +21,98 @@
         const now =
             new Date();
 
+
         const year =
             now.getFullYear();
+
 
         const month =
             String(
                 now.getMonth() + 1
-            ).padStart(2, "0");
+            ).padStart(
+                2,
+                "0"
+            );
+
 
         const day =
             String(
                 now.getDate()
-            ).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-    }
-
-
-    /* =========================================
-       DATABASE AWAL
-    ========================================= */
-
-    function createSeedData() {
-
-        return {
-
-            schemaVersion: 2,
-
-
-            /* ===============================
-               INFORMASI USAHA
-            =============================== */
-
-            business: {
-
-                name:
-                    "Babi Guling Sari Kembar 99",
-
-                stockUnit:
-                    "Porsi"
-
-            },
-
-
-            /* ===============================
-               USER
-            =============================== */
-
-            users: [
-
-                {
-                    id: 1,
-
-                    name:
-                        "Pemilik Usaha",
-
-                    username:
-                        "owner",
-
-                    password:
-                        "owner123",
-
-                    role:
-                        "OWNER",
-
-                    status:
-                        "AKTIF"
-                },
-
-
-                {
-                    id: 2,
-
-                    name:
-                        "Made",
-
-                    username:
-                        "made",
-
-                    password:
-                        "123456",
-
-                    role:
-                        "KASIR",
-
-                    status:
-                        "AKTIF"
-                },
-
-
-                {
-                    id: 3,
-
-                    name:
-                        "Putu",
-
-                    username:
-                        "putu",
-
-                    password:
-                        "123456",
-
-                    role:
-                        "KASIR",
-
-                    status:
-                        "AKTIF"
-                },
-
-
-                {
-                    id: 4,
-
-                    name:
-                        "Kadek",
-
-                    username:
-                        "kadek",
-
-                    password:
-                        "123456",
-
-                    role:
-                        "KASIR",
-
-                    status:
-                        "AKTIF"
-                }
-
-            ],
-
-
-            /* ===============================
-               MENU
-            =============================== */
-
-            menus: [
-
-                {
-                    id: 1,
-                    code: "M001",
-
-                    name:
-                        "Nasi Babi Guling Biasa",
-
-                    category:
-                        "Paket Nasi",
-
-                    price:
-                        25000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 2,
-                    code: "M002",
-
-                    name:
-                        "Nasi Babi Guling Komplit",
-
-                    category:
-                        "Paket Nasi",
-
-                    price:
-                        40000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 3,
-                    code: "M003",
-
-                    name:
-                        "Nasi Babi Guling Spesial",
-
-                    category:
-                        "Paket Nasi",
-
-                    price:
-                        50000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 4,
-                    code: "M004",
-
-                    name:
-                        "Nasi Ayam Betutu",
-
-                    category:
-                        "Paket Nasi",
-
-                    price:
-                        20000,
-
-                    portionUsage:
-                        0,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 5,
-                    code: "M005",
-
-                    name:
-                        "Daging Guling",
-
-                    category:
-                        "Daging & Lauk",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 6,
-                    code: "M006",
-
-                    name:
-                        "Kulit",
-
-                    category:
-                        "Daging & Lauk",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 7,
-                    code: "M007",
-
-                    name:
-                        "Urutan",
-
-                    category:
-                        "Daging & Lauk",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 8,
-                    code: "M008",
-
-                    name:
-                        "Sate",
-
-                    category:
-                        "Daging & Lauk",
-
-                    price:
-                        50000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 9,
-                    code: "M009",
-
-                    name:
-                        "Daging Merah",
-
-                    category:
-                        "Gorengan",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 10,
-                    code: "M010",
-
-                    name:
-                        "Iga Goreng",
-
-                    category:
-                        "Gorengan",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 11,
-                    code: "M011",
-
-                    name:
-                        "Dendeng Manis",
-
-                    category:
-                        "Gorengan",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 12,
-                    code: "M012",
-
-                    name:
-                        "Usus Goreng",
-
-                    category:
-                        "Gorengan",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 13,
-                    code: "M013",
-
-                    name:
-                        "Paru Goreng",
-
-                    category:
-                        "Gorengan",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 14,
-                    code: "M014",
-
-                    name:
-                        "Ati Goreng",
-
-                    category:
-                        "Gorengan",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 15,
-                    code: "M015",
-
-                    name:
-                        "Sup Balung",
-
-                    category:
-                        "Sayur & Pendamping",
-
-                    price:
-                        15000,
-
-                    portionUsage:
-                        1,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 16,
-                    code: "M016",
-
-                    name:
-                        "Sayur Gonda",
-
-                    category:
-                        "Sayur & Pendamping",
-
-                    price:
-                        15000,
-
-                    portionUsage:
-                        0,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 17,
-                    code: "M017",
-
-                    name:
-                        "Lawar",
-
-                    category:
-                        "Sayur & Pendamping",
-
-                    price:
-                        15000,
-
-                    portionUsage:
-                        0,
-
-                    status:
-                        "TERSEDIA"
-                },
-
-
-                {
-                    id: 18,
-                    code: "M018",
-
-                    name:
-                        "Sate Lilit Ayam",
-
-                    category:
-                        "Daging & Lauk",
-
-                    price:
-                        30000,
-
-                    portionUsage:
-                        0,
-
-                    status:
-                        "TERSEDIA"
-                }
-
-            ],
-
-
-            /* ===============================
-               PRODUKSI / STOK AWAL
-            =============================== */
-
-            production: [
-
-                {
-                    id: 1,
-
-                    date:
-                        todayISO(),
-
-                    ingredient:
-                        "Daging matang",
-
-                    stockWeight:
-                        50,
-
-                    estimatedPortion:
-                        100,
-
-                    notes:
-                        "Produksi awal hari"
-                }
-
-            ],
-
-
-            /* ===============================
-               DATA TRANSAKSI
-            =============================== */
-
-            transactions: [],
-
-
-            /* ===============================
-               WASTE
-            =============================== */
-
-            waste: [],
-
-
-            /* ===============================
-               STOCK OPNAME
-            =============================== */
-
-            stockOpnames: [],
-
-
-            /* ===============================
-               CLOSING
-            =============================== */
-
-            closings: [],
-
-
-            /* ===============================
-               AUDIT LOG
-            =============================== */
-
-            auditLogs: []
-
-        };
-
-    }
-
-
-    /* =========================================
-       NORMALIZE DATABASE
-    ========================================= */
-
-    function normalizeDB(data) {
-
-        data =
-            data || {};
-
-
-        data.schemaVersion =
-            data.schemaVersion || 2;
-
-
-        data.business =
-            data.business || {
-
-                name:
-                    "Babi Guling Sari Kembar 99",
-
-                stockUnit:
-                    "Porsi"
-
-            };
-
-
-        data.users =
-            data.users || [];
-
-        data.menus =
-            data.menus || [];
-
-        data.production =
-            data.production || [];
-
-        data.transactions =
-            data.transactions || [];
-
-        data.waste =
-            data.waste || [];
-
-        data.stockOpnames =
-            data.stockOpnames || [];
-
-        data.closings =
-            data.closings || [];
-
-        data.auditLogs =
-            data.auditLogs || [];
-
-
-        return data;
-
-    }
-
-
-    /* =========================================
-       INITIALIZE DATABASE
-    ========================================= */
-
-    function initializeDatabase() {
-
-        const saved =
-            localStorage.getItem(
-                STORAGE_KEY
+            ).padStart(
+                2,
+                "0"
             );
 
 
-        if (!saved) {
-
-            const seed =
-                createSeedData();
-
-
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(seed)
-            );
-
-
-            return seed;
-
-        }
-
-
-        try {
-
-            const database =
-                normalizeDB(
-                    JSON.parse(saved)
-                );
-
-
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(database)
-            );
-
-
-            return database;
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Database rusak:",
-                error
-            );
-
-
-            const seed =
-                createSeedData();
-
-
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(seed)
-            );
-
-
-            return seed;
-
-        }
-
-    }
-
-
-    /* =========================================
-       GET DATABASE
-    ========================================= */
-
-    function getDB() {
-
-        return initializeDatabase();
-
-    }
-
-
-    /* =========================================
-       SAVE DATABASE
-    ========================================= */
-
-    function saveDB(database) {
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(database)
+        return (
+            `${year}-${month}-${day}`
         );
 
     }
 
 
     /* =========================================
-       LOGIN
+       API HELPER
     ========================================= */
 
-    function login(
-        selectedRole,
-        username,
-        password
+    async function apiRequest(
+        endpoint,
+        options = {}
     ) {
 
-        const database =
-            getDB();
+        const response =
+            await fetch(
+                `${API_URL}${endpoint}`,
+                {
 
+                    ...options,
 
-        const user =
-            database.users.find(
-                item =>
+                    headers: {
 
-                    item.username ===
-                    username
+                        "Content-Type":
+                            "application/json",
 
-                    &&
+                        ...(options.headers || {})
 
-                    item.password ===
-                    password
+                    }
 
-                    &&
-
-                    item.status ===
-                    "AKTIF"
+                }
             );
 
 
-        if (!user) {
+        let result;
 
-            return {
 
-                success: false,
+        try {
 
-                message:
-                    "Username atau password salah."
+            result =
+                await response.json();
 
-            };
+        }
+
+        catch {
+
+            throw new Error(
+                "Respons server tidak valid."
+            );
 
         }
 
 
         if (
-            user.role !==
-            selectedRole
+            !response.ok ||
+            !result.success
         ) {
 
-            return {
-
-                success: false,
-
-                message:
-
-                    selectedRole ===
-                    "OWNER"
-
-                        ?
-                        "Akun ini bukan akun Owner."
-
-                        :
-                        "Akun ini bukan akun Pegawai."
-
-            };
+            throw new Error(
+                result.message ||
+                "Terjadi kesalahan pada server."
+            );
 
         }
 
 
-        const session = {
-
-            id:
-                user.id,
-
-            name:
-                user.name,
-
-            username:
-                user.username,
-
-            role:
-                user.role
-
-        };
-
-
-        localStorage.setItem(
-            SESSION_KEY,
-            JSON.stringify(session)
-        );
-
-
-        database.auditLogs.push({
-
-            id:
-                Date.now(),
-
-            userId:
-                user.id,
-
-            action:
-                "LOGIN",
-
-            description:
-                `Login sebagai ${user.role}`,
-
-            createdAt:
-                new Date()
-                    .toISOString()
-
-        });
-
-
-        saveDB(database);
-
-
-        return {
-
-            success: true,
-
-            user:
-                session
-
-        };
+        return result;
 
     }
 
@@ -893,18 +126,252 @@
         try {
 
             return JSON.parse(
+
                 localStorage.getItem(
                     SESSION_KEY
                 )
+
                 ||
+
                 "null"
+
             );
 
         }
 
-        catch {
+        catch (error) {
+
+            console.error(
+                "Session Error:",
+                error
+            );
+
 
             return null;
+
+        }
+
+    }
+
+
+    function setSession(user) {
+
+        const session = {
+
+            id:
+                Number(
+                    user.id
+                ),
+
+            name:
+                user.name,
+
+            username:
+                user.username,
+
+            role:
+                user.role,
+
+            status:
+                user.status
+
+        };
+
+
+        localStorage.setItem(
+
+            SESSION_KEY,
+
+            JSON.stringify(
+                session
+            )
+
+        );
+
+
+        return session;
+
+    }
+
+
+    /* =========================================
+       LOGIN MYSQL
+    ========================================= */
+
+    async function login(
+        selectedRole,
+        username,
+        password
+    ) {
+
+        try {
+
+            const result =
+                await apiRequest(
+                    "/api/login",
+                    {
+
+                        method:
+                            "POST",
+
+                        body:
+                            JSON.stringify({
+
+                                username:
+                                    username,
+
+                                password:
+                                    password
+
+                            })
+
+                    }
+                );
+
+
+            const user =
+                result.user;
+
+
+            if (!user) {
+
+                return {
+
+                    success:
+                        false,
+
+                    message:
+                        "Data pengguna tidak ditemukan."
+
+                };
+
+            }
+
+
+            if (
+                String(
+                    user.role
+                ).toUpperCase()
+                !==
+                String(
+                    selectedRole
+                ).toUpperCase()
+            ) {
+
+                return {
+
+                    success:
+                        false,
+
+                    message:
+
+                        String(
+                            selectedRole
+                        ).toUpperCase()
+                        ===
+                        "OWNER"
+
+                            ?
+
+                            "Akun ini bukan akun Owner."
+
+                            :
+
+                            "Akun ini bukan akun Pegawai."
+
+                };
+
+            }
+
+
+            const session =
+                setSession(
+                    user
+                );
+
+
+            return {
+
+                success:
+                    true,
+
+                user:
+                    session
+
+            };
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Login API Error:",
+                error
+            );
+
+
+            return {
+
+                success:
+                    false,
+
+                message:
+                    error.message ||
+                    "Tidak dapat terhubung ke server SmartPOS."
+
+            };
+
+        }
+
+    }
+
+
+    /* =========================================
+       GET USERS MYSQL
+    ========================================= */
+
+    async function getUsers() {
+
+        try {
+
+            const result =
+                await apiRequest(
+                    "/api/users"
+                );
+
+
+            return {
+
+                success:
+                    true,
+
+                data:
+                    result.data || []
+
+            };
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Get Users Error:",
+                error
+            );
+
+
+            return {
+
+                success:
+                    false,
+
+                data:
+                    [],
+
+                message:
+                    error.message
+
+            };
 
         }
 
@@ -920,6 +387,7 @@
         localStorage.removeItem(
             SESSION_KEY
         );
+
 
         window.location.href =
             "../index.html";
@@ -944,19 +412,51 @@
             window.location.href =
                 "../index.html";
 
+
             return null;
 
         }
 
 
+        const roles =
+            Array.isArray(
+                allowedRoles
+            )
+
+                ?
+
+                allowedRoles
+
+                :
+
+                [
+                    allowedRoles
+                ];
+
+
+        const normalizedRoles =
+            roles.map(
+                role =>
+                    String(
+                        role
+                    ).toUpperCase()
+            );
+
+
+        const currentRole =
+            String(
+                session.role || ""
+            ).toUpperCase();
+
+
         if (
-            !allowedRoles.includes(
-                session.role
+            !normalizedRoles.includes(
+                currentRole
             )
         ) {
 
             if (
-                session.role ===
+                currentRole ===
                 "OWNER"
             ) {
 
@@ -984,13 +484,19 @@
 
 
     /* =========================================
-       SIDEBAR ROLE
+       ROLE NAVIGATION
     ========================================= */
 
     function applyRoleNavigation() {
 
         const session =
             getSession();
+
+
+        const role =
+            String(
+                session?.role || ""
+            ).toUpperCase();
 
 
         document
@@ -1002,43 +508,19 @@
 
                     element.style.display =
 
-                        session?.role ===
+                        role ===
                         "OWNER"
 
                             ?
+
                             ""
 
                             :
+
                             "none";
 
                 }
             );
-
-    }
-
-
-    /* =========================================
-       RESET DATABASE UNTUK TESTING
-    ========================================= */
-
-    function resetDemoDatabase() {
-
-        const database =
-            createSeedData();
-
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(database)
-        );
-
-
-        localStorage.removeItem(
-            SESSION_KEY
-        );
-
-
-        return database;
 
     }
 
@@ -1049,33 +531,29 @@
 
     window.SmartPOSDB = {
 
-        STORAGE_KEY,
-
         SESSION_KEY,
+
+        API_URL,
 
         todayISO,
 
-        getDB,
-
-        saveDB,
+        apiRequest,
 
         login,
 
+        getUsers,
+
         getSession,
+
+        setSession,
 
         logout,
 
         requireRole,
 
-        applyRoleNavigation,
-
-        resetDemoDatabase
+        applyRoleNavigation
 
     };
 
-
-    /* AUTO INIT */
-
-    initializeDatabase();
 
 })();

@@ -1,320 +1,658 @@
-const STORAGE_KEY = "umkmControlDataV1";
-const SESSION_KEY = "umkmControlSessionV1";
+const SESSION_KEY =
+    "umkmControlSessionV1";
 
-let currentUser =
-    JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-
-let db =
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+const API_URL =
+    "http://localhost:3000";
 
 
-// ==========================================
-// CEK LOGIN
-// ==========================================
+/* =========================================
+   SESSION
+========================================= */
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem(
+            SESSION_KEY
+        ) || "null"
+    );
+
 
 if (!currentUser) {
-    window.location.href = "../index.html";
+
+    window.location.href =
+        "../index.html";
+
 }
 
 
-// ==========================================
-// CEK ROLE
-// ==========================================
+if (
+    currentUser &&
+    currentUser.role !== "OWNER"
+) {
 
-if (currentUser && currentUser.role !== "OWNER") {
-    window.location.href = "../pos/index.html";
+    window.location.href =
+        "../pos/index.html";
+
 }
 
 
-// ==========================================
-// SIAPKAN DATABASE
-// ==========================================
+/* =========================================
+   DATA MYSQL
+========================================= */
 
-db.users = db.users || [];
-db.menus = db.menus || [];
-db.production = db.production || [];
-db.transactions = db.transactions || [];
-db.waste = db.waste || [];
-db.stockOpnames = db.stockOpnames || [];
-db.closings = db.closings || [];
-db.auditLogs = db.auditLogs || [];
+const db = {
+
+    menus: [],
+
+    production: [],
+
+    transactions: [],
+
+    waste: [],
+
+    stockOpnames: []
+
+};
 
 
-// ==========================================
-// SIMPAN DATABASE
-// ==========================================
+/* =========================================
+   API HELPER
+========================================= */
 
-function saveDB() {
+async function apiRequest(
+    url,
+    options = {}
+) {
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(db)
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
+
+                ...options,
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
+
+    const result =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Terjadi kesalahan pada server."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================
+   LOAD MENUS
+========================================= */
+
+async function loadMenus() {
+
+    const result =
+        await apiRequest(
+            "/api/menus"
+        );
+
+
+    db.menus =
+        (result.data || [])
+            .map(
+                menu => ({
+
+                    ...menu,
+
+                    id:
+                        Number(
+                            menu.id
+                        ),
+
+                    portionUsage:
+                        Number(
+                            menu.portionUsage || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD PRODUCTION
+========================================= */
+
+async function loadProduction() {
+
+    const result =
+        await apiRequest(
+            "/api/production"
+        );
+
+
+    db.production =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    estimatedPortion:
+                        Number(
+                            item.estimatedPortion || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD TRANSACTIONS
+========================================= */
+
+async function loadTransactions() {
+
+    const result =
+        await apiRequest(
+            "/api/transactions"
+        );
+
+
+    db.transactions =
+        (result.data || [])
+            .map(
+                transaction => ({
+
+                    ...transaction,
+
+                    id:
+                        Number(
+                            transaction.id
+                        ),
+
+                    total:
+                        Number(
+                            transaction.total || 0
+                        ),
+
+                    items:
+                        (
+                            transaction.items || []
+                        )
+                            .map(
+                                item => ({
+
+                                    ...item,
+
+                                    menuId:
+                                        Number(
+                                            item.menuId
+                                        ),
+
+                                    quantity:
+                                        Number(
+                                            item.quantity || 0
+                                        ),
+
+                                    portionUsageAtSale:
+                                        Number(
+                                            item.portionUsageAtSale || 0
+                                        )
+
+                                })
+                            )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD WASTE
+========================================= */
+
+async function loadWaste() {
+
+    const result =
+        await apiRequest(
+            "/api/waste"
+        );
+
+
+    db.waste =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    quantity:
+                        Number(
+                            item.quantity || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            item.portionUsage || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD STOCK OPNAMES
+========================================= */
+
+async function loadStockOpnames() {
+
+    const result =
+        await apiRequest(
+            "/api/stock-opnames"
+        );
+
+
+    db.stockOpnames =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    expectedStock:
+                        Number(
+                            item.expectedStock || 0
+                        ),
+
+                    physicalStock:
+                        Number(
+                            item.physicalStock || 0
+                        ),
+
+                    difference:
+                        Number(
+                            item.difference || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ STOCK OPNAME MYSQL:",
+        db.stockOpnames
     );
+
 }
 
 
-// ==========================================
-// TANGGAL HARI INI
-// ==========================================
+/* =========================================
+   DATE
+========================================= */
 
 function todayISO() {
 
     const now =
         new Date();
 
+
     const year =
         now.getFullYear();
 
+
     const month =
-        String(now.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
-        String(now.getDate())
-            .padStart(2, "0");
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     return `${year}-${month}-${day}`;
+
 }
 
 
-// ==========================================
-// FORMAT PORSI
-// ==========================================
+/* =========================================
+   FORMAT
+========================================= */
 
 function formatPortion(value) {
 
     const number =
-        Number(value || 0);
+        Number(
+            value || 0
+        );
 
-    if (Number.isInteger(number)) {
+
+    if (
+        Number.isInteger(
+            number
+        )
+    ) {
+
         return number;
+
     }
 
+
     return number
-        .toFixed(2)
-        .replace(/0+$/, "")
-        .replace(/\.$/, "");
+        .toFixed(
+            2
+        )
+        .replace(
+            /0+$/,
+            ""
+        )
+        .replace(
+            /\.$/,
+            ""
+        );
+
 }
 
 
-// ==========================================
-// AMBIL MENU
-// ==========================================
+/* =========================================
+   MENU
+========================================= */
 
 function getMenu(menuId) {
 
     return db.menus.find(
+
         menu =>
-            Number(menu.id) ===
-            Number(menuId)
+            Number(
+                menu.id
+            )
+            ===
+            Number(
+                menuId
+            )
+
     );
+
 }
 
 
-// ==========================================
-// PRODUKSI HARI INI
-// ==========================================
+/* =========================================
+   STOCK PER DATE
+========================================= */
 
-function productionToday() {
+function productionPortions(date) {
 
-    const today =
-        todayISO();
+    return db.production
 
-    return db.production.filter(
-        item =>
-            item.date === today
-    );
-}
-
-
-// ==========================================
-// STOK AWAL
-// ==========================================
-
-function initialPortionsToday() {
-
-    return productionToday().reduce(
-        (total, item) =>
-            total +
-            Number(item.estimatedPortion || 0),
-        0
-    );
-}
-
-
-// ==========================================
-// TRANSAKSI HARI INI
-// ==========================================
-
-function validTransactions() {
-
-    const today =
-        todayISO();
-
-    return db.transactions.filter(
-        transaction =>
-            transaction.date === today &&
-            transaction.status !== "VOID"
-    );
-}
-
-
-// ==========================================
-// PORSI TERJUAL
-// ==========================================
-
-function soldPortionsToday() {
-
-    return validTransactions().reduce(
-        (total, transaction) => {
-
-            const items =
-                transaction.items || [];
-
-
-            const portions =
-                items.reduce(
-                    (subtotal, item) => {
-
-                        const menu =
-                            getMenu(item.menuId);
-
-
-                        const portionUsage =
-                            Number(
-                                item.portionUsageAtSale ??
-                                menu?.portionUsage ??
-                                0
-                            );
-
-
-                        return subtotal +
-                            (
-                                Number(item.quantity || 0) *
-                                portionUsage
-                            );
-                    },
-                    0
-                );
-
-
-            return total +
-                portions;
-        },
-        0
-    );
-}
-
-
-// ==========================================
-// WASTE
-// ==========================================
-
-function wastePortionsToday() {
-
-    const today =
-        todayISO();
-
-
-    return db.waste
-        .filter(item => {
-
-            if (item.date) {
-                return item.date === today;
-            }
-
-
-            if (item.createdAt) {
-
-                return (
-                    item.createdAt.substring(0, 10)
-                    === today
-                );
-            }
-
-
-            return false;
-        })
+        .filter(
+            item =>
+                item.date ===
+                date
+        )
 
         .reduce(
-            (total, item) =>
+            (
+                total,
+                item
+            ) =>
 
-                total +
-
-                (
-                    Number(item.quantity || 0) *
-
-                    Number(
-                        item.portionUsage ?? 1
-                    )
+                total
+                +
+                Number(
+                    item.estimatedPortion || 0
                 ),
 
             0
         );
+
 }
 
 
-// ==========================================
-// STOK SISTEM
-// ==========================================
+function validTransactions(date) {
 
-function expectedStockToday() {
+    return db.transactions.filter(
 
-    return (
-        initialPortionsToday()
-        -
-        soldPortionsToday()
-        -
-        wastePortionsToday()
+        transaction =>
+
+            transaction.date ===
+            date
+
+            &&
+
+            transaction.status !==
+            "VOID"
+
     );
+
 }
 
 
-// ==========================================
-// HITUNG SELISIH
-// ==========================================
+function soldPortions(date) {
 
-function calculateDifference() {
+    return validTransactions(
+        date
+    )
+        .reduce(
 
-    const systemStock =
-        expectedStockToday();
+            (
+                total,
+                transaction
+            ) => {
+
+                const portions =
+                    (
+                        transaction.items || []
+                    )
+                        .reduce(
+
+                            (
+                                subtotal,
+                                item
+                            ) => {
+
+                                const menu =
+                                    getMenu(
+                                        item.menuId
+                                    );
 
 
-    const physicalStock =
-        Number(
-            document
-                .getElementById("physicalStock")
-                .value || 0
+                                const usage =
+                                    Number(
+
+                                        item.portionUsageAtSale
+
+                                        ??
+
+                                        menu?.portionUsage
+
+                                        ??
+
+                                        0
+
+                                    );
+
+
+                                return (
+
+                                    subtotal
+
+                                    +
+
+                                    (
+                                        Number(
+                                            item.quantity || 0
+                                        )
+
+                                        *
+
+                                        usage
+                                    )
+
+                                );
+
+                            },
+
+                            0
+
+                        );
+
+
+                return (
+                    total +
+                    portions
+                );
+
+            },
+
+            0
+
         );
 
-
-    return (
-        systemStock -
-        physicalStock
-    );
 }
 
 
-// ==========================================
-// TENTUKAN STATUS
-// ==========================================
+function wastePortions(date) {
+
+    return db.waste
+
+        .filter(
+            item =>
+                item.date ===
+                date
+        )
+
+        .reduce(
+
+            (
+                total,
+                item
+            ) =>
+
+                total
+
+                +
+
+                (
+                    Number(
+                        item.quantity || 0
+                    )
+
+                    *
+
+                    Number(
+                        item.portionUsage || 0
+                    )
+                ),
+
+            0
+
+        );
+
+}
+
+
+function expectedStock(date) {
+
+    return (
+
+        productionPortions(
+            date
+        )
+
+        -
+
+        soldPortions(
+            date
+        )
+
+        -
+
+        wastePortions(
+            date
+        )
+
+    );
+
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
 
 function getStatus(difference) {
 
-    const absDifference =
+    const absoluteDifference =
         Math.abs(
-            Number(difference)
+            Number(
+                difference || 0
+            )
         );
 
 
-    if (absDifference === 0) {
+    if (
+        absoluteDifference === 0
+    ) {
 
         return "NORMAL";
 
     }
 
 
-    if (absDifference <= 2) {
+    if (
+        absoluteDifference <= 2
+    ) {
 
         return "PERLU DIPERIKSA";
 
@@ -322,80 +660,160 @@ function getStatus(difference) {
 
 
     return "SELISIH TINGGI";
+
 }
 
 
-// ==========================================
-// TAMPILKAN RINGKASAN
-// ==========================================
+/* =========================================
+   CURRENT DATE FORM
+========================================= */
+
+function selectedDate() {
+
+    return document
+        .getElementById(
+            "opnameDate"
+        )
+        .value
+        ||
+        todayISO();
+
+}
+
+
+/* =========================================
+   SUMMARY
+========================================= */
 
 function renderStockSummary() {
 
-    const systemStock =
-        expectedStockToday();
+    const date =
+        selectedDate();
+
+
+    const production =
+        productionPortions(
+            date
+        );
+
+
+    const sold =
+        soldPortions(
+            date
+        );
+
+
+    const waste =
+        wastePortions(
+            date
+        );
+
+
+    const system =
+        expectedStock(
+            date
+        );
 
 
     document
-        .getElementById("stokAwal")
+        .getElementById(
+            "stokAwal"
+        )
         .textContent =
-        formatPortion(
-            initialPortionsToday()
-        ) + " Porsi";
+        `${formatPortion(
+            production
+        )} Porsi`;
 
 
     document
-        .getElementById("stokTerjual")
+        .getElementById(
+            "stokTerjual"
+        )
         .textContent =
-        formatPortion(
-            soldPortionsToday()
-        ) + " Porsi";
+        `${formatPortion(
+            sold
+        )} Porsi`;
 
 
     document
-        .getElementById("stokWaste")
+        .getElementById(
+            "stokWaste"
+        )
         .textContent =
-        formatPortion(
-            wastePortionsToday()
-        ) + " Porsi";
+        `${formatPortion(
+            waste
+        )} Porsi`;
 
 
     document
-        .getElementById("stokSistem")
+        .getElementById(
+            "stokSistem"
+        )
         .textContent =
-        formatPortion(
-            systemStock
-        ) + " Porsi";
+        `${formatPortion(
+            system
+        )} Porsi`;
 
 
     document
-        .getElementById("systemStock")
+        .getElementById(
+            "systemStock"
+        )
         .value =
-        systemStock;
+        system;
+
 }
 
 
-// ==========================================
-// PREVIEW SELISIH
-// ==========================================
+/* =========================================
+   DIFFERENCE
+========================================= */
 
 function renderDifference() {
 
+    const date =
+        selectedDate();
+
+
+    const systemStock =
+        expectedStock(
+            date
+        );
+
+
+    const physicalValue =
+        document
+            .getElementById(
+                "physicalStock"
+            )
+            .value;
+
+
+    const physicalStock =
+        Number(
+            physicalValue || 0
+        );
+
+
     const difference =
-        calculateDifference();
+        systemStock -
+        physicalStock;
+
+
+    document
+        .getElementById(
+            "stockDifference"
+        )
+        .value =
+        `${formatPortion(
+            difference
+        )} Porsi`;
 
 
     const status =
         getStatus(
             difference
         );
-
-
-    document
-        .getElementById("stockDifference")
-        .value =
-        formatPortion(
-            difference
-        ) + " Porsi";
 
 
     const statusBox =
@@ -412,106 +830,122 @@ function renderDifference() {
         "status-box";
 
 
-    if (status === "NORMAL") {
+    if (
+        physicalValue === ""
+    ) {
+
+        statusBox.textContent =
+            "BELUM DIISI";
+
 
         statusBox.classList.add(
             "normal"
         );
 
-    } else if (
-        status === "PERLU DIPERIKSA"
+
+        document
+            .getElementById(
+                "stockDifference"
+            )
+            .value =
+            "0 Porsi";
+
+
+        return;
+
+    }
+
+
+    if (
+        status ===
+        "NORMAL"
+    ) {
+
+        statusBox.classList.add(
+            "normal"
+        );
+
+    }
+
+    else if (
+        status ===
+        "PERLU DIPERIKSA"
     ) {
 
         statusBox.classList.add(
             "warning"
         );
 
-    } else {
+    }
+
+    else {
 
         statusBox.classList.add(
             "danger"
         );
+
     }
+
 }
 
 
-// ==========================================
-// AUDIT
-// ==========================================
+/* =========================================
+   SAVE STOCK OPNAME MYSQL
+========================================= */
 
-function addAudit(
-    action,
-    description,
-    userId
-) {
-
-    db.auditLogs.push({
-
-        id:
-            Date.now(),
-
-        userId:
-            userId,
-
-        action:
-            action,
-
-        description:
-            description,
-
-        createdAt:
-            new Date().toISOString()
-
-    });
-}
-
-
-// ==========================================
-// SIMPAN STOCK OPNAME
-// ==========================================
-
-function saveStockOpname(event) {
+async function saveStockOpname(event) {
 
     event.preventDefault();
 
 
     const date =
-        document
-            .getElementById("opnameDate")
-            .value;
+        selectedDate();
 
 
-    const expectedStock =
-        expectedStockToday();
+    const systemStock =
+        expectedStock(
+            date
+        );
 
 
     const physicalStock =
         Number(
             document
-                .getElementById("physicalStock")
+                .getElementById(
+                    "physicalStock"
+                )
                 .value
         );
 
 
     const notes =
         document
-            .getElementById("notes")
+            .getElementById(
+                "notes"
+            )
             .value
             .trim();
 
 
-    if (!date) {
+    if (
+        !date
+    ) {
 
         alert(
-            "Tanggal stock opname harus diisi."
+            "Tanggal stock opname wajib diisi."
         );
 
+
         return;
+
     }
 
 
     if (
-        Number.isNaN(physicalStock) ||
+        Number.isNaN(
+            physicalStock
+        )
+        ||
         physicalStock < 0
     ) {
 
@@ -519,94 +953,138 @@ function saveStockOpname(event) {
             "Stok fisik tidak valid."
         );
 
+
         return;
+
     }
 
 
-    const difference =
-        expectedStock -
-        physicalStock;
-
-
-    const status =
-        getStatus(
-            difference
+    const saveButton =
+        document.querySelector(
+            ".save-button"
         );
 
 
-    const stockOpname = {
-
-        id:
-            Date.now(),
-
-        date:
-            date,
-
-        expectedStock:
-            expectedStock,
-
-        physicalStock:
-            physicalStock,
-
-        difference:
-            difference,
-
-        status:
-            status,
-
-        notes:
-            notes,
-
-        createdBy:
-            currentUser.id,
-
-        createdAt:
-            new Date().toISOString()
-
-    };
+    const originalText =
+        saveButton
+            ? saveButton.textContent
+            : "";
 
 
-    db.stockOpnames.push(
-        stockOpname
-    );
+    try {
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                true;
 
 
-    addAudit(
-        "STOCK OPNAME",
-        `Stok sistem ${formatPortion(expectedStock)} porsi, stok fisik ${formatPortion(physicalStock)} porsi, selisih ${formatPortion(difference)} porsi`,
-        currentUser.id
-    );
+            saveButton.textContent =
+                "Menyimpan...";
+
+        }
 
 
-    saveDB();
+        const result =
+            await apiRequest(
+                "/api/stock-opnames",
+                {
+
+                    method:
+                        "POST",
+
+                    body:
+                        JSON.stringify({
+
+                            date:
+                                date,
+
+                            expectedStock:
+                                systemStock,
+
+                            physicalStock:
+                                physicalStock,
+
+                            notes:
+                                notes,
+
+                            createdBy:
+                                Number(
+                                    currentUser.id
+                                )
+
+                        })
+
+                }
+            );
 
 
-    alert(
-        "Stock opname berhasil disimpan."
-    );
+        alert(
+            `Stock opname berhasil disimpan. Status: ${result.status}`
+        );
 
 
-    document
-        .getElementById("physicalStock")
-        .value =
-        "";
+        document
+            .getElementById(
+                "physicalStock"
+            )
+            .value =
+            "";
 
 
-    document
-        .getElementById("notes")
-        .value =
-        "";
+        document
+            .getElementById(
+                "notes"
+            )
+            .value =
+            "";
 
 
-    renderDifference();
+        await loadStockOpnames();
 
-    renderStockOpnameTable();
+
+        renderDifference();
+
+        renderStockOpnameTable();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Save Stock Opname Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal menyimpan stock opname."
+        );
+
+    }
+
+    finally {
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                false;
+
+
+            saveButton.textContent =
+                originalText;
+
+        }
+
+    }
+
 }
 
 
-// ==========================================
-// RIWAYAT STOCK OPNAME
-// ==========================================
+/* =========================================
+   TABLE
+========================================= */
 
 function renderStockOpnameTable() {
 
@@ -621,84 +1099,107 @@ function renderStockOpnameTable() {
 
 
     if (
-        db.stockOpnames.length === 0
+        db.stockOpnames.length ===
+        0
     ) {
 
         table.innerHTML = `
+
             <tr>
+
                 <td colspan="6">
                     Belum ada data stock opname.
                 </td>
+
             </tr>
+
         `;
 
+
         return;
+
     }
 
 
-    const records =
-        [...db.stockOpnames]
-            .reverse();
+    /*
+     * API sudah mengurutkan terbaru dulu.
+     */
+
+    db.stockOpnames.forEach(
+
+        item => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
 
 
-    records.forEach(item => {
+            row.innerHTML = `
 
-        const row =
-            document.createElement(
-                "tr"
+                <td>
+                    ${item.date}
+                </td>
+
+                <td>
+                    ${formatPortion(
+                        item.expectedStock
+                    )} Porsi
+                </td>
+
+                <td>
+                    ${formatPortion(
+                        item.physicalStock
+                    )} Porsi
+                </td>
+
+                <td>
+                    ${formatPortion(
+                        item.difference
+                    )} Porsi
+                </td>
+
+                <td>
+                    ${item.status || "-"}
+                </td>
+
+                <td>
+                    ${item.notes || "-"}
+                </td>
+
+            `;
+
+
+            table.appendChild(
+                row
             );
 
+        }
 
-        row.innerHTML = `
-            <td>
-                ${item.date}
-            </td>
+    );
 
-            <td>
-                ${formatPortion(item.expectedStock)} Porsi
-            </td>
-
-            <td>
-                ${formatPortion(item.physicalStock)} Porsi
-            </td>
-
-            <td>
-                ${formatPortion(item.difference)} Porsi
-            </td>
-
-            <td>
-                ${item.status}
-            </td>
-
-            <td>
-                ${item.notes || "-"}
-            </td>
-        `;
-
-
-        table.appendChild(
-            row
-        );
-    });
 }
 
 
-// ==========================================
-// USER
-// ==========================================
+/* =========================================
+   USER
+========================================= */
 
 function renderUser() {
 
     document
-        .getElementById("namaUser")
+        .getElementById(
+            "namaUser"
+        )
         .textContent =
         currentUser.name;
+
 }
 
 
-// ==========================================
-// LOGOUT
-// ==========================================
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
@@ -709,15 +1210,18 @@ function logout() {
 
     window.location.href =
         "../index.html";
+
 }
 
 
-// ==========================================
-// EVENT
-// ==========================================
+/* =========================================
+   EVENTS
+========================================= */
 
 document
-    .getElementById("stockOpnameForm")
+    .getElementById(
+        "stockOpnameForm"
+    )
     .addEventListener(
         "submit",
         saveStockOpname
@@ -725,31 +1229,94 @@ document
 
 
 document
-    .getElementById("physicalStock")
+    .getElementById(
+        "physicalStock"
+    )
     .addEventListener(
         "input",
         renderDifference
     );
 
 
-// ==========================================
-// DEFAULT TANGGAL
-// ==========================================
-
 document
-    .getElementById("opnameDate")
-    .value =
-    todayISO();
+    .getElementById(
+        "opnameDate"
+    )
+    .addEventListener(
+        "change",
+        () => {
+
+            renderStockSummary();
+
+            renderDifference();
+
+        }
+    );
 
 
-// ==========================================
-// JALANKAN
-// ==========================================
+/* =========================================
+   INITIALIZE
+========================================= */
 
-renderUser();
+async function initializeStockOpname() {
 
-renderStockSummary();
+    document
+        .getElementById(
+            "opnameDate"
+        )
+        .value =
+        todayISO();
 
-renderDifference();
 
-renderStockOpnameTable();
+    renderUser();
+
+
+    try {
+
+        await Promise.all([
+
+            loadMenus(),
+
+            loadProduction(),
+
+            loadTransactions(),
+
+            loadWaste(),
+
+            loadStockOpnames()
+
+        ]);
+
+
+        renderStockSummary();
+
+        renderDifference();
+
+        renderStockOpnameTable();
+
+
+        console.log(
+            "✅ STOCK OPNAME MYSQL SIAP"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Stock Opname Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal memuat Stock Opname."
+        );
+
+    }
+
+}
+
+
+initializeStockOpname();

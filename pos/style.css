@@ -4,6 +4,7 @@
     box-sizing: border-box;
 }
 
+
 body {
     font-family: "Inter", sans-serif;
     background: #f5f7fb;
@@ -11,24 +12,25 @@ body {
 }
 
 
-/* ================================
+/* =========================================
    LAYOUT
-================================ */
+========================================= */
 
 .app-container {
     min-height: 100vh;
 }
 
 
-/* ================================
+/* =========================================
    SIDEBAR
-================================ */
+========================================= */
 
 .sidebar {
     width: 250px;
     height: 100vh;
 
     position: fixed;
+
     top: 0;
     left: 0;
 
@@ -47,6 +49,7 @@ body {
     margin-bottom: 35px;
 }
 
+
 .logo h2 {
     color: #ffffff;
 
@@ -55,6 +58,7 @@ body {
 
     margin-bottom: 5px;
 }
+
 
 .logo p {
     color: #9ca3af;
@@ -71,6 +75,7 @@ body {
 
     flex: 1;
 }
+
 
 .sidebar nav a {
     display: block;
@@ -89,13 +94,17 @@ body {
     transition: 0.2s;
 }
 
+
 .sidebar nav a:hover {
     background: #1f2937;
+
     color: white;
 }
 
+
 .sidebar nav a.active {
     background: #2563eb;
+
     color: white;
 }
 
@@ -104,6 +113,7 @@ body {
     border-top: 1px solid #374151;
 
     padding-top: 16px;
+
     margin-bottom: 15px;
 
     display: flex;
@@ -112,11 +122,13 @@ body {
     gap: 4px;
 }
 
+
 .sidebar-user span {
     color: #9ca3af;
 
     font-size: 11px;
 }
+
 
 .sidebar-user strong {
     color: white;
@@ -131,6 +143,7 @@ body {
     border: none;
 
     background: #fee2e2;
+
     color: #dc2626;
 
     padding: 12px;
@@ -142,14 +155,15 @@ body {
     cursor: pointer;
 }
 
+
 .logout-btn:hover {
     background: #fecaca;
 }
 
 
-/* ================================
-   CONTENT
-================================ */
+/* =========================================
+   MAIN CONTENT
+========================================= */
 
 .main-content {
     margin-left: 250px;
@@ -160,9 +174,9 @@ body {
 }
 
 
-/* ================================
+/* =========================================
    HEADER
-================================ */
+========================================= */
 
 .page-header {
     background: white;
@@ -180,14 +194,18 @@ body {
     justify-content: space-between;
     align-items: center;
 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    box-shadow:
+        0 4px 15px
+        rgba(0, 0, 0, 0.04);
 }
+
 
 .page-header h1 {
     font-size: 26px;
 
     margin-bottom: 5px;
 }
+
 
 .page-header p {
     color: #6b7280;
@@ -204,12 +222,15 @@ body {
     text-align: right;
 }
 
+
 .header-info div {
     display: flex;
+
     flex-direction: column;
 
     gap: 4px;
 }
+
 
 .header-info span {
     color: #9ca3af;
@@ -217,19 +238,22 @@ body {
     font-size: 11px;
 }
 
+
 .header-info strong {
     font-size: 14px;
 }
 
 
-/* ================================
+/* =========================================
    POS LAYOUT
-================================ */
+========================================= */
 
 .pos-layout {
     display: grid;
 
-    grid-template-columns: minmax(0, 2fr) 390px;
+    grid-template-columns:
+        minmax(0, 2fr)
+        390px;
 
     gap: 22px;
 
@@ -239,9 +263,9 @@ body {
 }
 
 
-/* ================================
-   MENU SECTION
-================================ */
+/* =========================================
+   CARDS
+========================================= */
 
 .menu-section,
 .cart-section,
@@ -254,9 +278,15 @@ body {
 
     padding: 22px;
 
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.03);
 }
 
+
+/* =========================================
+   SECTION HEADER
+========================================= */
 
 .section-header {
     display: flex;
@@ -269,17 +299,20 @@ body {
     margin-bottom: 20px;
 }
 
+
 .section-header h2 {
     font-size: 18px;
 
     margin-bottom: 4px;
 }
 
+
 .section-header p {
     color: #6b7280;
 
     font-size: 12px;
 }
+
 
 .section-header input {
     width: 220px;
@@ -295,17 +328,94 @@ body {
     font-family: inherit;
 }
 
+
 .section-header input:focus {
     border-color: #2563eb;
 
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.08);
 }
 
+
+/* =========================================
+   CATEGORY FILTER
+========================================= */
+
+.category-filter {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 20px;
+
+    padding: 7px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+
+.category-btn {
+    border: 1px solid transparent;
+
+    background: transparent;
+
+    color: #64748b;
+
+    padding: 9px 14px;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: 0.2s;
+}
+
+
+.category-btn:hover {
+    background: #ffffff;
+
+    color: #2563eb;
+
+    border-color: #bfdbfe;
+}
+
+
+.category-btn.active {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 4px 10px
+        rgba(37, 99, 235, 0.20);
+}
+
+
+/* =========================================
+   MENU
+========================================= */
 
 .menu-grid {
     display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns:
+        repeat(3, 1fr);
 
     gap: 14px;
 }
@@ -326,15 +436,21 @@ body {
 
     display: flex;
     flex-direction: column;
+
+    background: white;
 }
+
 
 .menu-card:hover {
     transform: translateY(-2px);
 
     border-color: #93c5fd;
 
-    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 7px 18px
+        rgba(0, 0, 0, 0.06);
 }
+
 
 .menu-category {
     color: #6b7280;
@@ -344,6 +460,7 @@ body {
     margin-bottom: 8px;
 }
 
+
 .menu-name {
     font-size: 15px;
 
@@ -351,6 +468,7 @@ body {
 
     margin-bottom: 8px;
 }
+
 
 .menu-price {
     color: #2563eb;
@@ -362,6 +480,7 @@ body {
     margin-top: auto;
 }
 
+
 .menu-portion {
     font-size: 10px;
 
@@ -371,9 +490,9 @@ body {
 }
 
 
-/* ================================
+/* =========================================
    CART
-================================ */
+========================================= */
 
 .cart-section {
     position: sticky;
@@ -390,14 +509,17 @@ body {
 
     padding-bottom: 15px;
 
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom:
+        1px solid #e5e7eb;
 }
+
 
 .cart-header h2 {
     font-size: 18px;
 
     margin-bottom: 4px;
 }
+
 
 .cart-header p {
     color: #6b7280;
@@ -423,10 +545,15 @@ body {
 }
 
 
+.clear-btn:hover {
+    background: #e5e7eb;
+}
+
+
 .cart-list {
     min-height: 180px;
 
-    max-height: 360px;
+    max-height: 300px;
 
     overflow-y: auto;
 
@@ -446,10 +573,12 @@ body {
 
 
 .cart-item {
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom:
+        1px solid #f1f5f9;
 
     padding: 12px 0;
 }
+
 
 .cart-item-top {
     display: flex;
@@ -461,11 +590,13 @@ body {
     margin-bottom: 10px;
 }
 
+
 .cart-item-name {
     font-size: 13px;
 
     font-weight: 600;
 }
+
 
 .cart-item-price {
     color: #6b7280;
@@ -492,11 +623,13 @@ body {
     gap: 8px;
 }
 
+
 .quantity-control button {
     width: 28px;
     height: 28px;
 
-    border: 1px solid #d1d5db;
+    border:
+        1px solid #d1d5db;
 
     background: white;
 
@@ -507,9 +640,11 @@ body {
     font-size: 15px;
 }
 
+
 .quantity-control button:hover {
     background: #f3f4f6;
 }
+
 
 .quantity-number {
     min-width: 20px;
@@ -529,15 +664,17 @@ body {
 }
 
 
-/* ================================
-   SUMMARY
-================================ */
+/* =========================================
+   CART SUMMARY
+========================================= */
 
 .cart-summary {
-    border-top: 1px solid #e5e7eb;
+    border-top:
+        1px solid #e5e7eb;
 
     padding-top: 15px;
 }
+
 
 .summary-row {
     display: flex;
@@ -549,17 +686,21 @@ body {
     font-size: 12px;
 }
 
+
 .summary-row span {
     color: #6b7280;
 }
+
 
 .total-row {
     font-size: 17px;
 
     padding-top: 10px;
 
-    border-top: 1px dashed #d1d5db;
+    border-top:
+        1px dashed #d1d5db;
 }
+
 
 .total-row span {
     color: #111827;
@@ -568,13 +709,159 @@ body {
 }
 
 
-/* ================================
+/* =========================================
+   ORDER TYPE
+========================================= */
+
+.order-type-section {
+    margin-top: 18px;
+
+    padding-top: 17px;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+
+.order-type-label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #111827;
+}
+
+
+.order-type-options {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 8px;
+}
+
+
+.order-type-card {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 11px;
+
+    border:
+        1px solid #dbe3ee;
+
+    border-radius: 10px;
+
+    background: white;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.order-type-card:hover {
+    border-color: #93c5fd;
+
+    background: #f8fbff;
+}
+
+
+.order-type-card:has(
+    input:checked
+) {
+    border-color: #2563eb;
+
+    background: #eff6ff;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(37, 99, 235, 0.08);
+}
+
+
+.order-type-card input {
+    width: 14px;
+    height: 14px;
+
+    accent-color: #2563eb;
+
+    flex-shrink: 0;
+}
+
+
+.order-type-icon {
+    font-size: 20px;
+
+    line-height: 1;
+}
+
+
+.order-type-text {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.order-type-text strong {
+    font-size: 11px;
+
+    color: #111827;
+}
+
+
+.order-type-text small {
+    color: #64748b;
+
+    font-size: 8px;
+
+    line-height: 1.35;
+}
+
+
+.validation-station-hint {
+    margin-top: 9px;
+
+    padding: 9px 10px;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    color: #475569;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================
    PAYMENT
-================================ */
+========================================= */
 
 .payment-section {
     margin-top: 18px;
 }
+
 
 .payment-section label {
     display: block;
@@ -586,12 +873,14 @@ body {
     margin-bottom: 7px;
 }
 
+
 .payment-section select {
     width: 100%;
 
     padding: 11px;
 
-    border: 1px solid #d1d5db;
+    border:
+        1px solid #d1d5db;
 
     border-radius: 8px;
 
@@ -602,6 +891,19 @@ body {
     outline: none;
 }
 
+
+.payment-section select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================================
+   PROCESS BUTTON
+========================================= */
 
 .process-btn {
     width: 100%;
@@ -625,9 +927,11 @@ body {
     font-family: inherit;
 }
 
+
 .process-btn:hover {
     background: #1d4ed8;
 }
+
 
 .process-btn:disabled {
     background: #9ca3af;
@@ -635,6 +939,10 @@ body {
     cursor: not-allowed;
 }
 
+
+/* =========================================
+   MESSAGE
+========================================= */
 
 .message-box {
     display: none;
@@ -646,12 +954,453 @@ body {
     border-radius: 8px;
 
     font-size: 11px;
+
+    line-height: 1.5;
 }
 
 
-/* ================================
+.message-box.success {
+    display: block;
+
+    background: #dcfce7;
+
+    border:
+        1px solid #bbf7d0;
+
+    color: #166534;
+}
+
+
+.message-box.error {
+    display: block;
+
+    background: #fee2e2;
+
+    border:
+        1px solid #fecaca;
+
+    color: #991b1b;
+}
+
+
+.message-box.warning {
+    display: block;
+
+    background: #fef3c7;
+
+    border:
+        1px solid #fde68a;
+
+    color: #92400e;
+}
+
+
+/* =========================================
+   IOT QUEUE
+========================================= */
+
+.iot-queue-section {
+    margin-top: 18px;
+
+    padding-top: 17px;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+
+.iot-queue-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+
+.iot-queue-header > div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.iot-queue-kicker {
+    color: #64748b;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.7px;
+}
+
+
+.iot-queue-header strong {
+    color: #111827;
+
+    font-size: 12px;
+}
+
+
+.iot-queue-count {
+    min-width: 25px;
+    height: 25px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.iot-validation-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+    max-height: 420px;
+
+    overflow-y: auto;
+
+    padding-right: 2px;
+}
+
+
+.iot-empty-state {
+    padding: 25px 12px;
+
+    border:
+        1px dashed #cbd5e1;
+
+    border-radius: 10px;
+
+    color: #94a3b8;
+
+    text-align: center;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   IOT VALIDATION ITEM
+========================================= */
+
+.iot-queue-item {
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 11px;
+
+    padding: 12px;
+
+    background: #ffffff;
+
+    transition: 0.2s;
+}
+
+
+.iot-queue-item.pending {
+    border-color: #fde68a;
+
+    background: #fffbeb;
+}
+
+
+.iot-queue-item.match {
+    border-color: #86efac;
+
+    background: #f0fdf4;
+}
+
+
+.iot-queue-item.mismatch {
+    border-color: #fecaca;
+
+    background: #fef2f2;
+}
+
+
+.iot-queue-item.error {
+    border-color: #fecaca;
+
+    background: #fff7ed;
+}
+
+
+.iot-item-top {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+
+.iot-item-title {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.iot-item-code {
+    color: #111827;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+.iot-station-badge {
+    width: fit-content;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 4px 7px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+
+.iot-station-badge.takeaway {
+    background: #dbeafe;
+
+    color: #1d4ed8;
+}
+
+
+.iot-station-badge.dinein {
+    background: #ede9fe;
+
+    color: #6d28d9;
+}
+
+
+.iot-status-badge {
+    flex-shrink: 0;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+
+.iot-status-badge.pending {
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.iot-status-badge.match {
+    background: #dcfce7;
+
+    color: #166534;
+}
+
+
+.iot-status-badge.mismatch {
+    background: #fee2e2;
+
+    color: #991b1b;
+}
+
+
+.iot-status-badge.error {
+    background: #ffedd5;
+
+    color: #9a3412;
+}
+
+
+/* =========================================
+   IOT DATA
+========================================= */
+
+.iot-item-data {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 6px;
+
+    margin-bottom: 9px;
+}
+
+
+.iot-item-data-box {
+    padding: 8px;
+
+    border:
+        1px solid rgba(
+            203,
+            213,
+            225,
+            0.75
+        );
+
+    border-radius: 8px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+}
+
+
+.iot-item-data-box span {
+    display: block;
+
+    color: #64748b;
+
+    font-size: 8px;
+
+    margin-bottom: 4px;
+}
+
+
+.iot-item-data-box strong {
+    color: #111827;
+
+    font-size: 10px;
+}
+
+
+.iot-item-message {
+    padding: 8px 9px;
+
+    border-radius: 7px;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    line-height: 1.45;
+}
+
+
+.iot-queue-item.pending
+.iot-item-message {
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.iot-queue-item.match
+.iot-item-message {
+    background: #dcfce7;
+
+    color: #166534;
+}
+
+
+.iot-queue-item.mismatch
+.iot-item-message {
+    background: #fee2e2;
+
+    color: #991b1b;
+}
+
+
+.iot-queue-item.error
+.iot-item-message {
+    background: #ffedd5;
+
+    color: #9a3412;
+}
+
+
+/* =========================================
+   ORDER TYPE BADGE IN TABLE
+========================================= */
+
+.order-type-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.order-type-badge.takeaway {
+    background: #dbeafe;
+
+    color: #1d4ed8;
+}
+
+
+.order-type-badge.dinein {
+    background: #ede9fe;
+
+    color: #6d28d9;
+}
+
+
+/* =========================================
    HISTORY
-================================ */
+========================================= */
 
 .history-section {
     margin-bottom: 30px;
@@ -664,15 +1413,18 @@ body {
     overflow-x: auto;
 }
 
+
 table {
     width: 100%;
 
     border-collapse: collapse;
 }
 
+
 thead {
     background: #f8fafc;
 }
+
 
 th {
     text-align: left;
@@ -683,19 +1435,37 @@ th {
 
     font-size: 11px;
 
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom:
+        1px solid #e5e7eb;
+
+    white-space: nowrap;
 }
+
 
 td {
     padding: 13px 12px;
 
     font-size: 12px;
 
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom:
+        1px solid #f1f5f9;
+
+    vertical-align: middle;
 }
 
 
+tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================
+   TRANSACTION STATUS
+========================================= */
+
 .status-success {
+    display: inline-block;
+
     background: #dcfce7;
 
     color: #166534;
@@ -711,6 +1481,8 @@ td {
 
 
 .status-void {
+    display: inline-block;
+
     background: #fee2e2;
 
     color: #991b1b;
@@ -725,69 +1497,16 @@ td {
 }
 
 
-/* ================================
-   RESPONSIVE
-================================ */
-
-@media (max-width: 1150px) {
-
-    .menu-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .pos-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .cart-section {
-        position: static;
-    }
-}
-@media (max-width: 768px) {
-
-    .sidebar {
-        width: 200px;
-    }
-
-    .main-content {
-        margin-left: 200px;
-        padding: 20px;
-    }
-
-    .page-header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .header-info {
-        text-align: left;
-    }
-
-    .menu-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .section-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .section-header input {
-        width: 100%;
-    }
-
-}
-
-
 /* =========================================
-   VOID TRANSACTION
+   VOID
 ========================================= */
 
 .void-btn {
-    border: 1px solid #fecaca;
+    border:
+        1px solid #fecaca;
 
     background: #fff1f2;
+
     color: #dc2626;
 
     padding: 7px 10px;
@@ -795,6 +1514,7 @@ td {
     border-radius: 7px;
 
     font-size: 10px;
+
     font-weight: 600;
 
     cursor: pointer;
@@ -804,9 +1524,11 @@ td {
     transition: 0.2s;
 }
 
+
 .void-btn:hover {
     background: #fee2e2;
 }
+
 
 .void-info {
     color: #9ca3af;
@@ -816,110 +1538,92 @@ td {
 
 
 /* =========================================
-   CATEGORY FILTER
+   SCROLLBAR
 ========================================= */
 
-.category-filter {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-top: 4px;
-    margin-bottom: 20px;
-
-    padding: 6px;
-
-    width: fit-content;
-    max-width: 100%;
-
-    background: #f8fafc;
-
-    border: 1px solid #e2e8f0;
-
-    border-radius: 14px;
+.cart-list::-webkit-scrollbar,
+.iot-validation-list::-webkit-scrollbar {
+    width: 5px;
 }
 
 
-/* CATEGORY BUTTON */
+.cart-list::-webkit-scrollbar-thumb,
+.iot-validation-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
 
-.category-btn {
-    appearance: none;
-    -webkit-appearance: none;
-
-    border: 1px solid transparent;
-
-    outline: none;
-
-    background: transparent;
-    color: #64748b;
-
-    padding: 9px 15px;
-
-    border-radius: 9px;
-
-    font-family: "Inter", sans-serif;
-
-    font-size: 12px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    white-space: nowrap;
-
-    transition: all 0.2s ease;
-}
-
-
-/* HOVER */
-
-.category-btn:hover {
-    background: #ffffff;
-
-    color: #2563eb;
-
-    border-color: #bfdbfe;
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 3px 8px
-        rgba(15, 23, 42, 0.06);
-}
-
-
-/* ACTIVE */
-
-.category-btn.active {
-    background: #2563eb;
-
-    color: #ffffff;
-
-    border-color: #2563eb;
-
-    box-shadow:
-        0 4px 12px
-        rgba(37, 99, 235, 0.22);
-}
-
-
-/* ACTIVE HOVER */
-
-.category-btn.active:hover {
-    background: #1d4ed8;
-
-    color: #ffffff;
-
-    border-color: #1d4ed8;
+    border-radius: 20px;
 }
 
 
 /* =========================================
-   CATEGORY RESPONSIVE
+   RESPONSIVE
 ========================================= */
 
+@media (max-width: 1200px) {
+
+    .menu-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .pos-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .cart-section {
+        position: static;
+    }
+
+}
+
+
 @media (max-width: 768px) {
+
+    .sidebar {
+        width: 200px;
+    }
+
+
+    .main-content {
+        margin-left: 200px;
+
+        padding: 20px;
+    }
+
+
+    .page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+
+    .header-info {
+        text-align: left;
+    }
+
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .section-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .section-header input {
+        width: 100%;
+    }
+
 
     .category-filter {
         width: 100%;
@@ -931,17 +1635,24 @@ td {
         scrollbar-width: none;
     }
 
+
     .category-filter::-webkit-scrollbar {
         display: none;
     }
 
+
     .category-btn {
         flex-shrink: 0;
-
-        padding: 9px 13px;
-
-        font-size: 11px;
     }
 
+
+    .order-type-options {
+        grid-template-columns: 1fr;
+    }
+
+
+    .iot-item-data {
+        grid-template-columns: 1fr;
+    }
 
 }

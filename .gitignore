@@ -1,2 +1,16 @@
 backend/node_modules/
 backend/.env
+
+iot-service/venv/
+iot-service/__pycache__/
+*.pyc
+
+# hasil testing lokal
+iot-service/camera-test.jpg
+iot-service/yolo-result.jpg
+
+# model YOLO bawaan untuk testing lokal
+iot-service/yolo11n.pt
+
+# setting VS Code lokal
+.vscode/

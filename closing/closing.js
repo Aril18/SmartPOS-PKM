@@ -1,9 +1,13 @@
-const STORAGE_KEY =
-    "umkmControlDataV1";
-
 const SESSION_KEY =
     "umkmControlSessionV1";
 
+const API_URL =
+    "http://localhost:3000";
+
+
+/* =========================================
+   SESSION
+========================================= */
 
 const currentUser =
     JSON.parse(
@@ -21,129 +25,325 @@ if (!currentUser) {
 }
 
 
-const db =
-    JSON.parse(
-        localStorage.getItem(
-            STORAGE_KEY
-        ) || "{}"
-    );
+/* =========================================
+   DATA MYSQL
+========================================= */
+
+let users = [];
+
+let transactions = [];
+
+let closings = [];
 
 
-db.users =
-    db.users || [];
+/* =========================================
+   API HELPER
+========================================= */
 
-db.transactions =
-    db.transactions || [];
+async function apiRequest(
+    url,
+    options = {}
+) {
 
-db.closings =
-    db.closings || [];
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
 
-db.auditLogs =
-    db.auditLogs || [];
+                ...options,
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
 
 
-/* ================================
-   BASIC
-================================ */
+    let result;
 
-function saveDB() {
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(db)
-    );
+    try {
+
+        result =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            "Respons server tidak valid."
+        );
+
+    }
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Terjadi kesalahan pada server."
+        );
+
+    }
+
+
+    return result;
 
 }
 
+
+/* =========================================
+   BASIC
+========================================= */
 
 function todayISO() {
 
     const now =
         new Date();
 
+
     const year =
         now.getFullYear();
+
 
     const month =
         String(
             now.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
         String(
             now.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     return `${year}-${month}-${day}`;
 
 }
 
 
-function formatRupiah(value) {
+function formatRupiah(
+    value
+) {
 
     return new Intl.NumberFormat(
         "id-ID",
         {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0
+
+            style:
+                "currency",
+
+            currency:
+                "IDR",
+
+            minimumFractionDigits:
+                0
+
         }
     ).format(
-        Number(value || 0)
+        Number(
+            value || 0
+        )
     );
 
 }
 
 
-function getUser(userId) {
+/* =========================================
+   LOAD USERS
+========================================= */
 
-    return db.users.find(
-        user =>
-            Number(user.id) ===
-            Number(userId)
+async function loadUsers() {
+
+    const result =
+        await apiRequest(
+            "/api/users"
+        );
+
+
+    users =
+        (result.data || [])
+            .map(
+                user => ({
+
+                    ...user,
+
+                    id:
+                        Number(
+                            user.id
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD TRANSACTIONS
+========================================= */
+
+async function loadTransactions() {
+
+    const result =
+        await apiRequest(
+            "/api/transactions"
+        );
+
+
+    transactions =
+        (result.data || [])
+            .map(
+                transaction => ({
+
+                    ...transaction,
+
+                    id:
+                        Number(
+                            transaction.id
+                        ),
+
+                    cashierId:
+                        Number(
+                            transaction.cashierId
+                        ),
+
+                    total:
+                        Number(
+                            transaction.total || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD CLOSINGS
+========================================= */
+
+async function loadClosings() {
+
+    const result =
+        await apiRequest(
+            "/api/closings"
+        );
+
+
+    closings =
+        (result.data || [])
+            .map(
+                closing => ({
+
+                    ...closing,
+
+                    id:
+                        Number(
+                            closing.id
+                        ),
+
+                    cashierId:
+                        Number(
+                            closing.cashierId
+                        ),
+
+                    transactionCount:
+                        Number(
+                            closing.transactionCount || 0
+                        ),
+
+                    voidCount:
+                        Number(
+                            closing.voidCount || 0
+                        ),
+
+                    cashSales:
+                        Number(
+                            closing.cashSales || 0
+                        ),
+
+                    nonCashSales:
+                        Number(
+                            closing.nonCashSales || 0
+                        ),
+
+                    systemCash:
+                        Number(
+                            closing.systemCash || 0
+                        ),
+
+                    actualCash:
+                        Number(
+                            closing.actualCash || 0
+                        ),
+
+                    cashDifference:
+                        Number(
+                            closing.cashDifference || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ CLOSINGS MYSQL:",
+        closings
     );
 
 }
 
 
-function addAudit(
-    action,
-    description
+/* =========================================
+   USER
+========================================= */
+
+function getUser(
+    userId
 ) {
 
-    db.auditLogs.push({
+    return users.find(
 
-        id:
-            Date.now(),
+        user =>
+            Number(
+                user.id
+            )
+            ===
+            Number(
+                userId
+            )
 
-        userId:
-            currentUser.id,
-
-        action:
-            action,
-
-        description:
-            description,
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    });
-
-
-    saveDB();
+    );
 
 }
 
 
-/* ================================
-   TRANSACTIONS
-================================ */
+/* =========================================
+   TRANSACTIONS USER HARI INI
+========================================= */
 
 function userTransactionsToday() {
 
-    return db.transactions.filter(
+    return transactions.filter(
+
         transaction =>
 
             transaction.date ===
@@ -153,10 +353,12 @@ function userTransactionsToday() {
 
             Number(
                 transaction.cashierId
-            ) ===
+            )
+            ===
             Number(
                 currentUser.id
             )
+
     );
 
 }
@@ -166,9 +368,11 @@ function validTransactionsToday() {
 
     return userTransactionsToday()
         .filter(
+
             transaction =>
                 transaction.status !==
                 "VOID"
+
         );
 
 }
@@ -178,35 +382,50 @@ function voidTransactionsToday() {
 
     return userTransactionsToday()
         .filter(
+
             transaction =>
                 transaction.status ===
                 "VOID"
+
         );
 
 }
 
+
+/* =========================================
+   PENJUALAN
+========================================= */
 
 function cashSalesToday() {
 
     return validTransactionsToday()
 
         .filter(
+
             transaction =>
                 String(
                     transaction.paymentMethod
-                ).toUpperCase() ===
+                ).toUpperCase()
+                ===
                 "TUNAI"
+
         )
 
         .reduce(
-            (total, transaction) =>
 
-                total +
+            (
+                total,
+                transaction
+            ) =>
+
+                total
+                +
                 Number(
                     transaction.total || 0
                 ),
 
             0
+
         );
 
 }
@@ -217,37 +436,48 @@ function nonCashSalesToday() {
     return validTransactionsToday()
 
         .filter(
+
             transaction =>
                 String(
                     transaction.paymentMethod
-                ).toUpperCase() !==
+                ).toUpperCase()
+                !==
                 "TUNAI"
+
         )
 
         .reduce(
-            (total, transaction) =>
 
-                total +
+            (
+                total,
+                transaction
+            ) =>
+
+                total
+                +
                 Number(
                     transaction.total || 0
                 ),
 
             0
+
         );
 
 }
 
 
-/* ================================
-   CLOSINGS
-================================ */
+/* =========================================
+   CLOSINGS HARI INI
+========================================= */
 
 function closingsToday() {
 
-    return db.closings.filter(
+    return closings.filter(
+
         closing =>
             closing.date ===
             todayISO()
+
     );
 
 }
@@ -258,40 +488,60 @@ function currentUserClosingToday() {
     return [...closingsToday()]
         .reverse()
         .find(
+
             closing =>
+
                 Number(
-                    closing.userId
-                    ??
                     closing.cashierId
-                ) ===
+                )
+
+                ===
+
                 Number(
                     currentUser.id
                 )
+
         );
 
 }
 
 
-/* ================================
-   ROLE
-================================ */
+/* =========================================
+   USER DISPLAY
+========================================= */
 
 function renderUser() {
 
-    document
-        .getElementById(
+    const namaUser =
+        document.getElementById(
             "namaUser"
-        )
-        .textContent =
-        currentUser.name;
+        );
 
 
-    document
-        .getElementById(
+    if (
+        namaUser
+    ) {
+
+        namaUser.textContent =
+            currentUser.name;
+
+    }
+
+
+    const sidebarUser =
+        document.getElementById(
             "sidebarUser"
-        )
-        .textContent =
-        currentUser.name;
+        );
+
+
+    if (
+        sidebarUser
+    ) {
+
+        sidebarUser.textContent =
+            currentUser.name;
+
+    }
 
 
     document
@@ -303,41 +553,25 @@ function renderUser() {
             .toLocaleDateString(
                 "id-ID",
                 {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric"
+
+                    day:
+                        "2-digit",
+
+                    month:
+                        "long",
+
+                    year:
+                        "numeric"
+
                 }
             );
-
-
-    const ownerOnlyMenus =
-        document.querySelectorAll(
-            ".owner-only"
-        );
-
-
-    if (
-        currentUser.role ===
-        "KASIR"
-    ) {
-
-        ownerOnlyMenus.forEach(
-            menu => {
-
-                menu.style.display =
-                    "none";
-
-            }
-        );
-
-    }
 
 }
 
 
-/* ================================
+/* =========================================
    SUMMARY
-================================ */
+========================================= */
 
 function renderSummary() {
 
@@ -391,17 +625,16 @@ function renderSummary() {
 }
 
 
-/* ================================
+/* =========================================
    DIFFERENCE PREVIEW
-================================ */
+========================================= */
 
 function updateDifferencePreview() {
 
     const physicalInput =
-        document
-            .getElementById(
-                "physicalCash"
-            );
+        document.getElementById(
+            "physicalCash"
+        );
 
 
     const value =
@@ -477,7 +710,9 @@ function updateDifferencePreview() {
                 "cashDifference"
             )
             .textContent =
-            formatRupiah(0);
+            formatRupiah(
+                0
+            );
 
 
         return;
@@ -534,9 +769,9 @@ function updateDifferencePreview() {
 }
 
 
-/* ================================
-   CLOSING STATUS
-================================ */
+/* =========================================
+   STATUS CLOSING
+========================================= */
 
 function renderClosingStatus() {
 
@@ -579,6 +814,18 @@ function renderClosingStatus() {
 
 
         button.disabled =
+            false;
+
+
+        button.textContent =
+            "Simpan Closing";
+
+
+        physicalInput.disabled =
+            false;
+
+
+        notesInput.disabled =
             false;
 
 
@@ -626,9 +873,9 @@ function renderClosingStatus() {
 }
 
 
-/* ================================
+/* =========================================
    MESSAGE
-================================ */
+========================================= */
 
 function showMessage(
     message,
@@ -650,7 +897,8 @@ function showMessage(
 
 
     if (
-        type === "success"
+        type ===
+        "success"
     ) {
 
         box.style.background =
@@ -679,6 +927,7 @@ function showMessage(
 
 
     setTimeout(
+
         () => {
 
             box.style.display =
@@ -687,16 +936,19 @@ function showMessage(
         },
 
         4000
+
     );
 
 }
 
 
-/* ================================
-   SAVE CLOSING
-================================ */
+/* =========================================
+   SAVE CLOSING MYSQL
+========================================= */
 
-function saveClosing(event) {
+async function saveClosing(
+    event
+) {
 
     event.preventDefault();
 
@@ -709,6 +961,7 @@ function saveClosing(event) {
             "Closing hari ini sudah dilakukan.",
             "error"
         );
+
 
         return;
 
@@ -735,11 +988,11 @@ function saveClosing(event) {
 
 
     if (
-        physicalCash < 0
-        ||
         Number.isNaN(
             physicalCash
         )
+        ||
+        physicalCash < 0
     ) {
 
         showMessage(
@@ -747,129 +1000,115 @@ function saveClosing(event) {
             "error"
         );
 
+
         return;
 
     }
 
 
-    const systemCash =
-        cashSalesToday();
+    const button =
+        document.getElementById(
+            "closingBtn"
+        );
 
 
-    const cashDifference =
-        physicalCash -
-        systemCash;
+    const originalText =
+        button.textContent;
 
 
-    let status =
-        "SESUAI";
+    try {
+
+        button.disabled =
+            true;
 
 
-    if (
-        cashDifference < 0
-    ) {
+        button.textContent =
+            "Menyimpan...";
 
-        status =
-            "KURANG";
+
+        await apiRequest(
+            "/api/closings",
+            {
+
+                method:
+                    "POST",
+
+                body:
+                    JSON.stringify({
+
+                        cashierId:
+                            Number(
+                                currentUser.id
+                            ),
+
+                        date:
+                            todayISO(),
+
+                        actualCash:
+                            physicalCash,
+
+                        notes:
+                            notes
+
+                    })
+
+            }
+        );
+
+
+        await Promise.all([
+
+            loadTransactions(),
+
+            loadClosings()
+
+        ]);
+
+
+        renderSummary();
+
+        renderClosingTable();
+
+        renderClosingStatus();
+
+
+        showMessage(
+            "Closing berhasil disimpan ke database.",
+            "success"
+        );
 
     }
 
-    else if (
-        cashDifference > 0
-    ) {
+    catch (error) {
 
-        status =
-            "LEBIH";
+        console.error(
+            "❌ Save Closing Error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Gagal menyimpan closing.",
+            "error"
+        );
+
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            originalText;
 
     }
-
-
-    const closing = {
-
-        id:
-            Date.now(),
-
-        date:
-            todayISO(),
-
-        createdAt:
-            new Date()
-                .toISOString(),
-
-        userId:
-            currentUser.id,
-
-        cashierId:
-            currentUser.id,
-
-        transactionCount:
-            validTransactionsToday()
-                .length,
-
-        voidCount:
-            voidTransactionsToday()
-                .length,
-
-        cashSales:
-            systemCash,
-
-        nonCashSales:
-            nonCashSalesToday(),
-
-        systemCash:
-            systemCash,
-
-        actualCash:
-            physicalCash,
-
-        cashDifference:
-            cashDifference,
-
-        status:
-            status,
-
-        notes:
-            notes
-
-    };
-
-
-    db.closings.push(
-        closing
-    );
-
-
-    saveDB();
-
-
-    addAudit(
-        "CREATE_CLOSING",
-        `Closing ${currentUser.name} - sistem ${formatRupiah(
-            systemCash
-        )} - fisik ${formatRupiah(
-            physicalCash
-        )} - selisih ${formatRupiah(
-            cashDifference
-        )}`
-    );
-
-
-    showMessage(
-        "Closing berhasil disimpan.",
-        "success"
-    );
-
-
-    renderClosingTable();
-
-    renderClosingStatus();
 
 }
 
 
-/* ================================
+/* =========================================
    TABLE
-================================ */
+========================================= */
 
 function renderClosingTable() {
 
@@ -879,22 +1118,30 @@ function renderClosingTable() {
         );
 
 
-    table.innerHTML = "";
+    table.innerHTML =
+        "";
 
 
     const records =
         [...closingsToday()]
-        .sort(
-            (a, b) =>
+            .sort(
 
-                new Date(
-                    b.createdAt || 0
-                )
-                -
-                new Date(
-                    a.createdAt || 0
-                )
-        );
+                (
+                    a,
+                    b
+                ) =>
+
+                    new Date(
+                        b.createdAt || 0
+                    )
+
+                    -
+
+                    new Date(
+                        a.createdAt || 0
+                    )
+
+            );
 
 
     if (
@@ -919,36 +1166,60 @@ function renderClosingTable() {
 
         `;
 
+
         return;
 
     }
 
 
     records.forEach(
+
         closing => {
 
             const user =
                 getUser(
-                    closing.userId
-                    ??
                     closing.cashierId
                 );
 
 
-            const time =
-                new Date(
-                    closing.createdAt
-                )
-                .toLocaleTimeString(
-                    "id-ID",
-                    {
-                        hour:
-                            "2-digit",
+            let time =
+                "-";
 
-                        minute:
-                            "2-digit"
-                    }
-                );
+
+            if (
+                closing.createdAt
+            ) {
+
+                const date =
+                    new Date(
+                        closing.createdAt
+                    );
+
+
+                if (
+                    !Number.isNaN(
+                        date.getTime()
+                    )
+                ) {
+
+                    time =
+                        date
+                            .toLocaleTimeString(
+                                "id-ID",
+                                {
+
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+
+                                }
+                            );
+
+                }
+
+            }
 
 
             const difference =
@@ -994,23 +1265,24 @@ function renderClosingTable() {
                 </td>
 
                 <td>
-                    ${user?.name || "-"}
+                    ${
+                        closing.cashierName
+                        ||
+                        user?.name
+                        ||
+                        "-"
+                    }
                 </td>
 
                 <td>
                     ${formatRupiah(
                         closing.systemCash
-                        ??
-                        closing.cashSales
-                        ??
-                        0
                     )}
                 </td>
 
                 <td>
                     ${formatRupiah(
-                        closing.actualCash ||
-                        0
+                        closing.actualCash
                     )}
                 </td>
 
@@ -1036,14 +1308,15 @@ function renderClosingTable() {
             );
 
         }
+
     );
 
 }
 
 
-/* ================================
+/* =========================================
    EVENTS
-================================ */
+========================================= */
 
 document
     .getElementById(
@@ -1065,30 +1338,9 @@ document
     );
 
 
-/* ================================
-   STORAGE UPDATE
-================================ */
-
-window.addEventListener(
-    "storage",
-    function (event) {
-
-        if (
-            event.key ===
-            STORAGE_KEY
-        ) {
-
-            location.reload();
-
-        }
-
-    }
-);
-
-
-/* ================================
+/* =========================================
    LOGOUT
-================================ */
+========================================= */
 
 function logout() {
 
@@ -1103,16 +1355,60 @@ function logout() {
 }
 
 
-/* ================================
-   INITIAL
-================================ */
+/* =========================================
+   INITIALIZE
+========================================= */
 
-renderUser();
+async function initializeClosing() {
 
-renderSummary();
+    renderUser();
 
-renderClosingTable();
 
-updateDifferencePreview();
+    try {
 
-renderClosingStatus();
+        await Promise.all([
+
+            loadUsers(),
+
+            loadTransactions(),
+
+            loadClosings()
+
+        ]);
+
+
+        renderSummary();
+
+        renderClosingTable();
+
+        updateDifferencePreview();
+
+        renderClosingStatus();
+
+
+        console.log(
+            "✅ CLOSING MYSQL SIAP"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Initialize Closing Error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Gagal memuat halaman Closing.",
+            "error"
+        );
+
+    }
+
+}
+
+
+initializeClosing();

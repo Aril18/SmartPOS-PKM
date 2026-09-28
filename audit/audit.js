@@ -1,198 +1,437 @@
-const STORAGE_KEY = "umkmControlDataV1";
-const SESSION_KEY = "umkmControlSessionV1";
+const SESSION_KEY =
+    "umkmControlSessionV1";
 
-let currentUser =
-    JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-
-let db =
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+const API_URL =
+    "http://localhost:3000";
 
 
-// ==========================================
-// CEK LOGIN
-// ==========================================
+/* =========================================
+   SESSION
+========================================= */
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem(
+            SESSION_KEY
+        ) || "null"
+    );
+
+
+/* =========================================
+   CEK LOGIN
+========================================= */
 
 if (!currentUser) {
-    window.location.href = "../index.html";
+
+    window.location.href =
+        "../index.html";
+
 }
 
 
-// ==========================================
-// CEK ROLE
-// ==========================================
+/* =========================================
+   KHUSUS OWNER
+========================================= */
 
-if (currentUser && currentUser.role !== "OWNER") {
-    window.location.href = "../pos/index.html";
+if (
+    currentUser &&
+    currentUser.role !==
+    "OWNER"
+) {
+
+    window.location.href =
+        "../pos/index.html";
+
 }
 
 
-// ==========================================
-// SIAPKAN DATABASE
-// ==========================================
+/* =========================================
+   DATA MYSQL
+========================================= */
 
-db.users = db.users || [];
-db.menus = db.menus || [];
-db.production = db.production || [];
-db.transactions = db.transactions || [];
-db.waste = db.waste || [];
-db.stockOpnames = db.stockOpnames || [];
-db.closings = db.closings || [];
-db.auditLogs = db.auditLogs || [];
+let users = [];
+
+let auditLogs = [];
 
 
-// ==========================================
-// TANGGAL HARI INI
-// ==========================================
+/* =========================================
+   API
+========================================= */
+
+async function apiRequest(
+    url,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
+
+                ...options,
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
+
+    let result;
+
+
+    try {
+
+        result =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            "Respons server tidak valid."
+        );
+
+    }
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Terjadi kesalahan pada server."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================
+   LOAD USERS MYSQL
+========================================= */
+
+async function loadUsers() {
+
+    const result =
+        await apiRequest(
+            "/api/users"
+        );
+
+
+    users =
+        (result.data || [])
+            .map(
+                user => ({
+
+                    ...user,
+
+                    id:
+                        Number(
+                            user.id
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ AUDIT USERS MYSQL:",
+        users
+    );
+
+}
+
+
+/* =========================================
+   LOAD AUDIT LOG MYSQL
+========================================= */
+
+async function loadAuditLogs() {
+
+    const result =
+        await apiRequest(
+            "/api/audit-logs"
+        );
+
+
+    auditLogs =
+        (result.data || [])
+            .map(
+                log => ({
+
+                    ...log,
+
+                    id:
+                        Number(
+                            log.id
+                        ),
+
+                    userId:
+                        Number(
+                            log.userId
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ AUDIT LOGS MYSQL:",
+        auditLogs
+    );
+
+}
+
+
+/* =========================================
+   TANGGAL HARI INI
+========================================= */
 
 function todayISO() {
 
     const now =
         new Date();
 
+
     const year =
         now.getFullYear();
+
 
     const month =
         String(
             now.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
         String(
             now.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     return `${year}-${month}-${day}`;
+
 }
 
 
-// ==========================================
-// AMBIL USER
-// ==========================================
+/* =========================================
+   AMBIL USER
+========================================= */
 
-function getUser(userId) {
+function getUser(
+    userId
+) {
 
-    return db.users.find(
+    return users.find(
+
         user =>
-            Number(user.id) ===
-            Number(userId)
+            Number(
+                user.id
+            )
+            ===
+            Number(
+                userId
+            )
+
     );
+
 }
 
 
-// ==========================================
-// FORMAT TANGGAL
-// ==========================================
+/* =========================================
+   FORMAT TANGGAL
+========================================= */
 
-function formatDate(createdAt) {
+function formatDate(
+    createdAt
+) {
 
     if (!createdAt) {
+
         return "-";
+
     }
 
 
     const date =
-        new Date(createdAt);
+        new Date(
+            createdAt
+        );
 
 
-    return date.toLocaleDateString(
-        "id-ID",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }
-    );
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+
+    }
+
+
+    return date
+        .toLocaleDateString(
+            "id-ID",
+            {
+
+                day:
+                    "2-digit",
+
+                month:
+                    "2-digit",
+
+                year:
+                    "numeric"
+
+            }
+        );
+
 }
 
 
-// ==========================================
-// FORMAT WAKTU
-// ==========================================
+/* =========================================
+   FORMAT WAKTU
+========================================= */
 
-function formatTime(createdAt) {
+function formatTime(
+    createdAt
+) {
 
     if (!createdAt) {
+
         return "-";
+
     }
 
 
     const date =
-        new Date(createdAt);
+        new Date(
+            createdAt
+        );
 
 
-    return date.toLocaleTimeString(
-        "id-ID",
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+
+    }
+
+
+    return date
+        .toLocaleTimeString(
+            "id-ID",
+            {
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit"
+
+            }
+        );
+
 }
 
 
-// ==========================================
-// TANGGAL LOG ISO
-// ==========================================
+/* =========================================
+   TANGGAL LOG
+========================================= */
 
-function getLogDate(log) {
+function getLogDate(
+    log
+) {
 
-    if (!log.createdAt) {
+    if (
+        !log.createdAt
+    ) {
+
         return "";
+
     }
 
 
-    const date =
-        new Date(log.createdAt);
+    /*
+     * Endpoint sudah mengirim:
+     * YYYY-MM-DDTHH:mm:ss
+     */
+
+    if (
+        typeof log.createdAt ===
+        "string"
+
+        &&
+
+        log.createdAt.length >=
+        10
+    ) {
+
+        return log.createdAt
+            .substring(
+                0,
+                10
+            );
+
+    }
 
 
-    const year =
-        date.getFullYear();
+    return "";
 
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
-
-
-    return `${year}-${month}-${day}`;
 }
 
 
-// ==========================================
-// USER
-// ==========================================
+/* =========================================
+   USER
+========================================= */
 
 function renderUser() {
 
-    if (!currentUser) {
-        return;
-    }
-
-
     document
-        .getElementById("namaUser")
+        .getElementById(
+            "namaUser"
+        )
         .textContent =
         currentUser.name;
 
 
     document
-        .getElementById("sidebarUser")
+        .getElementById(
+            "sidebarUser"
+        )
         .textContent =
         currentUser.name;
+
 }
 
 
-// ==========================================
-// SUMMARY
-// ==========================================
+/* =========================================
+   SUMMARY
+========================================= */
 
 function renderSummary() {
 
@@ -201,98 +440,215 @@ function renderSummary() {
 
 
     const logsToday =
-        db.auditLogs.filter(
+        auditLogs.filter(
+
             log =>
-                getLogDate(log) === today
+                getLogDate(
+                    log
+                )
+                ===
+                today
+
         );
 
 
     const loginToday =
         logsToday.filter(
+
             log =>
-                log.action === "LOGIN"
+                log.action ===
+                "LOGIN"
+
         ).length;
 
 
     const transactionToday =
         logsToday.filter(
+
             log =>
-                log.action === "TRANSAKSI"
+                log.action ===
+                "TRANSAKSI"
+
         ).length;
 
 
     document
-        .getElementById("totalAktivitas")
+        .getElementById(
+            "totalAktivitas"
+        )
         .textContent =
-        db.auditLogs.length;
+        auditLogs.length;
 
 
     document
-        .getElementById("aktivitasHariIni")
+        .getElementById(
+            "aktivitasHariIni"
+        )
         .textContent =
         logsToday.length;
 
 
     document
-        .getElementById("loginHariIni")
+        .getElementById(
+            "loginHariIni"
+        )
         .textContent =
         loginToday;
 
 
     document
-        .getElementById("transaksiHariIni")
+        .getElementById(
+            "transaksiHariIni"
+        )
         .textContent =
         transactionToday;
+
 }
 
 
-// ==========================================
-// ISI FILTER PEGAWAI
-// ==========================================
+/* =========================================
+   FILTER PEGAWAI
+========================================= */
 
 function renderUserFilter() {
 
     const filterUser =
-        document.getElementById("filterUser");
+        document.getElementById(
+            "filterUser"
+        );
 
 
     filterUser.innerHTML = `
+
         <option value="">
             Semua Pegawai
         </option>
+
     `;
 
 
-    db.users.forEach(user => {
+    users.forEach(
 
-        const option =
-            document.createElement("option");
+        user => {
 
-
-        option.value =
-            user.id;
-
-
-        option.textContent =
-            `${user.name} (${user.role})`;
+            const option =
+                document.createElement(
+                    "option"
+                );
 
 
-        filterUser.appendChild(
-            option
-        );
-    });
+            option.value =
+                user.id;
+
+
+            option.textContent =
+                `${user.name} (${user.role})`;
+
+
+            filterUser.appendChild(
+                option
+            );
+
+        }
+
+    );
+
 }
 
 
-// ==========================================
-// FILTER LOG
-// ==========================================
+/* =========================================
+   FILTER ACTION DINAMIS
+========================================= */
+
+function renderActionFilter() {
+
+    const filterAction =
+        document.getElementById(
+            "filterAction"
+        );
+
+
+    const currentValue =
+        filterAction.value;
+
+
+    const actions =
+        [
+            ...new Set(
+                auditLogs
+                    .map(
+                        log =>
+                            log.action
+                    )
+                    .filter(
+                        Boolean
+                    )
+            )
+        ]
+            .sort();
+
+
+    filterAction.innerHTML = `
+
+        <option value="">
+            Semua Aktivitas
+        </option>
+
+    `;
+
+
+    actions.forEach(
+
+        action => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                action;
+
+
+            option.textContent =
+                action;
+
+
+            filterAction.appendChild(
+                option
+            );
+
+        }
+
+    );
+
+
+    if (
+        actions.includes(
+            currentValue
+        )
+    ) {
+
+        filterAction.value =
+            currentValue;
+
+    }
+
+}
+
+
+/* =========================================
+   FILTER
+========================================= */
 
 function getFilteredLogs() {
 
     const keyword =
         document
-            .getElementById("searchAudit")
+            .getElementById(
+                "searchAudit"
+            )
             .value
             .toLowerCase()
             .trim();
@@ -300,98 +656,156 @@ function getFilteredLogs() {
 
     const action =
         document
-            .getElementById("filterAction")
+            .getElementById(
+                "filterAction"
+            )
             .value;
 
 
     const userId =
         document
-            .getElementById("filterUser")
+            .getElementById(
+                "filterUser"
+            )
             .value;
 
 
     const date =
         document
-            .getElementById("filterDate")
+            .getElementById(
+                "filterDate"
+            )
             .value;
 
 
-    return db.auditLogs.filter(
+    return auditLogs.filter(
+
         log => {
 
             const user =
-                getUser(log.userId);
+                getUser(
+                    log.userId
+                );
 
 
             const name =
-                user?.name || "";
+                (
+                    log.userName
+                    ||
+                    user?.name
+                    ||
+                    ""
+                );
 
 
             const description =
-                log.description || "";
+                log.description ||
+                "";
 
 
             const actionText =
-                log.action || "";
+                log.action ||
+                "";
 
 
             const matchesKeyword =
                 !keyword
+
                 ||
+
                 name
                     .toLowerCase()
-                    .includes(keyword)
+                    .includes(
+                        keyword
+                    )
+
                 ||
+
                 description
                     .toLowerCase()
-                    .includes(keyword)
+                    .includes(
+                        keyword
+                    )
+
                 ||
+
                 actionText
                     .toLowerCase()
-                    .includes(keyword);
+                    .includes(
+                        keyword
+                    );
 
 
             const matchesAction =
                 !action
+
                 ||
-                log.action === action;
+
+                log.action ===
+                action;
 
 
             const matchesUser =
                 !userId
+
                 ||
-                Number(log.userId) ===
-                    Number(userId);
+
+                Number(
+                    log.userId
+                )
+                ===
+                Number(
+                    userId
+                );
 
 
             const matchesDate =
                 !date
+
                 ||
-                getLogDate(log) === date;
+
+                getLogDate(
+                    log
+                )
+                ===
+                date;
 
 
             return (
+
                 matchesKeyword
+
                 &&
+
                 matchesAction
+
                 &&
+
                 matchesUser
+
                 &&
+
                 matchesDate
+
             );
+
         }
+
     );
+
 }
 
 
-// ==========================================
-// TAMPILKAN AUDIT
-// ==========================================
+/* =========================================
+   TABLE
+========================================= */
 
 function renderAuditTable() {
 
     const auditTable =
-        document.getElementById("auditTable");
+        document.getElementById(
+            "auditTable"
+        );
 
 
     auditTable.innerHTML =
@@ -399,116 +813,191 @@ function renderAuditTable() {
 
 
     const logs =
-        getFilteredLogs()
+        [...getFilteredLogs()]
             .sort(
-                (a, b) =>
-                    new Date(b.createdAt) -
-                    new Date(a.createdAt)
+
+                (
+                    a,
+                    b
+                ) =>
+
+                    new Date(
+                        b.createdAt
+                    )
+
+                    -
+
+                    new Date(
+                        a.createdAt
+                    )
+
             );
 
 
-    if (logs.length === 0) {
+    if (
+        logs.length ===
+        0
+    ) {
 
         auditTable.innerHTML = `
+
             <tr>
-                <td colspan="6">
+
+                <td
+                    colspan="6"
+                    style="
+                        text-align:center;
+                        color:#9ca3af;
+                    "
+                >
                     Tidak ada aktivitas yang ditemukan.
                 </td>
+
             </tr>
+
         `;
 
+
         return;
+
     }
 
 
-    logs.forEach(log => {
+    logs.forEach(
 
-        const user =
-            getUser(log.userId);
+        log => {
 
-
-        const row =
-            document.createElement("tr");
-
-
-        row.innerHTML = `
-            <td>
-                ${formatDate(log.createdAt)}
-            </td>
-
-            <td>
-                ${formatTime(log.createdAt)}
-            </td>
-
-            <td>
-                ${user?.name || "-"}
-            </td>
-
-            <td>
-                <span class="role-badge">
-                    ${user?.role || "-"}
-                </span>
-            </td>
-
-            <td>
-                <span class="activity-badge">
-                    ${log.action || "-"}
-                </span>
-            </td>
-
-            <td>
-                ${log.description || "-"}
-            </td>
-        `;
+            const user =
+                getUser(
+                    log.userId
+                );
 
 
-        auditTable.appendChild(
-            row
-        );
-    });
+            const userName =
+                log.userName
+                ||
+                user?.name
+                ||
+                "-";
+
+
+            const userRole =
+                log.userRole
+                ||
+                user?.role
+                ||
+                "-";
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${formatDate(
+                        log.createdAt
+                    )}
+                </td>
+
+                <td>
+                    ${formatTime(
+                        log.createdAt
+                    )}
+                </td>
+
+                <td>
+                    ${userName}
+                </td>
+
+                <td>
+
+                    <span class="role-badge">
+                        ${userRole}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <span class="activity-badge">
+                        ${log.action || "-"}
+                    </span>
+
+                </td>
+
+                <td>
+                    ${log.description || "-"}
+                </td>
+
+            `;
+
+
+            auditTable.appendChild(
+                row
+            );
+
+        }
+
+    );
+
 }
 
 
-// ==========================================
-// RESET FILTER
-// ==========================================
+/* =========================================
+   RESET FILTER
+========================================= */
 
 function resetFilter() {
 
     document
-        .getElementById("searchAudit")
+        .getElementById(
+            "searchAudit"
+        )
         .value =
         "";
 
 
     document
-        .getElementById("filterAction")
+        .getElementById(
+            "filterAction"
+        )
         .value =
         "";
 
 
     document
-        .getElementById("filterUser")
+        .getElementById(
+            "filterUser"
+        )
         .value =
         "";
 
 
     document
-        .getElementById("filterDate")
+        .getElementById(
+            "filterDate"
+        )
         .value =
         "";
 
 
     renderAuditTable();
+
 }
 
 
-// ==========================================
-// EVENT FILTER
-// ==========================================
+/* =========================================
+   EVENTS
+========================================= */
 
 document
-    .getElementById("searchAudit")
+    .getElementById(
+        "searchAudit"
+    )
     .addEventListener(
         "input",
         renderAuditTable
@@ -516,7 +1005,9 @@ document
 
 
 document
-    .getElementById("filterAction")
+    .getElementById(
+        "filterAction"
+    )
     .addEventListener(
         "change",
         renderAuditTable
@@ -524,7 +1015,9 @@ document
 
 
 document
-    .getElementById("filterUser")
+    .getElementById(
+        "filterUser"
+    )
     .addEventListener(
         "change",
         renderAuditTable
@@ -532,16 +1025,18 @@ document
 
 
 document
-    .getElementById("filterDate")
+    .getElementById(
+        "filterDate"
+    )
     .addEventListener(
         "change",
         renderAuditTable
     );
 
 
-// ==========================================
-// LOGOUT
-// ==========================================
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
@@ -552,17 +1047,61 @@ function logout() {
 
     window.location.href =
         "../index.html";
+
 }
 
 
-// ==========================================
-// JALANKAN
-// ==========================================
+/* =========================================
+   INITIALIZE
+========================================= */
 
-renderUser();
+async function initializeAudit() {
 
-renderSummary();
+    renderUser();
 
-renderUserFilter();
 
-renderAuditTable();
+    try {
+
+        await Promise.all([
+
+            loadUsers(),
+
+            loadAuditLogs()
+
+        ]);
+
+
+        renderSummary();
+
+        renderUserFilter();
+
+        renderActionFilter();
+
+        renderAuditTable();
+
+
+        console.log(
+            "✅ AUDIT MYSQL SIAP"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Initialize Audit Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal memuat Audit Aktivitas."
+        );
+
+    }
+
+}
+
+
+initializeAudit();

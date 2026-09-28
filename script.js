@@ -14,15 +14,30 @@ const loginButton =
     );
 
 
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+
+const loginError =
+    document.getElementById(
+        "loginError"
+    );
+
+
 /* =========================================
    PILIH ROLE
 ========================================= */
 
 roleButtons.forEach(
+
     button => {
 
         button.addEventListener(
+
             "click",
+
             function () {
 
                 selectedRole =
@@ -30,6 +45,7 @@ roleButtons.forEach(
 
 
                 roleButtons.forEach(
+
                     item => {
 
                         item.classList.remove(
@@ -37,6 +53,7 @@ roleButtons.forEach(
                         );
 
                     }
+
                 );
 
 
@@ -51,60 +68,104 @@ roleButtons.forEach(
                     "OWNER"
 
                         ?
+
                         "Login sebagai Owner"
 
                         :
+
                         "Login sebagai Pegawai";
 
 
-                document
-                    .getElementById(
-                        "loginError"
-                    )
-                    .textContent =
+                loginError.textContent =
                     "";
 
             }
+
         );
 
     }
+
 );
 
 
 /* =========================================
-   LOGIN
+   LOGIN MELALUI MYSQL
 ========================================= */
 
-document
-    .getElementById(
-        "loginForm"
-    )
-    .addEventListener(
-        "submit",
-        function (event) {
+loginForm.addEventListener(
 
-            event.preventDefault();
+    "submit",
 
+    async function (
+        event
+    ) {
 
-            const username =
-                document
-                    .getElementById(
-                        "username"
-                    )
-                    .value
-                    .trim();
+        event.preventDefault();
 
 
-            const password =
-                document
-                    .getElementById(
-                        "password"
-                    )
-                    .value;
+        const username =
+            document
+                .getElementById(
+                    "username"
+                )
+                .value
+                .trim();
 
+
+        const password =
+            document
+                .getElementById(
+                    "password"
+                )
+                .value;
+
+
+        /* =========================================
+           VALIDASI FORM
+        ========================================= */
+
+        if (
+            !username ||
+            !password
+        ) {
+
+            loginError.textContent =
+                "Username dan password wajib diisi.";
+
+
+            return;
+
+        }
+
+
+        /* =========================================
+           LOADING BUTTON
+        ========================================= */
+
+        const originalButtonText =
+            loginButton.textContent;
+
+
+        loginButton.disabled =
+            true;
+
+
+        loginButton.textContent =
+            "Memeriksa akun...";
+
+
+        loginError.textContent =
+            "";
+
+
+        try {
+
+            /* =========================================
+               LOGIN KE NODE.JS / MYSQL
+            ========================================= */
 
             const result =
-                SmartPOSDB.login(
+                await SmartPOSDB.login(
 
                     selectedRole,
 
@@ -119,11 +180,7 @@ document
                 !result.success
             ) {
 
-                document
-                    .getElementById(
-                        "loginError"
-                    )
-                    .textContent =
+                loginError.textContent =
                     result.message;
 
 
@@ -131,6 +188,10 @@ document
 
             }
 
+
+            /* =========================================
+               REDIRECT BERDASARKAN ROLE MYSQL
+            ========================================= */
 
             if (
                 result.user.role ===
@@ -150,4 +211,31 @@ document
             }
 
         }
-    );
+
+        catch (error) {
+
+            console.error(
+                "Login Error:",
+                error
+            );
+
+
+            loginError.textContent =
+                "Terjadi kesalahan saat login.";
+
+        }
+
+        finally {
+
+            loginButton.disabled =
+                false;
+
+
+            loginButton.textContent =
+                originalButtonText;
+
+        }
+
+    }
+
+);

@@ -1,173 +1,317 @@
-const STORAGE_KEY = "umkmControlDataV1";
-const SESSION_KEY = "umkmControlSessionV1";
+const SESSION_KEY =
+    "umkmControlSessionV1";
+
+const API_URL =
+    "http://localhost:3000";
+
+
+/* =========================================
+   SESSION
+========================================= */
 
 let currentUser =
-    JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    JSON.parse(
+        localStorage.getItem(
+            SESSION_KEY
+        ) || "null"
+    );
 
-let db =
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+/* =========================================
+   DATA PEGAWAI DARI MYSQL
+========================================= */
+
+let users = [];
 
 
-// ==========================================
-// CEK LOGIN
-// ==========================================
+/* =========================================
+   CEK LOGIN
+========================================= */
 
 if (!currentUser) {
-    window.location.href = "../index.html";
+
+    window.location.href =
+        "../index.html";
+
 }
 
 
-// ==========================================
-// CEK ROLE
-// ==========================================
+/* =========================================
+   CEK ROLE
+========================================= */
 
-if (currentUser && currentUser.role !== "OWNER") {
-    window.location.href = "../pos/index.html";
-}
-
-
-// ==========================================
-// SIAPKAN DATABASE
-// ==========================================
-
-db.users = db.users || [];
-db.menus = db.menus || [];
-db.production = db.production || [];
-db.transactions = db.transactions || [];
-db.waste = db.waste || [];
-db.stockOpnames = db.stockOpnames || [];
-db.closings = db.closings || [];
-db.auditLogs = db.auditLogs || [];
-
-
-// ==========================================
-// SIMPAN DATABASE
-// ==========================================
-
-function saveDB() {
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(db)
-    );
-}
-
-
-// ==========================================
-// AUDIT LOG
-// ==========================================
-
-function addAudit(
-    action,
-    description,
-    userId
+if (
+    currentUser &&
+    currentUser.role !== "OWNER"
 ) {
 
-    db.auditLogs.push({
+    window.location.href =
+        "../pos/index.html";
 
-        id: Date.now(),
-
-        userId: userId,
-
-        action: action,
-
-        description: description,
-
-        createdAt:
-            new Date().toISOString()
-
-    });
 }
 
 
-// ==========================================
-// TAMPILKAN USER
-// ==========================================
+/* =========================================
+   API HELPER
+========================================= */
+
+async function apiRequest(
+    url,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
+
+                ...options,
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
+
+    let result;
+
+
+    try {
+
+        result =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            "Respons server tidak valid."
+        );
+
+    }
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Terjadi kesalahan pada server."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================
+   LOAD USERS DARI MYSQL
+========================================= */
+
+async function loadUsers() {
+
+    try {
+
+        const result =
+            await apiRequest(
+                "/api/users"
+            );
+
+
+        users =
+            (result.data || [])
+                .map(
+                    user => ({
+
+                        ...user,
+
+                        id:
+                            Number(
+                                user.id
+                            )
+
+                    })
+                );
+
+
+        console.log(
+            "✅ USERS MYSQL:",
+            users
+        );
+
+
+        renderSummary();
+
+        renderEmployeeTable(
+            document
+                .getElementById(
+                    "searchEmployee"
+                )
+                ?.value || ""
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Gagal mengambil users:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal mengambil data pegawai."
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   TAMPILKAN USER LOGIN
+========================================= */
 
 function renderUser() {
 
     if (!currentUser) {
+
         return;
+
     }
 
 
-    document
-        .getElementById("namaUser")
-        .textContent =
-        currentUser.name;
+    const namaUser =
+        document.getElementById(
+            "namaUser"
+        );
 
 
-    document
-        .getElementById("sidebarUser")
-        .textContent =
-        currentUser.name;
+    const sidebarUser =
+        document.getElementById(
+            "sidebarUser"
+        );
+
+
+    if (namaUser) {
+
+        namaUser.textContent =
+            currentUser.name;
+
+    }
+
+
+    if (sidebarUser) {
+
+        sidebarUser.textContent =
+            currentUser.name;
+
+    }
+
 }
 
 
-// ==========================================
-// SUMMARY
-// ==========================================
+/* =========================================
+   SUMMARY
+========================================= */
 
 function renderSummary() {
 
     const totalPegawai =
-        db.users.length;
+        users.length;
 
 
     const pegawaiAktif =
-        db.users.filter(
+        users.filter(
+
             user =>
-                user.status === "AKTIF"
+                user.status ===
+                "AKTIF"
+
         ).length;
 
 
     const totalKasir =
-        db.users.filter(
+        users.filter(
+
             user =>
-                user.role === "KASIR"
+                user.role ===
+                "KASIR"
+
         ).length;
 
 
     const totalOwner =
-        db.users.filter(
+        users.filter(
+
             user =>
-                user.role === "OWNER"
+                user.role ===
+                "OWNER"
+
         ).length;
 
 
     document
-        .getElementById("totalPegawai")
+        .getElementById(
+            "totalPegawai"
+        )
         .textContent =
         totalPegawai;
 
 
     document
-        .getElementById("pegawaiAktif")
+        .getElementById(
+            "pegawaiAktif"
+        )
         .textContent =
         pegawaiAktif;
 
 
     document
-        .getElementById("totalKasir")
+        .getElementById(
+            "totalKasir"
+        )
         .textContent =
         totalKasir;
 
 
     document
-        .getElementById("totalOwner")
+        .getElementById(
+            "totalOwner"
+        )
         .textContent =
         totalOwner;
+
 }
 
 
-// ==========================================
-// TAMPILKAN TABEL PEGAWAI
-// ==========================================
+/* =========================================
+   TAMPILKAN TABEL PEGAWAI
+========================================= */
 
-function renderEmployeeTable(keyword = "") {
+function renderEmployeeTable(
+    keyword = ""
+) {
 
     const employeeTable =
-        document.getElementById("employeeTable");
+        document.getElementById(
+            "employeeTable"
+        );
 
 
     employeeTable.innerHTML =
@@ -175,175 +319,236 @@ function renderEmployeeTable(keyword = "") {
 
 
     const search =
-        keyword
+        String(
+            keyword || ""
+        )
             .toLowerCase()
             .trim();
 
 
-    const users =
-        db.users.filter(
+    const filteredUsers =
+        users.filter(
+
             user => {
 
                 return (
-                    String(user.id)
-                        .includes(search)
+
+                    String(
+                        user.id
+                    )
+                        .includes(
+                            search
+                        )
+
                     ||
-                    user.name
+
+                    String(
+                        user.name || ""
+                    )
                         .toLowerCase()
-                        .includes(search)
+                        .includes(
+                            search
+                        )
+
                     ||
-                    user.username
+
+                    String(
+                        user.username || ""
+                    )
                         .toLowerCase()
-                        .includes(search)
+                        .includes(
+                            search
+                        )
+
                     ||
-                    user.role
+
+                    String(
+                        user.role || ""
+                    )
                         .toLowerCase()
-                        .includes(search)
+                        .includes(
+                            search
+                        )
+
+                    ||
+
+                    String(
+                        user.status || ""
+                    )
+                        .toLowerCase()
+                        .includes(
+                            search
+                        )
+
                 );
+
             }
+
         );
 
 
-    if (users.length === 0) {
+    if (
+        filteredUsers.length ===
+        0
+    ) {
 
         employeeTable.innerHTML = `
+
             <tr>
+
                 <td colspan="6">
                     Data pegawai tidak ditemukan.
                 </td>
+
             </tr>
+
         `;
+
 
         return;
+
     }
 
 
-    users.forEach(user => {
+    filteredUsers.forEach(
 
-        const row =
-            document.createElement("tr");
+        user => {
 
-
-        row.innerHTML = `
-            <td>
-                ${user.id}
-            </td>
-
-            <td>
-                ${user.name}
-            </td>
-
-            <td>
-                ${user.username}
-            </td>
-
-            <td>
-                <span class="role-badge">
-                    ${user.role}
-                </span>
-            </td>
-
-            <td>
-                <span
-                    class="status ${
-                        user.status === "AKTIF"
-                            ? "active"
-                            : "inactive"
-                    }"
-                >
-                    ${user.status}
-                </span>
-            </td>
-
-            <td>
-
-                <button
-                    type="button"
-                    class="edit-button"
-                    onclick="editEmployee(${user.id})"
-                >
-                    Edit
-                </button>
-
-            </td>
-        `;
+            const row =
+                document.createElement(
+                    "tr"
+                );
 
 
-        employeeTable.appendChild(
-            row
-        );
-    });
-}
+            row.innerHTML = `
+
+                <td>
+                    ${user.id}
+                </td>
+
+                <td>
+                    ${user.name}
+                </td>
+
+                <td>
+                    ${user.username}
+                </td>
+
+                <td>
+
+                    <span class="role-badge">
+                        ${user.role}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <span
+                        class="status ${
+                            user.status ===
+                            "AKTIF"
+
+                                ?
+
+                                "active"
+
+                                :
+
+                                "inactive"
+                        }"
+                    >
+                        ${user.status}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="edit-button"
+                        onclick="editEmployee(
+                            ${user.id}
+                        )"
+                    >
+                        Edit
+                    </button>
+
+                </td>
+
+            `;
 
 
-// ==========================================
-// GENERATE ID
-// ==========================================
+            employeeTable.appendChild(
+                row
+            );
 
-function generateEmployeeId() {
+        }
 
-    if (db.users.length === 0) {
-        return 1;
-    }
-
-
-    const ids =
-        db.users.map(
-            user =>
-                Number(user.id || 0)
-        );
-
-
-    return (
-        Math.max(...ids) + 1
     );
+
 }
 
 
-// ==========================================
-// SIMPAN PEGAWAI
-// ==========================================
+/* =========================================
+   SIMPAN PEGAWAI
+========================================= */
 
-function saveEmployee(event) {
+async function saveEmployee(
+    event
+) {
 
     event.preventDefault();
 
 
     const employeeId =
         document
-            .getElementById("employeeId")
+            .getElementById(
+                "employeeId"
+            )
             .value;
 
 
     const employeeName =
         document
-            .getElementById("employeeName")
+            .getElementById(
+                "employeeName"
+            )
             .value
             .trim();
 
 
     const employeeUsername =
         document
-            .getElementById("employeeUsername")
+            .getElementById(
+                "employeeUsername"
+            )
             .value
             .trim();
 
 
     const employeePassword =
         document
-            .getElementById("employeePassword")
+            .getElementById(
+                "employeePassword"
+            )
             .value;
 
 
     const employeeRole =
         document
-            .getElementById("employeeRole")
+            .getElementById(
+                "employeeRole"
+            )
             .value;
 
 
     const employeeStatus =
         document
-            .getElementById("employeeStatus")
+            .getElementById(
+                "employeeStatus"
+            )
             .value;
 
 
@@ -358,346 +563,521 @@ function saveEmployee(event) {
             "Lengkapi data pegawai terlebih dahulu."
         );
 
+
         return;
+
     }
 
 
-    const duplicateUsername =
-        db.users.find(
-            user =>
-                user.username.toLowerCase() ===
-                    employeeUsername.toLowerCase()
-                &&
-                Number(user.id) !==
-                    Number(employeeId)
-        );
+    /* =========================================
+       JANGAN NONAKTIFKAN AKUN SENDIRI
+    ========================================= */
 
-
-    if (duplicateUsername) {
+    if (
+        employeeId &&
+        Number(employeeId) ===
+        Number(currentUser.id) &&
+        employeeStatus ===
+        "NONAKTIF"
+    ) {
 
         alert(
-            "Username sudah digunakan."
+            "Akun yang sedang digunakan tidak dapat dinonaktifkan."
         );
 
+
         return;
+
     }
 
 
-    // ======================================
-    // EDIT PEGAWAI
-    // ======================================
+    const saveButton =
+        document.querySelector(
+            ".save-button"
+        );
 
-    if (employeeId) {
 
-        const user =
-            db.users.find(
-                item =>
-                    Number(item.id) ===
-                    Number(employeeId)
+    const originalButtonText =
+        saveButton.textContent;
+
+
+    try {
+
+        saveButton.disabled =
+            true;
+
+
+        saveButton.textContent =
+            "Menyimpan...";
+
+
+        /* =========================================
+           EDIT PEGAWAI
+        ========================================= */
+
+        if (employeeId) {
+
+            await apiRequest(
+                `/api/users/${employeeId}`,
+                {
+
+                    method:
+                        "PATCH",
+
+                    body:
+                        JSON.stringify({
+
+                            name:
+                                employeeName,
+
+                            username:
+                                employeeUsername,
+
+                            role:
+                                employeeRole,
+
+                            status:
+                                employeeStatus
+
+                        })
+
+                }
             );
 
 
-        if (!user) {
-            return;
-        }
+            /* =========================================
+               UPDATE PASSWORD JIKA DIISI
+            ========================================= */
+
+            if (
+                employeePassword
+            ) {
+
+                await apiRequest(
+                    `/api/users/${employeeId}/password`,
+                    {
+
+                        method:
+                            "PATCH",
+
+                        body:
+                            JSON.stringify({
+
+                                password:
+                                    employeePassword
+
+                            })
+
+                    }
+                );
+
+            }
 
 
-        if (
-            Number(user.id) ===
+            /* =========================================
+               JIKA EDIT AKUN SENDIRI
+            ========================================= */
+
+            if (
+                Number(employeeId) ===
                 Number(currentUser.id)
-            &&
-            employeeStatus === "NONAKTIF"
-        ) {
+            ) {
+
+                currentUser = {
+
+                    ...currentUser,
+
+                    name:
+                        employeeName,
+
+                    username:
+                        employeeUsername,
+
+                    role:
+                        employeeRole,
+
+                    status:
+                        employeeStatus
+
+                };
+
+
+                localStorage.setItem(
+                    SESSION_KEY,
+                    JSON.stringify(
+                        currentUser
+                    )
+                );
+
+
+                /*
+                 * Kalau owner mengubah dirinya
+                 * menjadi kasir, hak akses owner
+                 * langsung dicabut.
+                 */
+
+                if (
+                    employeeRole !==
+                    "OWNER"
+                ) {
+
+                    alert(
+                        "Data akun berhasil diperbarui. Role akun Anda sekarang KASIR."
+                    );
+
+
+                    window.location.href =
+                        "../pos/index.html";
+
+
+                    return;
+
+                }
+
+            }
+
 
             alert(
-                "Akun yang sedang digunakan tidak dapat dinonaktifkan."
+                employeePassword
+
+                    ?
+
+                    "Data dan password pegawai berhasil diperbarui."
+
+                    :
+
+                    "Data pegawai berhasil diperbarui."
             );
 
-            return;
         }
 
 
-        user.name =
-            employeeName;
+        /* =========================================
+           TAMBAH PEGAWAI
+        ========================================= */
 
-        user.username =
-            employeeUsername;
+        else {
 
-        user.role =
-            employeeRole;
+            if (
+                !employeePassword
+            ) {
 
-        user.status =
-            employeeStatus;
+                alert(
+                    "Password pegawai baru harus diisi."
+                );
 
 
-        if (employeePassword) {
+                return;
 
-            user.password =
-                employeePassword;
+            }
+
+
+            await apiRequest(
+                "/api/users",
+                {
+
+                    method:
+                        "POST",
+
+                    body:
+                        JSON.stringify({
+
+                            name:
+                                employeeName,
+
+                            username:
+                                employeeUsername,
+
+                            password:
+                                employeePassword,
+
+                            role:
+                                employeeRole,
+
+                            status:
+                                employeeStatus
+
+                        })
+
+                }
+            );
+
+
+            alert(
+                "Pegawai berhasil ditambahkan."
+            );
+
         }
 
 
-        addAudit(
-            "UPDATE PEGAWAI",
-            `Mengubah data pegawai ${employeeName}`,
-            currentUser.id
+        /* =========================================
+           REFRESH DARI MYSQL
+        ========================================= */
+
+        resetForm();
+
+        renderUser();
+
+        await loadUsers();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Simpan Pegawai Error:",
+            error
         );
 
 
-        if (
-            Number(user.id) ===
-            Number(currentUser.id)
-        ) {
-
-            currentUser = user;
-
-
-            localStorage.setItem(
-                SESSION_KEY,
-                JSON.stringify(user)
-            );
-        }
-
-
         alert(
-            "Data pegawai berhasil diperbarui."
+            error.message ||
+            "Gagal menyimpan data pegawai."
         );
 
     }
 
+    finally {
 
-    // ======================================
-    // TAMBAH PEGAWAI
-    // ======================================
-
-    else {
-
-        if (!employeePassword) {
-
-            alert(
-                "Password pegawai baru harus diisi."
-            );
-
-            return;
-        }
+        saveButton.disabled =
+            false;
 
 
-        const user = {
+        saveButton.textContent =
+            originalButtonText;
 
-            id:
-                generateEmployeeId(),
-
-            name:
-                employeeName,
-
-            username:
-                employeeUsername,
-
-            password:
-                employeePassword,
-
-            role:
-                employeeRole,
-
-            status:
-                employeeStatus
-
-        };
-
-
-        db.users.push(
-            user
-        );
-
-
-        addAudit(
-            "TAMBAH PEGAWAI",
-            `Menambahkan pegawai ${employeeName}`,
-            currentUser.id
-        );
-
-
-        alert(
-            "Pegawai berhasil ditambahkan."
-        );
     }
 
-
-    saveDB();
-
-    resetForm();
-
-    renderUser();
-
-    renderSummary();
-
-    renderEmployeeTable();
 }
 
 
-// ==========================================
-// EDIT PEGAWAI
-// ==========================================
+/* =========================================
+   EDIT PEGAWAI
+========================================= */
 
-function editEmployee(employeeId) {
+function editEmployee(
+    employeeId
+) {
 
     const user =
-        db.users.find(
+        users.find(
+
             item =>
-                Number(item.id) ===
-                Number(employeeId)
+                Number(
+                    item.id
+                )
+                ===
+                Number(
+                    employeeId
+                )
+
         );
 
 
     if (!user) {
+
+        alert(
+            "Data pegawai tidak ditemukan."
+        );
+
+
         return;
+
     }
 
 
     document
-        .getElementById("employeeId")
+        .getElementById(
+            "employeeId"
+        )
         .value =
         user.id;
 
 
     document
-        .getElementById("employeeName")
+        .getElementById(
+            "employeeName"
+        )
         .value =
         user.name;
 
 
     document
-        .getElementById("employeeUsername")
+        .getElementById(
+            "employeeUsername"
+        )
         .value =
         user.username;
 
 
     document
-        .getElementById("employeePassword")
+        .getElementById(
+            "employeePassword"
+        )
         .value =
         "";
 
 
     document
-        .getElementById("employeeRole")
+        .getElementById(
+            "employeeRole"
+        )
         .value =
         user.role;
 
 
     document
-        .getElementById("employeeStatus")
+        .getElementById(
+            "employeeStatus"
+        )
         .value =
         user.status;
 
 
     document
-        .getElementById("formTitle")
+        .getElementById(
+            "formTitle"
+        )
         .textContent =
         "Edit Pegawai";
 
 
     document
-        .getElementById("passwordHelp")
+        .getElementById(
+            "passwordHelp"
+        )
         .textContent =
         "Kosongkan password jika tidak ingin mengubahnya.";
 
 
     document
-        .getElementById("cancelButton")
+        .getElementById(
+            "cancelButton"
+        )
         .style.display =
         "inline-block";
 
 
     window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+
+        top:
+            0,
+
+        behavior:
+            "smooth"
+
     });
+
 }
 
 
-// ==========================================
-// RESET FORM
-// ==========================================
+/* =========================================
+   RESET FORM
+========================================= */
 
 function resetForm() {
 
     document
-        .getElementById("employeeForm")
+        .getElementById(
+            "employeeForm"
+        )
         .reset();
 
 
     document
-        .getElementById("employeeId")
+        .getElementById(
+            "employeeId"
+        )
         .value =
         "";
 
 
     document
-        .getElementById("formTitle")
+        .getElementById(
+            "formTitle"
+        )
         .textContent =
         "Tambah Pegawai";
 
 
     document
-        .getElementById("employeeRole")
+        .getElementById(
+            "employeeRole"
+        )
         .value =
         "KASIR";
 
 
     document
-        .getElementById("employeeStatus")
+        .getElementById(
+            "employeeStatus"
+        )
         .value =
         "AKTIF";
 
 
     document
-        .getElementById("passwordHelp")
+        .getElementById(
+            "passwordHelp"
+        )
         .textContent =
         "Password wajib untuk pegawai baru.";
 
 
     document
-        .getElementById("cancelButton")
+        .getElementById(
+            "cancelButton"
+        )
         .style.display =
         "none";
+
 }
 
 
-// ==========================================
-// BATAL EDIT
-// ==========================================
+/* =========================================
+   BATAL EDIT
+========================================= */
 
 function cancelEdit() {
 
     resetForm();
+
 }
 
 
-// ==========================================
-// SEARCH
-// ==========================================
+/* =========================================
+   SEARCH
+========================================= */
 
 const searchEmployee =
-    document.getElementById("searchEmployee");
+    document.getElementById(
+        "searchEmployee"
+    );
 
 
 searchEmployee.addEventListener(
+
     "input",
+
     function () {
 
         renderEmployeeTable(
             this.value
         );
+
     }
+
 );
 
 
-// ==========================================
-// FORM
-// ==========================================
+/* =========================================
+   FORM
+========================================= */
 
 const employeeForm =
-    document.getElementById("employeeForm");
+    document.getElementById(
+        "employeeForm"
+    );
 
 
 employeeForm.addEventListener(
@@ -706,9 +1086,9 @@ employeeForm.addEventListener(
 );
 
 
-// ==========================================
-// LOGOUT
-// ==========================================
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
@@ -719,21 +1099,30 @@ function logout() {
 
     window.location.href =
         "../index.html";
+
 }
 
 
-// ==========================================
-// JALANKAN HALAMAN
-// ==========================================
+/* =========================================
+   INITIALIZE
+========================================= */
 
-document
-    .getElementById("cancelButton")
-    .style.display =
-    "none";
+async function initializeEmployeePage() {
+
+    document
+        .getElementById(
+            "cancelButton"
+        )
+        .style.display =
+        "none";
 
 
-renderUser();
+    renderUser();
 
-renderSummary();
 
-renderEmployeeTable();
+    await loadUsers();
+
+}
+
+
+initializeEmployeePage();

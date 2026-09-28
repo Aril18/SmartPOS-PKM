@@ -1,315 +1,992 @@
-const STORAGE_KEY = "umkmControlDataV1";
-const SESSION_KEY = "umkmControlSessionV1";
+const SESSION_KEY =
+    "umkmControlSessionV1";
+
+const API_URL =
+    "http://localhost:3000";
+
+
+/* =========================================
+   SESSION
+========================================= */
 
 const currentUser =
-    JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    JSON.parse(
+        localStorage.getItem(
+            SESSION_KEY
+        ) || "null"
+    );
 
-
-// ==========================================
-// CEK LOGIN
-// ==========================================
 
 if (!currentUser) {
-    window.location.href = "../index.html";
+
+    window.location.href =
+        "../index.html";
+
 }
 
 
-// ==========================================
-// CEK ROLE
-// ==========================================
+if (
+    currentUser &&
+    currentUser.role !== "OWNER"
+) {
 
-if (currentUser && currentUser.role !== "OWNER") {
-    window.location.href = "../pos/index.html";
+    window.location.href =
+        "../pos/index.html";
+
 }
 
 
-// ==========================================
-// AMBIL DATA DARI LOCAL STORAGE
-// ==========================================
+/* =========================================
+   DATA MYSQL
+========================================= */
 
-const db =
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+const db = {
 
-db.users = db.users || [];
-db.menus = db.menus || [];
-db.production = db.production || [];
-db.transactions = db.transactions || [];
-db.waste = db.waste || [];
-db.stockOpnames = db.stockOpnames || [];
-db.closings = db.closings || [];
-db.auditLogs = db.auditLogs || [];
+    users: [],
+
+    menus: [],
+
+    production: [],
+
+    transactions: [],
+
+    waste: [],
+
+    stockOpnames: [],
+
+    closings: [],
+
+    auditLogs: []
+
+};
 
 
-// ==========================================
-// TANGGAL HARI INI
-// ==========================================
+/* =========================================
+   API HELPER
+========================================= */
+
+async function apiRequest(url) {
+
+    const response =
+        await fetch(
+            `${API_URL}${url}`
+        );
+
+
+    const result =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Gagal mengambil data."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================
+   LOAD USERS
+========================================= */
+
+async function loadUsers() {
+
+    const result =
+        await apiRequest(
+            "/api/users"
+        );
+
+
+    db.users =
+        (result.data || [])
+            .map(
+                user => ({
+
+                    ...user,
+
+                    id:
+                        Number(
+                            user.id
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD MENUS
+========================================= */
+
+async function loadMenus() {
+
+    const result =
+        await apiRequest(
+            "/api/menus"
+        );
+
+
+    db.menus =
+        (result.data || [])
+            .map(
+                menu => ({
+
+                    ...menu,
+
+                    id:
+                        Number(
+                            menu.id
+                        ),
+
+                    price:
+                        Number(
+                            menu.price || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            menu.portionUsage || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD PRODUCTION
+========================================= */
+
+async function loadProduction() {
+
+    const result =
+        await apiRequest(
+            "/api/production"
+        );
+
+
+    db.production =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    stockWeight:
+                        Number(
+                            item.stockWeight || 0
+                        ),
+
+                    estimatedPortion:
+                        Number(
+                            item.estimatedPortion || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ DASHBOARD PRODUCTION:",
+        db.production
+    );
+
+}
+
+
+/* =========================================
+   LOAD TRANSACTIONS
+========================================= */
+
+async function loadTransactions() {
+
+    const result =
+        await apiRequest(
+            "/api/transactions"
+        );
+
+
+    db.transactions =
+        (result.data || [])
+            .map(
+                transaction => ({
+
+                    ...transaction,
+
+                    id:
+                        Number(
+                            transaction.id
+                        ),
+
+                    cashierId:
+                        Number(
+                            transaction.cashierId
+                        ),
+
+                    total:
+                        Number(
+                            transaction.total || 0
+                        ),
+
+                    items:
+                        (
+                            transaction.items ||
+                            []
+                        )
+                            .map(
+                                item => ({
+
+                                    ...item,
+
+                                    menuId:
+                                        Number(
+                                            item.menuId
+                                        ),
+
+                                    quantity:
+                                        Number(
+                                            item.quantity || 0
+                                        ),
+
+                                    portionUsageAtSale:
+                                        Number(
+                                            item.portionUsageAtSale || 0
+                                        )
+
+                                })
+                            )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD WASTE
+========================================= */
+
+async function loadWaste() {
+
+    const result =
+        await apiRequest(
+            "/api/waste"
+        );
+
+
+    db.waste =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    quantity:
+                        Number(
+                            item.quantity || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            item.portionUsage || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD STOCK OPNAMES
+========================================= */
+
+async function loadStockOpnames() {
+
+    const result =
+        await apiRequest(
+            "/api/stock-opnames"
+        );
+
+
+    db.stockOpnames =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    expectedStock:
+                        Number(
+                            item.expectedStock || 0
+                        ),
+
+                    physicalStock:
+                        Number(
+                            item.physicalStock || 0
+                        ),
+
+                    difference:
+                        Number(
+                            item.difference || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD CLOSINGS MYSQL
+========================================= */
+
+async function loadClosings() {
+
+    const result =
+        await apiRequest(
+            "/api/closings"
+        );
+
+
+    db.closings =
+        (result.data || [])
+            .map(
+                closing => ({
+
+                    ...closing,
+
+                    id:
+                        Number(
+                            closing.id
+                        ),
+
+                    cashierId:
+                        Number(
+                            closing.cashierId
+                        ),
+
+                    transactionCount:
+                        Number(
+                            closing.transactionCount || 0
+                        ),
+
+                    voidCount:
+                        Number(
+                            closing.voidCount || 0
+                        ),
+
+                    cashSales:
+                        Number(
+                            closing.cashSales || 0
+                        ),
+
+                    nonCashSales:
+                        Number(
+                            closing.nonCashSales || 0
+                        ),
+
+                    systemCash:
+                        Number(
+                            closing.systemCash || 0
+                        ),
+
+                    actualCash:
+                        Number(
+                            closing.actualCash || 0
+                        ),
+
+                    cashDifference:
+                        Number(
+                            closing.cashDifference || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ DASHBOARD CLOSINGS MYSQL:",
+        db.closings
+    );
+
+}
+
+
+/* =========================================
+   LOAD AUDIT MYSQL
+========================================= */
+
+async function loadAuditLogs() {
+
+    const result =
+        await apiRequest(
+            "/api/audit-logs"
+        );
+
+
+    db.auditLogs =
+        (result.data || [])
+            .map(
+                log => ({
+
+                    ...log,
+
+                    id:
+                        Number(
+                            log.id
+                        ),
+
+                    userId:
+                        Number(
+                            log.userId
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ DASHBOARD AUDIT MYSQL:",
+        db.auditLogs
+    );
+
+}
+
+
+/* =========================================
+   DATE
+========================================= */
 
 function todayISO() {
-    const now = new Date();
+
+    const now =
+        new Date();
+
 
     const year =
         now.getFullYear();
 
+
     const month =
-        String(now.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
-        String(now.getDate())
-            .padStart(2, "0");
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     return `${year}-${month}-${day}`;
+
 }
 
 
-// ==========================================
-// FORMAT RUPIAH
-// ==========================================
+/* =========================================
+   FORMAT
+========================================= */
 
 function formatRupiah(value) {
+
     return new Intl.NumberFormat(
         "id-ID",
         {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0
+
+            style:
+                "currency",
+
+            currency:
+                "IDR",
+
+            minimumFractionDigits:
+                0
+
         }
-    ).format(Number(value || 0));
+    ).format(
+        Number(
+            value || 0
+        )
+    );
+
 }
 
-
-// ==========================================
-// FORMAT PORSI
-// ==========================================
 
 function formatPortion(value) {
-    const number =
-        Number(value || 0);
 
-    if (Number.isInteger(number)) {
+    const number =
+        Number(
+            value || 0
+        );
+
+
+    if (
+        Number.isInteger(
+            number
+        )
+    ) {
+
         return number;
+
     }
 
-    return number.toFixed(1);
+
+    return number.toFixed(
+        1
+    );
+
 }
 
 
-// ==========================================
-// AMBIL MENU BERDASARKAN ID
-// ==========================================
+/* =========================================
+   HELPERS
+========================================= */
 
 function getMenu(menuId) {
+
     return db.menus.find(
+
         menu =>
-            Number(menu.id) ===
-            Number(menuId)
+            Number(
+                menu.id
+            )
+            ===
+            Number(
+                menuId
+            )
+
     );
+
 }
 
 
 function getUser(userId) {
+
     return db.users.find(
+
         user =>
-            Number(user.id) ===
-            Number(userId)
+            Number(
+                user.id
+            )
+            ===
+            Number(
+                userId
+            )
+
     );
+
 }
 
+
+/* =========================================
+   PRODUCTION TODAY
+========================================= */
 
 function productionToday() {
+
     const today =
         todayISO();
+
 
     return db.production.filter(
+
         item =>
-            item.date === today
+            item.date ===
+            today
+
     );
-}
 
-
-function transactionsToday() {
-    const today =
-        todayISO();
-
-    return db.transactions.filter(
-        transaction =>
-            transaction.date === today
-    );
-}
-
-
-function validTransactions() {
-    return transactionsToday().filter(
-        transaction =>
-            transaction.status !== "VOID"
-    );
-}
-
-
-function voidTransactions() {
-    return transactionsToday().filter(
-        transaction =>
-            transaction.status === "VOID"
-    );
 }
 
 
 function initialPortionsToday() {
-    return productionToday().reduce(
-        (total, item) =>
-            total +
-            Number(item.estimatedPortion || 0),
-        0
-    );
+
+    return productionToday()
+        .reduce(
+
+            (
+                total,
+                item
+            ) =>
+
+                total
+                +
+                Number(
+                    item.estimatedPortion || 0
+                ),
+
+            0
+
+        );
+
 }
 
 
-function soldPortionsToday() {
-    return validTransactions().reduce(
-        (total, transaction) => {
+/* =========================================
+   TRANSACTIONS TODAY
+========================================= */
 
-            const items =
-                transaction.items || [];
+function transactionsToday() {
 
-            const transactionPortions =
-                items.reduce(
-                    (subtotal, item) => {
-
-                        const menu =
-                            getMenu(item.menuId);
-
-                        const portionUsage =
-                            Number(
-                                item.portionUsageAtSale ??
-                                menu?.portionUsage ??
-                                0
-                            );
-
-                        return subtotal +
-                            (
-                                Number(item.quantity || 0) *
-                                portionUsage
-                            );
-                    },
-                    0
-                );
-
-            return total + transactionPortions;
-        },
-        0
-    );
-}
-
-function todayWaste() {
     const today =
         todayISO();
 
-    return db.waste.filter(
-        item => {
 
-            if (item.date) {
-                return item.date === today;
-            }
+    return db.transactions.filter(
 
-            if (item.createdAt) {
-                return (
-                    item.createdAt.substring(0, 10)
-                    === today
-                );
-            }
+        transaction =>
+            transaction.date ===
+            today
 
-            return false;
-        }
     );
+
+}
+
+
+function validTransactions() {
+
+    return transactionsToday()
+        .filter(
+
+            transaction =>
+                transaction.status !==
+                "VOID"
+
+        );
+
+}
+
+
+function voidTransactions() {
+
+    return transactionsToday()
+        .filter(
+
+            transaction =>
+                transaction.status ===
+                "VOID"
+
+        );
+
+}
+
+
+/* =========================================
+   SOLD PORTIONS
+========================================= */
+
+function soldPortionsToday() {
+
+    return validTransactions()
+        .reduce(
+
+            (
+                total,
+                transaction
+            ) => {
+
+                const transactionPortions =
+                    (
+                        transaction.items ||
+                        []
+                    )
+                        .reduce(
+
+                            (
+                                subtotal,
+                                item
+                            ) => {
+
+                                const menu =
+                                    getMenu(
+                                        item.menuId
+                                    );
+
+
+                                const portionUsage =
+                                    Number(
+
+                                        item.portionUsageAtSale
+
+                                        ??
+
+                                        menu?.portionUsage
+
+                                        ??
+
+                                        0
+
+                                    );
+
+
+                                return (
+
+                                    subtotal
+
+                                    +
+
+                                    (
+                                        Number(
+                                            item.quantity || 0
+                                        )
+
+                                        *
+
+                                        portionUsage
+                                    )
+
+                                );
+
+                            },
+
+                            0
+
+                        );
+
+
+                return (
+                    total +
+                    transactionPortions
+                );
+
+            },
+
+            0
+
+        );
+
+}
+
+
+/* =========================================
+   WASTE TODAY
+========================================= */
+
+function todayWaste() {
+
+    const today =
+        todayISO();
+
+
+    return db.waste.filter(
+
+        item =>
+            item.date ===
+            today
+
+    );
+
 }
 
 
 function wastePortionsToday() {
-    return todayWaste().reduce(
-        (total, item) =>
-            total +
+
+    return todayWaste()
+        .reduce(
+
             (
-                Number(item.quantity || 0) *
-                Number(item.portionUsage ?? 1)
-            ),
-        0
-    );
+                total,
+                item
+            ) =>
+
+                total
+
+                +
+
+                (
+                    Number(
+                        item.quantity || 0
+                    )
+
+                    *
+
+                    Number(
+                        item.portionUsage || 0
+                    )
+                ),
+
+            0
+
+        );
+
 }
 
+
+/* =========================================
+   STOCK
+========================================= */
 
 function expectedStockToday() {
+
     return (
+
         initialPortionsToday()
+
         -
+
         soldPortionsToday()
+
         -
+
         wastePortionsToday()
+
     );
+
 }
+
+
+/* =========================================
+   OMZET
+========================================= */
 
 function omzetToday() {
-    return validTransactions().reduce(
-        (total, transaction) =>
-            total +
-            Number(transaction.total || 0),
-        0
-    );
+
+    return validTransactions()
+        .reduce(
+
+            (
+                total,
+                transaction
+            ) =>
+
+                total
+                +
+                Number(
+                    transaction.total || 0
+                ),
+
+            0
+
+        );
+
 }
 
 
+/* =========================================
+   STOCK DIFFERENCE
+========================================= */
+
 function stockDifferenceToday() {
+
     const today =
         todayISO();
 
+
     const stockOpname =
-        [...db.stockOpnames]
-            .reverse()
-            .find(
-                item =>
-                    item.date === today
-            );
+        db.stockOpnames.find(
+
+            item =>
+                item.date ===
+                today
+
+        );
+
 
     if (!stockOpname) {
+
         return 0;
+
     }
+
 
     return Number(
         stockOpname.difference || 0
     );
+
 }
 
 
+/* =========================================
+   CASH DIFFERENCE
+========================================= */
+
 function cashDifferenceToday() {
+
     const today =
         todayISO();
 
+
+    /*
+     * API Closing sudah urut terbaru dulu.
+     */
+
     const closing =
-        [...db.closings]
-            .reverse()
-            .find(
-                item =>
-                    item.date === today
-            );
+        db.closings.find(
+
+            item =>
+                item.date ===
+                today
+
+        );
+
 
     if (!closing) {
+
         return 0;
+
     }
+
 
     return Number(
         closing.cashDifference || 0
     );
+
 }
+
+
+/* =========================================
+   RENDER DASHBOARD
+========================================= */
 
 function renderDashboard() {
 
     document
-        .getElementById("namaUser")
+        .getElementById(
+            "namaUser"
+        )
         .textContent =
         currentUser.name;
 
 
     document
-        .getElementById("omzetHariIni")
+        .getElementById(
+            "omzetHariIni"
+        )
         .textContent =
         formatRupiah(
             omzetToday()
@@ -317,13 +994,18 @@ function renderDashboard() {
 
 
     document
-        .getElementById("jumlahTransaksi")
+        .getElementById(
+            "jumlahTransaksi"
+        )
         .textContent =
-        validTransactions().length;
+        validTransactions()
+            .length;
 
 
     document
-        .getElementById("porsiTerjual")
+        .getElementById(
+            "porsiTerjual"
+        )
         .textContent =
         formatPortion(
             soldPortionsToday()
@@ -331,37 +1013,48 @@ function renderDashboard() {
 
 
     document
-        .getElementById("stokTersisa")
+        .getElementById(
+            "stokTersisa"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             expectedStockToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     document
-        .getElementById("wasteHariIni")
+        .getElementById(
+            "wasteHariIni"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             wastePortionsToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     document
-        .getElementById("jumlahVoid")
+        .getElementById(
+            "jumlahVoid"
+        )
         .textContent =
-        voidTransactions().length;
+        voidTransactions()
+            .length;
 
 
     document
-        .getElementById("selisihStok")
+        .getElementById(
+            "selisihStok"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             stockDifferenceToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     document
-        .getElementById("selisihKas")
+        .getElementById(
+            "selisihKas"
+        )
         .textContent =
         formatRupiah(
             cashDifferenceToday()
@@ -369,78 +1062,115 @@ function renderDashboard() {
 
 
     document
-        .getElementById("stokAwal")
+        .getElementById(
+            "stokAwal"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             initialPortionsToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     document
-        .getElementById("stokTerjual")
+        .getElementById(
+            "stokTerjual"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             soldPortionsToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     document
-        .getElementById("stokWaste")
+        .getElementById(
+            "stokWaste"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             wastePortionsToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     document
-        .getElementById("stokSistem")
+        .getElementById(
+            "stokSistem"
+        )
         .textContent =
-        formatPortion(
+        `${formatPortion(
             expectedStockToday()
-        ) + " Porsi";
+        )} Porsi`;
 
 
     renderStockAlert();
 
     renderAuditTable();
+
 }
 
+
+/* =========================================
+   STOCK ALERT
+========================================= */
 
 function renderStockAlert() {
 
     const stock =
         expectedStockToday();
 
+
     const stockAlert =
-        document.getElementById("stockAlert");
+        document.getElementById(
+            "stockAlert"
+        );
 
 
-    if (stock <= 0) {
+    if (
+        !stockAlert
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        stock <= 0
+    ) {
 
         stockAlert.textContent =
             "STOK HABIS";
 
+
         stockAlert.style.background =
             "#fee2e2";
 
+
         stockAlert.style.color =
             "#991b1b";
+
 
         stockAlert.style.borderColor =
             "#fecaca";
 
     }
 
-    else if (stock <= 10) {
+    else if (
+        stock <= 10
+    ) {
 
         stockAlert.textContent =
-            `STOK MENIPIS: Tersisa ${formatPortion(stock)} porsi`;
+            `STOK MENIPIS: Tersisa ${formatPortion(
+                stock
+            )} porsi`;
+
 
         stockAlert.style.background =
             "#fef3c7";
 
+
         stockAlert.style.color =
             "#92400e";
+
 
         stockAlert.style.borderColor =
             "#fde68a";
@@ -450,91 +1180,185 @@ function renderStockAlert() {
     else {
 
         stockAlert.textContent =
-            `STOK AMAN: Tersisa ${formatPortion(stock)} porsi`;
+            `STOK AMAN: Tersisa ${formatPortion(
+                stock
+            )} porsi`;
+
 
         stockAlert.style.background =
             "#dcfce7";
 
+
         stockAlert.style.color =
             "#166534";
+
 
         stockAlert.style.borderColor =
             "#bbf7d0";
 
     }
+
 }
 
+
+/* =========================================
+   AKTIVITAS TERBARU MYSQL
+========================================= */
 
 function renderAuditTable() {
 
     const auditTable =
-        document.getElementById("auditTable");
-
-    auditTable.innerHTML = "";
-
-
-    const logs =
-        [...db.auditLogs]
-            .reverse()
-            .slice(0, 10);
+        document.getElementById(
+            "auditTable"
+        );
 
 
-    if (logs.length === 0) {
-
-        auditTable.innerHTML = `
-            <tr>
-                <td colspan="4">
-                    Belum ada aktivitas.
-                </td>
-            </tr>
-        `;
+    if (!auditTable) {
 
         return;
+
     }
 
 
-    logs.forEach(log => {
-
-        const user =
-            getUser(log.userId);
+    auditTable.innerHTML =
+        "";
 
 
-        let time = "-";
+    /*
+     * API sudah mengirim aktivitas
+     * paling baru di posisi atas.
+     *
+     * Jadi TIDAK perlu .reverse()
+     */
+
+    const logs =
+        [...db.auditLogs]
+            .slice(
+                0,
+                10
+            );
 
 
-        if (log.createdAt) {
+    if (
+        logs.length ===
+        0
+    ) {
 
-            time =
-                new Date(
-                    log.createdAt
-                ).toLocaleTimeString(
-                    "id-ID",
-                    {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    }
-                );
+        auditTable.innerHTML = `
 
-        }
+            <tr>
 
+                <td colspan="4">
+                    Belum ada aktivitas.
+                </td>
 
-        const row =
-            document.createElement("tr");
+            </tr>
 
-
-        row.innerHTML = `
-            <td>${time}</td>
-            <td>${user?.name || "-"}</td>
-            <td>${log.action || "-"}</td>
-            <td>${log.description || "-"}</td>
         `;
 
 
-        auditTable.appendChild(row);
+        return;
 
-    });
+    }
+
+
+    logs.forEach(
+
+        log => {
+
+            const user =
+                getUser(
+                    log.userId
+                );
+
+
+            let time =
+                "-";
+
+
+            if (
+                log.createdAt
+            ) {
+
+                const date =
+                    new Date(
+                        log.createdAt
+                    );
+
+
+                if (
+                    !Number.isNaN(
+                        date.getTime()
+                    )
+                ) {
+
+                    time =
+                        date
+                            .toLocaleTimeString(
+                                "id-ID",
+                                {
+
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+
+                                }
+                            );
+
+                }
+
+            }
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${time}
+                </td>
+
+                <td>
+                    ${
+                        log.userName
+                        ||
+                        user?.name
+                        ||
+                        "-"
+                    }
+                </td>
+
+                <td>
+                    ${log.action || "-"}
+                </td>
+
+                <td>
+                    ${log.description || "-"}
+                </td>
+
+            `;
+
+
+            auditTable.appendChild(
+                row
+            );
+
+        }
+
+    );
+
 }
 
+
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
@@ -542,13 +1366,67 @@ function logout() {
         SESSION_KEY
     );
 
+
     window.location.href =
         "../index.html";
+
 }
 
-window.addEventListener("storage", function (event) {
-    if (event.key === STORAGE_KEY) {
-        location.reload();
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+async function initializeDashboard() {
+
+    try {
+
+        await Promise.all([
+
+            loadUsers(),
+
+            loadMenus(),
+
+            loadProduction(),
+
+            loadTransactions(),
+
+            loadWaste(),
+
+            loadStockOpnames(),
+
+            loadClosings(),
+
+            loadAuditLogs()
+
+        ]);
+
+
+        console.log(
+            "✅ DASHBOARD MYSQL SIAP"
+        );
+
+
+        renderDashboard();
+
     }
-});
-renderDashboard();
+
+    catch (error) {
+
+        console.error(
+            "❌ Dashboard Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal memuat Dashboard."
+        );
+
+    }
+
+}
+
+
+initializeDashboard();

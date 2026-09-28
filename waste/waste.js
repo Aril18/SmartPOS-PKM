@@ -1,9 +1,15 @@
-const STORAGE_KEY =
-    "umkmControlDataV1";
+
 
 const SESSION_KEY =
     "umkmControlSessionV1";
 
+const API_URL =
+    "http://localhost:3000";
+
+
+/* =========================================
+   SESSION
+========================================= */
 
 const currentUser =
     JSON.parse(
@@ -13,6 +19,10 @@ const currentUser =
     );
 
 
+/* =========================================
+   CEK LOGIN
+========================================= */
+
 if (!currentUser) {
 
     window.location.href =
@@ -21,173 +31,441 @@ if (!currentUser) {
 }
 
 
-const db =
-    JSON.parse(
-        localStorage.getItem(
-            STORAGE_KEY
-        ) || "{}"
-    );
+/* =========================================
+   DATA MYSQL
+========================================= */
+
+let menus = [];
+
+let production = [];
+
+let transactions = [];
+
+let wasteRecords = [];
 
 
-db.users =
-    db.users || [];
 
-db.menus =
-    db.menus || [];
+/* =========================================
+   API HELPER
+========================================= */
 
-db.production =
-    db.production || [];
+async function apiRequest(
+    url,
+    options = {}
+) {
 
-db.transactions =
-    db.transactions || [];
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
 
-db.waste =
-    db.waste || [];
+                ...options,
 
-db.auditLogs =
-    db.auditLogs || [];
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
 
 
-/* ================================
-   BASIC FUNCTIONS
-================================ */
+    let result;
 
-function saveDB() {
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(db)
-    );
+    try {
+
+        result =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            "Respons server tidak valid."
+        );
+
+    }
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Terjadi kesalahan pada server."
+        );
+
+    }
+
+
+    return result;
 
 }
 
+
+/* =========================================
+   BASIC FUNCTIONS
+========================================= */
 
 function todayISO() {
 
     const now =
         new Date();
 
+
     const year =
         now.getFullYear();
+
 
     const month =
         String(
             now.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
         String(
             now.getDate()
-        ).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-
-}
-
-
-function formatPortion(value) {
-
-    const number =
-        Number(value || 0);
-
-    if (
-        Number.isInteger(number)
-    ) {
-        return number;
-    }
-
-    return number.toFixed(1);
-
-}
+        ).padStart(
+            2,
+            "0"
+        );
 
 
-function getUser(userId) {
-
-    return db.users.find(
-        user =>
-            Number(user.id) ===
-            Number(userId)
+    return (
+        `${year}-${month}-${day}`
     );
 
 }
 
 
-function getMenu(menuId) {
-
-    return db.menus.find(
-        menu =>
-            Number(menu.id) ===
-            Number(menuId)
-    );
-
-}
-
-
-function addAudit(
-    action,
-    description
+function formatPortion(
+    value
 ) {
 
-    db.auditLogs.push({
-
-        id:
-            Date.now(),
-
-        userId:
-            currentUser.id,
-
-        action:
-            action,
-
-        description:
-            description,
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    });
+    const number =
+        Number(
+            value || 0
+        );
 
 
-    saveDB();
+    if (
+        Number.isInteger(
+            number
+        )
+    ) {
+
+        return number;
+
+    }
+
+
+    return number.toFixed(
+        1
+    );
 
 }
 
 
-/* ================================
+/* =========================================
+   LOAD MENUS MYSQL
+========================================= */
+
+async function loadMenus() {
+
+    const result =
+        await apiRequest(
+            "/api/menus"
+        );
+
+
+    menus =
+        (result.data || [])
+            .map(
+                menu => ({
+
+                    ...menu,
+
+                    id:
+                        Number(
+                            menu.id
+                        ),
+
+                    price:
+                        Number(
+                            menu.price || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            menu.portionUsage || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ MENU MYSQL:",
+        menus
+    );
+
+}
+
+
+/* =========================================
+   LOAD PRODUCTION MYSQL
+========================================= */
+
+async function loadProduction() {
+
+    const result =
+        await apiRequest(
+            "/api/production"
+        );
+
+
+    production =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    stockWeight:
+                        Number(
+                            item.stockWeight || 0
+                        ),
+
+                    estimatedPortion:
+                        Number(
+                            item.estimatedPortion || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ PRODUCTION MYSQL:",
+        production
+    );
+
+}
+
+
+/* =========================================
+   LOAD TRANSACTIONS MYSQL
+========================================= */
+
+async function loadTransactions() {
+
+    const result =
+        await apiRequest(
+            "/api/transactions"
+        );
+
+
+    transactions =
+        (result.data || [])
+            .map(
+                transaction => ({
+
+                    ...transaction,
+
+                    id:
+                        Number(
+                            transaction.id
+                        ),
+
+                    total:
+                        Number(
+                            transaction.total || 0
+                        ),
+
+                    items:
+                        (
+                            transaction.items || []
+                        )
+                            .map(
+                                item => ({
+
+                                    ...item,
+
+                                    menuId:
+                                        Number(
+                                            item.menuId
+                                        ),
+
+                                    quantity:
+                                        Number(
+                                            item.quantity || 0
+                                        ),
+
+                                    portionUsageAtSale:
+                                        Number(
+                                            item.portionUsageAtSale || 0
+                                        )
+
+                                })
+                            )
+
+                })
+            );
+
+
+    console.log(
+        "✅ TRANSAKSI MYSQL:",
+        transactions
+    );
+
+}
+
+
+/* =========================================
+   LOAD WASTE MYSQL
+========================================= */
+
+async function loadWaste() {
+
+    const result =
+        await apiRequest(
+            "/api/waste"
+        );
+
+
+    wasteRecords =
+        (result.data || [])
+            .map(
+                record => ({
+
+                    ...record,
+
+                    id:
+                        Number(
+                            record.id
+                        ),
+
+                    userId:
+                        Number(
+                            record.userId
+                        ),
+
+                    menuId:
+                        record.menuId === null
+                            ? null
+                            : Number(
+                                record.menuId
+                            ),
+
+                    quantity:
+                        Number(
+                            record.quantity || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            record.portionUsage || 0
+                        )
+
+                })
+            );
+
+
+    console.log(
+        "✅ WASTE MYSQL:",
+        wasteRecords
+    );
+
+}
+
+
+/* =========================================
+   GET MENU
+========================================= */
+
+function getMenu(
+    menuId
+) {
+
+    return menus.find(
+
+        menu =>
+            Number(
+                menu.id
+            )
+            ===
+            Number(
+                menuId
+            )
+
+    );
+
+}
+
+
+/* =========================================
    STOCK
-================================ */
+========================================= */
 
 function initialStockToday() {
 
-    return db.production
+    return production
 
         .filter(
+
             item =>
                 item.date ===
                 todayISO()
+
         )
 
         .reduce(
-            (total, item) =>
 
-                total +
+            (
+                total,
+                item
+            ) =>
+
+                total
+                +
                 Number(
-                    item.estimatedPortion ||
-                    0
+                    item.estimatedPortion || 0
                 ),
 
             0
+
         );
 
 }
 
 
+/* =========================================
+   SOLD PORTIONS
+========================================= */
+
 function soldPortionsToday() {
 
-    return db.transactions
+    return transactions
 
         .filter(
+
             transaction =>
 
                 transaction.date ===
@@ -197,174 +475,229 @@ function soldPortionsToday() {
 
                 transaction.status !==
                 "VOID"
+
         )
 
         .reduce(
-            (total, transaction) => {
 
-                return total +
+            (
+                total,
+                transaction
+            ) => {
 
+                const transactionPortions =
                     (
                         transaction.items ||
                         []
                     )
-                    .reduce(
-                        (
-                            subtotal,
-                            item
-                        ) => {
+                        .reduce(
 
-                            const menu =
-                                getMenu(
-                                    item.menuId
+                            (
+                                subtotal,
+                                item
+                            ) => {
+
+                                const menu =
+                                    getMenu(
+                                        item.menuId
+                                    );
+
+
+                                const usage =
+                                    Number(
+
+                                        item
+                                            .portionUsageAtSale
+
+                                        ??
+
+                                        menu
+                                            ?.portionUsage
+
+                                        ??
+
+                                        0
+
+                                    );
+
+
+                                return (
+
+                                    subtotal
+
+                                    +
+
+                                    (
+                                        Number(
+                                            item.quantity || 0
+                                        )
+
+                                        *
+
+                                        usage
+                                    )
+
                                 );
 
+                            },
 
-                            const usage =
-                                Number(
+                            0
 
-                                    item
-                                        .portionUsageAtSale
-                                    ??
-                                    menu
-                                        ?.portionUsage
-                                    ??
-                                    0
-
-                                );
+                        );
 
 
-                            return (
-                                subtotal
-                                +
-                                Number(
-                                    item.quantity ||
-                                    0
-                                )
-                                *
-                                usage
-                            );
-
-                        },
-
-                        0
-                    );
+                return (
+                    total
+                    +
+                    transactionPortions
+                );
 
             },
 
             0
+
         );
 
 }
 
 
+/* =========================================
+   WASTE HARI INI
+========================================= */
+
 function todayWaste() {
 
-    return db.waste.filter(
+    return wasteRecords.filter(
+
         item =>
             item.date ===
             todayISO()
+
     );
 
 }
 
+
+/* =========================================
+   TOTAL WASTE PORTIONS
+========================================= */
 
 function wastePortionsToday() {
 
-    return todayWaste().reduce(
-        (total, item) =>
+    return todayWaste()
+        .reduce(
 
-            total
-            +
             (
-                Number(
-                    item.quantity || 0
-                )
-                *
-                Number(
-                    item.portionUsage ??
-                    1
-                )
-            ),
+                total,
+                item
+            ) =>
 
-        0
-    );
+                total
+
+                +
+
+                (
+                    Number(
+                        item.quantity || 0
+                    )
+
+                    *
+
+                    Number(
+                        item.portionUsage || 0
+                    )
+                ),
+
+            0
+
+        );
 
 }
 
+
+/* =========================================
+   STOCK BEFORE WASTE
+========================================= */
 
 function stockBeforeWaste() {
 
     return (
+
         initialStockToday()
+
         -
+
         soldPortionsToday()
+
     );
 
 }
 
+
+/* =========================================
+   EXPECTED STOCK
+========================================= */
 
 function expectedStockToday() {
 
     return (
+
         stockBeforeWaste()
+
         -
+
         wastePortionsToday()
+
     );
 
 }
 
 
-/* ================================
-   ROLE
-================================ */
+/* =========================================
+   USER
+========================================= */
 
 function renderUser() {
 
-    document
-        .getElementById(
+    const namaUser =
+        document.getElementById(
             "namaUser"
-        )
-        .textContent =
-        currentUser.name;
-
-
-    document
-        .getElementById(
-            "sidebarUser"
-        )
-        .textContent =
-        currentUser.name;
-
-
-    const ownerOnlyMenus =
-        document.querySelectorAll(
-            ".owner-only"
         );
 
 
     if (
-        currentUser.role ===
-        "KASIR"
+        namaUser &&
+        currentUser
     ) {
 
-        ownerOnlyMenus.forEach(
-            menu => {
+        namaUser.textContent =
+            currentUser.name;
 
-                menu.style.display =
-                    "none";
+    }
 
-            }
+
+    const sidebarUser =
+        document.getElementById(
+            "sidebarUser"
         );
+
+
+    if (
+        sidebarUser &&
+        currentUser
+    ) {
+
+        sidebarUser.textContent =
+            currentUser.name;
 
     }
 
 }
 
 
-/* ================================
+/* =========================================
    MENU SELECT
-================================ */
+========================================= */
 
 function renderMenuOptions() {
 
@@ -374,22 +707,37 @@ function renderMenuOptions() {
         );
 
 
-    db.menus
+    select.innerHTML = `
+
+        <option value="">
+            Pilih item
+        </option>
+
+        <option value="GENERAL_STOCK">
+            Stok Daging / Porsi Umum
+        </option>
+
+    `;
+
+
+    menus
 
         .filter(
+
             menu =>
                 menu.status ===
                 "TERSEDIA"
+
         )
 
         .forEach(
+
             menu => {
 
                 const option =
-                    document
-                        .createElement(
-                            "option"
-                        );
+                    document.createElement(
+                        "option"
+                    );
 
 
                 option.value =
@@ -407,14 +755,15 @@ function renderMenuOptions() {
                 );
 
             }
+
         );
 
 }
 
 
-/* ================================
-   STOCK IMPACT
-================================ */
+/* =========================================
+   SELECTED PORTION USAGE
+========================================= */
 
 function selectedPortionUsage() {
 
@@ -437,7 +786,9 @@ function selectedPortionUsage() {
 
 
     const menu =
-        getMenu(selected);
+        getMenu(
+            selected
+        );
 
 
     return Number(
@@ -446,6 +797,10 @@ function selectedPortionUsage() {
 
 }
 
+
+/* =========================================
+   STOCK IMPACT
+========================================= */
 
 function updateStockImpact() {
 
@@ -477,9 +832,9 @@ function updateStockImpact() {
 }
 
 
-/* ================================
+/* =========================================
    SUMMARY
-================================ */
+========================================= */
 
 function renderSummary() {
 
@@ -533,9 +888,9 @@ function renderSummary() {
 }
 
 
-/* ================================
+/* =========================================
    MESSAGE
-================================ */
+========================================= */
 
 function showMessage(
     message,
@@ -557,25 +912,32 @@ function showMessage(
 
 
     if (
-        type === "success"
+        type ===
+        "success"
     ) {
 
         box.style.background =
             "#dcfce7";
 
+
         box.style.color =
             "#166534";
+
 
         box.style.border =
             "1px solid #bbf7d0";
 
-    } else {
+    }
+
+    else {
 
         box.style.background =
             "#fee2e2";
 
+
         box.style.color =
             "#991b1b";
+
 
         box.style.border =
             "1px solid #fecaca";
@@ -584,6 +946,7 @@ function showMessage(
 
 
     setTimeout(
+
         () => {
 
             box.style.display =
@@ -592,16 +955,19 @@ function showMessage(
         },
 
         4000
+
     );
 
 }
 
 
-/* ================================
-   SAVE WASTE
-================================ */
+/* =========================================
+   SAVE WASTE MYSQL
+========================================= */
 
-function saveWaste(event) {
+async function saveWaste(
+    event
+) {
 
     event.preventDefault();
 
@@ -653,13 +1019,15 @@ function saveWaste(event) {
             "error"
         );
 
+
         return;
 
     }
 
 
     if (
-        reason === "Lainnya"
+        reason ===
+        "Lainnya"
     ) {
 
         const customReason =
@@ -671,12 +1039,15 @@ function saveWaste(event) {
                 .trim();
 
 
-        if (!customReason) {
+        if (
+            !customReason
+        ) {
 
             showMessage(
                 "Alasan lainnya wajib diisi.",
                 "error"
             );
+
 
             return;
 
@@ -694,7 +1065,8 @@ function saveWaste(event) {
 
 
     const stockImpact =
-        quantity *
+        quantity
+        *
         portionUsage;
 
 
@@ -710,12 +1082,15 @@ function saveWaste(event) {
             "error"
         );
 
+
         return;
 
     }
 
 
-    let menuId = null;
+    let menuId =
+        null;
+
 
     let itemName =
         "Stok Daging / Porsi Umum";
@@ -732,8 +1107,23 @@ function saveWaste(event) {
             );
 
 
+        if (!menu) {
+
+            showMessage(
+                "Menu tidak ditemukan.",
+                "error"
+            );
+
+
+            return;
+
+        }
+
+
         menuId =
-            menu.id;
+            Number(
+                menu.id
+            );
 
 
         itemName =
@@ -742,91 +1132,142 @@ function saveWaste(event) {
     }
 
 
-    const wasteRecord = {
-
-        id:
-            Date.now(),
-
-        date:
-            todayISO(),
-
-        createdAt:
-            new Date()
-                .toISOString(),
-
-        userId:
-            currentUser.id,
-
-        menuId:
-            menuId,
-
-        itemName:
-            itemName,
-
-        quantity:
-            quantity,
-
-        portionUsage:
-            portionUsage,
-
-        reason:
-            reason,
-
-        notes:
-            notes
-
-    };
+    const saveButton =
+        document.querySelector(
+            ".save-btn"
+        );
 
 
-    db.waste.push(
-        wasteRecord
-    );
+    const originalButtonText =
+        saveButton.textContent;
 
 
-    saveDB();
+    try {
+
+        saveButton.disabled =
+            true;
 
 
-    addAudit(
-        "CREATE_WASTE",
-        `${itemName} - ${formatPortion(
-            stockImpact
-        )} porsi - ${reason}`
-    );
+        saveButton.textContent =
+            "Menyimpan...";
 
 
-    showMessage(
-        "Waste berhasil dicatat.",
-        "success"
-    );
+        await apiRequest(
+            "/api/waste",
+            {
+
+                method:
+                    "POST",
+
+                body:
+                    JSON.stringify({
+
+                        userId:
+                            Number(
+                                currentUser.id
+                            ),
+
+                        menuId:
+                            menuId,
+
+                        itemName:
+                            itemName,
+
+                        quantity:
+                            quantity,
+
+                        portionUsage:
+                            portionUsage,
+
+                        reason:
+                            reason,
+
+                        notes:
+                            notes
+
+                    })
+
+            }
+        );
 
 
-    document
-        .getElementById(
-            "wasteForm"
-        )
-        .reset();
+        /*
+         * Audit masih lokal sementara.
+         */
 
 
-    document
-        .getElementById(
-            "customReasonGroup"
-        )
-        .style.display =
-        "none";
 
 
-    updateStockImpact();
+        /*
+         * Ambil ulang waste langsung
+         * dari MySQL.
+         */
 
-    renderSummary();
+        await loadWaste();
 
-    renderWasteTable();
+
+        showMessage(
+            "Waste berhasil dicatat ke database.",
+            "success"
+        );
+
+
+        document
+            .getElementById(
+                "wasteForm"
+            )
+            .reset();
+
+
+        document
+            .getElementById(
+                "customReasonGroup"
+            )
+            .style.display =
+            "none";
+
+
+        updateStockImpact();
+
+        renderSummary();
+
+        renderWasteTable();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Simpan Waste Error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Gagal menyimpan waste.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        saveButton.disabled =
+            false;
+
+
+        saveButton.textContent =
+            originalButtonText;
+
+    }
 
 }
 
 
-/* ================================
-   TABLE
-================================ */
+/* =========================================
+   WASTE TABLE
+========================================= */
 
 function renderWasteTable() {
 
@@ -836,26 +1277,35 @@ function renderWasteTable() {
         );
 
 
-    table.innerHTML = "";
+    table.innerHTML =
+        "";
 
 
     const records =
         [...todayWaste()]
-        .sort(
-            (a, b) =>
+            .sort(
 
-                new Date(
-                    b.createdAt
-                )
-                -
-                new Date(
-                    a.createdAt
-                )
-        );
+                (
+                    a,
+                    b
+                ) =>
+
+                    new Date(
+                        b.createdAt || 0
+                    )
+
+                    -
+
+                    new Date(
+                        a.createdAt || 0
+                    )
+
+            );
 
 
     if (
-        records.length === 0
+        records.length ===
+        0
     ) {
 
         table.innerHTML = `
@@ -869,14 +1319,13 @@ function renderWasteTable() {
                         color:#9ca3af;
                     "
                 >
-
                     Belum ada waste hari ini.
-
                 </td>
 
             </tr>
 
         `;
+
 
         return;
 
@@ -884,38 +1333,58 @@ function renderWasteTable() {
 
 
     records.forEach(
+
         record => {
 
-            const user =
-                getUser(
-                    record.userId
-                );
+            let time =
+                "-";
 
 
-            const time =
-                new Date(
-                    record.createdAt
-                )
-                .toLocaleTimeString(
-                    "id-ID",
-                    {
-                        hour:
-                            "2-digit",
+            if (
+                record.createdAt
+            ) {
 
-                        minute:
-                            "2-digit"
-                    }
-                );
+                const date =
+                    new Date(
+                        record.createdAt
+                    );
+
+
+                if (
+                    !Number.isNaN(
+                        date.getTime()
+                    )
+                ) {
+
+                    time =
+                        date
+                            .toLocaleTimeString(
+                                "id-ID",
+                                {
+
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+
+                                }
+                            );
+
+                }
+
+            }
 
 
             const impact =
                 Number(
-                    record.quantity
+                    record.quantity || 0
                 )
+
                 *
+
                 Number(
-                    record.portionUsage ??
-                    1
+                    record.portionUsage || 0
                 );
 
 
@@ -932,7 +1401,21 @@ function renderWasteTable() {
                 </td>
 
                 <td>
-                    ${user?.name || "-"}
+                    ${
+                        record.userName
+                        ||
+                        (
+                            Number(
+                                record.userId
+                            )
+                            ===
+                            Number(
+                                currentUser.id
+                            )
+                                ? currentUser.name
+                                : "-"
+                        )
+                    }
                 </td>
 
                 <td>
@@ -967,21 +1450,24 @@ function renderWasteTable() {
             );
 
         }
+
     );
 
 }
 
 
-/* ================================
+/* =========================================
    REASON
-================================ */
+========================================= */
 
 document
     .getElementById(
         "reason"
     )
     .addEventListener(
+
         "change",
+
         function () {
 
             document
@@ -998,12 +1484,13 @@ document
                     : "none";
 
         }
+
     );
 
 
-/* ================================
+/* =========================================
    STOCK IMPACT EVENTS
-================================ */
+========================================= */
 
 document
     .getElementById(
@@ -1025,9 +1512,9 @@ document
     );
 
 
-/* ================================
+/* =========================================
    SUBMIT
-================================ */
+========================================= */
 
 document
     .getElementById(
@@ -1039,9 +1526,9 @@ document
     );
 
 
-/* ================================
+/* =========================================
    LOGOUT
-================================ */
+========================================= */
 
 function logout() {
 
@@ -1056,16 +1543,57 @@ function logout() {
 }
 
 
-/* ================================
-   INITIAL
-================================ */
+/* =========================================
+   INITIALIZE
+========================================= */
 
-renderUser();
+async function initializeWastePage() {
 
-renderMenuOptions();
+    renderUser();
 
-renderSummary();
 
-renderWasteTable();
+    try {
 
-updateStockImpact();
+        await Promise.all([
+
+            loadMenus(),
+
+            loadProduction(),
+
+            loadTransactions(),
+
+            loadWaste()
+
+        ]);
+
+
+        renderMenuOptions();
+
+        renderSummary();
+
+        renderWasteTable();
+
+        updateStockImpact();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Initialize Waste Error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Gagal memuat data Waste.",
+            "error"
+        );
+
+    }
+
+}
+
+
+initializeWastePage();

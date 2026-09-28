@@ -29,32 +29,28 @@
 
     <link
         rel="stylesheet"
-        href="style.css"
+        href="style.css?v=20260927-iot2"
     >
 </head>
+
 
 <body>
 
     <div class="app-container">
 
-     <aside
-    class="sidebar"
-    id="appSidebar"
->
-</aside>
+        <!-- SIDEBAR -->
+        <aside
+            class="sidebar"
+            id="appSidebar"
+        >
+        </aside>
 
-
-
-        <!-- ================================
-             MAIN CONTENT
-        ================================= -->
 
         <main class="main-content">
 
-
-            <!-- ================================
+            <!-- =====================================
                  HEADER
-            ================================= -->
+            ====================================== -->
 
             <header class="page-header">
 
@@ -73,9 +69,6 @@
 
                 <div class="header-info">
 
-
-                    <!-- KASIR -->
-
                     <div>
 
                         <span>
@@ -88,8 +81,6 @@
 
                     </div>
 
-
-                    <!-- STOK -->
 
                     <div>
 
@@ -108,20 +99,18 @@
             </header>
 
 
-
-            <!-- ================================
+            <!-- =====================================
                  POS AREA
-            ================================= -->
+            ====================================== -->
 
             <div class="pos-layout">
 
 
-                <!-- ================================
+                <!-- =================================
                      DAFTAR MENU
-                ================================= -->
+                ================================== -->
 
                 <section class="menu-section">
-
 
                     <div class="section-header">
 
@@ -138,8 +127,6 @@
                         </div>
 
 
-                        <!-- SEARCH MENU -->
-
                         <input
                             type="text"
                             id="searchMenu"
@@ -149,50 +136,62 @@
                     </div>
 
 
-                    <!-- MENU AKAN DIRENDER JS -->
-<!-- FILTER KATEGORI -->
+                    <!-- FILTER KATEGORI -->
 
-<div
-    class="category-filter"
-    id="categoryFilter"
->
+                    <div
+                        class="category-filter"
+                        id="categoryFilter"
+                    >
 
-    <button
-        class="category-btn active"
-        data-category="Semua"
-    >
-        Semua
-    </button>
+                        <button
+                            type="button"
+                            class="category-btn active"
+                            data-category="Semua"
+                        >
+                            Semua
+                        </button>
 
-    <button
-        class="category-btn"
-        data-category="Paket Nasi"
-    >
-        Paket Nasi
-    </button>
 
-    <button
-        class="category-btn"
-        data-category="Daging & Lauk"
-    >
-        Daging & Lauk
-    </button>
+                        <button
+                            type="button"
+                            class="category-btn"
+                            data-category="Paket Nasi"
+                        >
+                            Paket Nasi
+                        </button>
 
-    <button
-        class="category-btn"
-        data-category="Gorengan"
-    >
-        Gorengan
-    </button>
 
-    <button
-        class="category-btn"
-        data-category="Sayur & Pendamping"
-    >
-        Sayur & Pendamping
-    </button>
+                        <button
+                            type="button"
+                            class="category-btn"
+                            data-category="Daging & Lauk"
+                        >
+                            Daging &amp; Lauk
+                        </button>
 
-</div>
+
+                        <button
+                            type="button"
+                            class="category-btn"
+                            data-category="Gorengan"
+                        >
+                            Gorengan
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="category-btn"
+                            data-category="Sayur & Pendamping"
+                        >
+                            Sayur &amp; Pendamping
+                        </button>
+
+                    </div>
+
+
+                    <!-- LIST MENU -->
+
                     <div
                         id="menuList"
                         class="menu-grid"
@@ -202,15 +201,14 @@
                 </section>
 
 
-
-                <!-- ================================
-                     KERANJANG / PESANAN
-                ================================= -->
+                <!-- =================================
+                     PESANAN
+                ================================== -->
 
                 <section class="cart-section">
 
 
-                    <!-- HEADER CART -->
+                    <!-- HEADER PESANAN -->
 
                     <div class="cart-header">
 
@@ -230,6 +228,7 @@
                         <button
                             class="clear-btn"
                             id="clearCartBtn"
+                            type="button"
                         >
                             Kosongkan
                         </button>
@@ -237,8 +236,7 @@
                     </div>
 
 
-
-                    <!-- LIST PESANAN -->
+                    <!-- CART -->
 
                     <div
                         id="cartList"
@@ -247,15 +245,11 @@
                     </div>
 
 
-
-                    <!-- ================================
+                    <!-- =================================
                          SUMMARY
-                    ================================= -->
+                    ================================== -->
 
                     <div class="cart-summary">
-
-
-                        <!-- TOTAL ITEM -->
 
                         <div class="summary-row">
 
@@ -270,8 +264,6 @@
                         </div>
 
 
-                        <!-- PENGGUNAAN STOK -->
-
                         <div class="summary-row">
 
                             <span>
@@ -284,8 +276,6 @@
 
                         </div>
 
-
-                        <!-- TOTAL -->
 
                         <div class="summary-row total-row">
 
@@ -302,10 +292,98 @@
                     </div>
 
 
+                    <!-- =================================
+                         JENIS PESANAN
+                    ================================== -->
 
-                    <!-- ================================
-                         PAYMENT
-                    ================================= -->
+                    <div class="order-type-section">
+
+                        <label class="order-type-label">
+                            Jenis Pesanan
+                        </label>
+
+
+                        <div class="order-type-options">
+
+
+                            <!-- TAKE AWAY -->
+
+                            <label class="order-type-card">
+
+                                <input
+                                    type="radio"
+                                    name="orderType"
+                                    value="TAKEAWAY"
+                                    checked
+                                >
+
+                                <span class="order-type-icon">
+                                    🥡
+                                </span>
+
+
+                                <span class="order-type-text">
+
+                                    <strong>
+                                        Take Away
+                                    </strong>
+
+                                    <small>
+                                        Validasi di meja Take Away
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+
+                            <!-- DINE IN -->
+
+                            <label class="order-type-card">
+
+                                <input
+                                    type="radio"
+                                    name="orderType"
+                                    value="DINE_IN"
+                                >
+
+                                <span class="order-type-icon">
+                                    🍽️
+                                </span>
+
+
+                                <span class="order-type-text">
+
+                                    <strong>
+                                        Dine In
+                                    </strong>
+
+                                    <small>
+                                        Validasi di meja Dine In
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+                        <!-- PETUNJUK MEJA VALIDASI -->
+
+                        <div
+                            id="validationStationHint"
+                            class="validation-station-hint"
+                        >
+                            📍 Pesanan akan masuk ke Meja Validasi Take Away
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================
+                         METODE PEMBAYARAN
+                    ================================== -->
 
                     <div class="payment-section">
 
@@ -337,16 +415,17 @@
                     </div>
 
 
-
-                    <!-- SIMPAN TRANSAKSI -->
+                    <!-- =================================
+                         SIMPAN TRANSAKSI
+                    ================================== -->
 
                     <button
                         id="processBtn"
                         class="process-btn"
+                        type="button"
                     >
                         Simpan Transaksi
                     </button>
-
 
 
                     <!-- MESSAGE -->
@@ -357,18 +436,66 @@
                     >
                     </div>
 
+
+                    <!-- =================================
+                         ANTREAN VALIDASI IOT
+                    ================================== -->
+
+                    <div
+                        id="iotQueueSection"
+                        class="iot-queue-section"
+                    >
+
+                        <div class="iot-queue-header">
+
+                            <div>
+
+                                <span class="iot-queue-kicker">
+                                    VALIDASI IoT
+                                </span>
+
+                                <strong>
+                                    Antrean Validasi Pesanan
+                                </strong>
+
+                            </div>
+
+
+                            <span
+                                id="iotQueueCount"
+                                class="iot-queue-count"
+                            >
+                                0
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            id="iotValidationList"
+                            class="iot-validation-list"
+                        >
+
+                            <div class="iot-empty-state">
+
+                                Belum ada pesanan untuk divalidasi.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </section>
 
             </div>
 
 
-
-            <!-- ================================
+            <!-- =====================================
                  RIWAYAT TRANSAKSI
-            ================================= -->
+            ====================================== -->
 
             <section class="history-section">
-
 
                 <div class="section-header">
 
@@ -386,9 +513,6 @@
 
                 </div>
 
-
-
-                <!-- TABLE -->
 
                 <div class="table-container">
 
@@ -415,6 +539,10 @@
                                 </th>
 
                                 <th>
+                                    Jenis
+                                </th>
+
+                                <th>
                                     Pembayaran
                                 </th>
 
@@ -435,8 +563,6 @@
                         </thead>
 
 
-                        <!-- DATA DARI JAVASCRIPT -->
-
                         <tbody id="transactionTable">
                         </tbody>
 
@@ -451,16 +577,20 @@
     </div>
 
 
-
-    <!-- ================================
-         JAVASCRIPT
-    ================================= -->
+    <!-- =====================================
+         SCRIPT
+    ====================================== -->
 
     <script src="../shared/database.js"></script>
 
-<script src="../shared/sidebar.js"></script>
+    <script src="../shared/sidebar.js"></script>
 
-<script src="pos.js"></script>
+    <!--
+        Version dibuat berbeda supaya browser
+        tidak memakai cache pos.js lama.
+    -->
+
+    <script src="pos.js?v=20260927-iot2"></script>
 
 </body>
 

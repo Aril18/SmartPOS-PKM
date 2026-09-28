@@ -1,449 +1,601 @@
-const STORAGE_KEY = "umkmControlDataV1";
-const SESSION_KEY = "umkmControlSessionV1";
-
-let currentUser =
-    JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-
-let db =
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+const SESSION_KEY =
+    "umkmControlSessionV1";
 
 
-// ==========================================
-// CEK LOGIN
-// ==========================================
+const API_URL =
+    "http://localhost:3000";
+
+
+/* =========================================
+   SESSION
+========================================= */
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem(
+            SESSION_KEY
+        ) || "null"
+    );
+
+
+/* =========================================
+   CEK LOGIN
+========================================= */
 
 if (!currentUser) {
-    window.location.href = "../index.html";
+
+    window.location.href =
+        "../index.html";
+
 }
 
 
-// ==========================================
-// CEK ROLE
-// ==========================================
+/* =========================================
+   CEK ROLE
+========================================= */
 
-if (currentUser && currentUser.role !== "OWNER") {
-    window.location.href = "../pos/index.html";
+if (
+    currentUser &&
+    currentUser.role !==
+    "OWNER"
+) {
+
+    window.location.href =
+        "../pos/index.html";
+
 }
 
 
-// ==========================================
-// SIAPKAN DATABASE
-// ==========================================
+/* =========================================
+   DATA MYSQL
+========================================= */
 
-db.users = db.users || [];
-db.menus = db.menus || [];
-db.production = db.production || [];
-db.transactions = db.transactions || [];
-db.waste = db.waste || [];
-db.stockOpnames = db.stockOpnames || [];
-db.closings = db.closings || [];
-db.auditLogs = db.auditLogs || [];
+let menus = [];
 
 
-// ==========================================
-// MENU AWAL
-// ==========================================
+/* =========================================
+   API HELPER
+========================================= */
 
-const DEFAULT_MENUS = [
-    {
-        id: 1,
-        code: "M001",
-        name: "Nasi Babi Campur",
-        category: "Paket Nasi",
-        price: 25000,
-        portionUsage: 1,
-        status: "TERSEDIA"
-    },
-    {
-        id: 2,
-        code: "M002",
-        name: "Nasi Babi Spesial",
-        category: "Paket Nasi",
-        price: 35000,
-        portionUsage: 1.5,
-        status: "TERSEDIA"
-    },
-    {
-        id: 3,
-        code: "M003",
-        name: "Paket Babi Guling Komplit",
-        category: "Paket Nasi",
-        price: 45000,
-        portionUsage: 2,
-        status: "TERSEDIA"
-    },
-    {
-        id: 4,
-        code: "M004",
-        name: "Tambahan Daging Babi",
-        category: "Daging & Lauk",
-        price: 15000,
-        portionUsage: 0.5,
-        status: "TERSEDIA"
-    },
-    {
-        id: 5,
-        code: "M005",
-        name: "Babi Kecap",
-        category: "Daging & Lauk",
-        price: 15000,
-        portionUsage: 0.5,
-        status: "TERSEDIA"
-    },
-    {
-        id: 6,
-        code: "M006",
-        name: "Sate Babi",
-        category: "Daging & Lauk",
-        price: 10000,
-        portionUsage: 0.25,
-        status: "TERSEDIA"
-    },
-    {
-        id: 7,
-        code: "M007",
-        name: "Kulit Babi Crispy",
-        category: "Gorengan",
-        price: 10000,
-        portionUsage: 0.25,
-        status: "TERSEDIA"
-    },
-    {
-        id: 8,
-        code: "M008",
-        name: "Gorengan Babi",
-        category: "Gorengan",
-        price: 8000,
-        portionUsage: 0.25,
-        status: "TERSEDIA"
-    },
-    {
-        id: 9,
-        code: "M009",
-        name: "Lawar",
-        category: "Sayur & Pendamping",
-        price: 7000,
-        portionUsage: 0,
-        status: "TERSEDIA"
-    },
-    {
-        id: 10,
-        code: "M010",
-        name: "Sayur Urab",
-        category: "Sayur & Pendamping",
-        price: 5000,
-        portionUsage: 0,
-        status: "TERSEDIA"
-    }
-];
+async function apiRequest(
+    url,
+    options = {}
+) {
 
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
 
-// ==========================================
-// ISI MENU JIKA MASIH KOSONG
-// ==========================================
+                ...options,
 
-if (db.menus.length === 0) {
+                headers: {
 
-    db.menus =
-        JSON.parse(
-            JSON.stringify(DEFAULT_MENUS)
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
         );
 
-    saveDB();
+
+    let result;
+
+
+    try {
+
+        result =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            "Respons server tidak valid."
+        );
+
+    }
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Terjadi kesalahan pada server."
+        );
+
+    }
+
+
+    return result;
+
 }
 
 
-// ==========================================
-// SIMPAN DATABASE
-// ==========================================
-
-function saveDB() {
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(db)
-    );
-}
-
-
-// ==========================================
-// FORMAT RUPIAH
-// ==========================================
+/* =========================================
+   FORMAT RUPIAH
+========================================= */
 
 function formatRupiah(value) {
 
     return new Intl.NumberFormat(
         "id-ID",
         {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0
+            style:
+                "currency",
+
+            currency:
+                "IDR",
+
+            minimumFractionDigits:
+                0
         }
     ).format(
-        Number(value || 0)
+        Number(
+            value || 0
+        )
     );
+
 }
 
 
-// ==========================================
-// FORMAT PORSI
-// ==========================================
+/* =========================================
+   FORMAT PORSI
+========================================= */
 
 function formatPortion(value) {
 
     const number =
-        Number(value || 0);
+        Number(
+            value || 0
+        );
 
-    if (Number.isInteger(number)) {
+
+    if (
+        Number.isInteger(
+            number
+        )
+    ) {
+
         return number;
+
     }
 
-    return number.toFixed(2)
-        .replace(/0+$/, "")
-        .replace(/\.$/, "");
+
+    return number
+        .toFixed(2)
+        .replace(
+            /0+$/,
+            ""
+        )
+        .replace(
+            /\.$/,
+            ""
+        );
+
 }
 
 
-// ==========================================
-// TAMPILKAN USER
-// ==========================================
+/* =========================================
+   LOAD MENU MYSQL
+========================================= */
+
+async function loadMenus() {
+
+    try {
+
+        const result =
+            await apiRequest(
+                "/api/menus"
+            );
+
+
+        menus =
+            (result.data || [])
+                .map(
+                    menu => ({
+
+                        ...menu,
+
+                        id:
+                            Number(
+                                menu.id
+                            ),
+
+                        price:
+                            Number(
+                                menu.price || 0
+                            ),
+
+                        portionUsage:
+                            Number(
+                                menu.portionUsage || 0
+                            )
+
+                    })
+                );
+
+
+        console.log(
+            "✅ MENU MYSQL:",
+            menus
+        );
+
+
+        renderSummary();
+
+        renderMenuTable(
+            document
+                .getElementById(
+                    "searchMenu"
+                )
+                ?.value || ""
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Load Menu Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal mengambil data menu."
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   USER
+========================================= */
 
 function renderUser() {
 
     const namaUser =
-        document.getElementById("namaUser");
+        document.getElementById(
+            "namaUser"
+        );
 
-    if (currentUser) {
+
+    if (
+        namaUser &&
+        currentUser
+    ) {
 
         namaUser.textContent =
             currentUser.name;
+
     }
+
 }
 
 
-// ==========================================
-// RINGKASAN MENU
-// ==========================================
+/* =========================================
+   SUMMARY
+========================================= */
 
 function renderSummary() {
 
     const totalMenu =
-        db.menus.length;
+        menus.length;
+
 
     const available =
-        db.menus.filter(
+        menus.filter(
             menu =>
-                menu.status === "TERSEDIA"
+                String(
+                    menu.status
+                ).toUpperCase()
+                ===
+                "TERSEDIA"
         ).length;
+
 
     const unavailable =
-        db.menus.filter(
+        menus.filter(
             menu =>
-                menu.status === "TIDAK TERSEDIA"
+                String(
+                    menu.status
+                ).toUpperCase()
+                ===
+                "TIDAK TERSEDIA"
         ).length;
 
 
-    document
-        .getElementById("totalMenu")
-        .textContent =
-        totalMenu;
+    const totalElement =
+        document.getElementById(
+            "totalMenu"
+        );
 
 
-    document
-        .getElementById("menuTersedia")
-        .textContent =
-        available;
+    const availableElement =
+        document.getElementById(
+            "menuTersedia"
+        );
 
 
-    document
-        .getElementById("menuTidakTersedia")
-        .textContent =
-        unavailable;
+    const unavailableElement =
+        document.getElementById(
+            "menuTidakTersedia"
+        );
+
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            totalMenu;
+
+    }
+
+
+    if (availableElement) {
+
+        availableElement.textContent =
+            available;
+
+    }
+
+
+    if (unavailableElement) {
+
+        unavailableElement.textContent =
+            unavailable;
+
+    }
+
 }
 
 
-// ==========================================
-// TAMPILKAN MENU
-// ==========================================
+/* =========================================
+   RENDER TABLE
+========================================= */
 
-function renderMenuTable(keyword = "") {
+function renderMenuTable(
+    keyword = ""
+) {
 
     const menuTable =
-        document.getElementById("menuTable");
+        document.getElementById(
+            "menuTable"
+        );
 
 
-    menuTable.innerHTML = "";
+    if (!menuTable) {
+
+        return;
+
+    }
+
+
+    menuTable.innerHTML =
+        "";
 
 
     const search =
-        keyword
+        String(
+            keyword || ""
+        )
             .toLowerCase()
             .trim();
 
 
-    const menus =
-        db.menus.filter(
+    const filteredMenus =
+        menus.filter(
             menu => {
 
                 return (
-                    menu.code
+
+                    String(
+                        menu.code || ""
+                    )
                         .toLowerCase()
-                        .includes(search)
+                        .includes(
+                            search
+                        )
+
                     ||
-                    menu.name
+
+                    String(
+                        menu.name || ""
+                    )
                         .toLowerCase()
-                        .includes(search)
+                        .includes(
+                            search
+                        )
+
                     ||
-                    menu.category
+
+                    String(
+                        menu.category || ""
+                    )
                         .toLowerCase()
-                        .includes(search)
+                        .includes(
+                            search
+                        )
+
                 );
+
             }
         );
 
 
-    if (menus.length === 0) {
+    if (
+        filteredMenus.length ===
+        0
+    ) {
 
         menuTable.innerHTML = `
+
             <tr>
-                <td colspan="7">
+
+                <td
+                    colspan="7"
+                    style="
+                        text-align:center;
+                        color:#9ca3af;
+                    "
+                >
                     Menu tidak ditemukan.
                 </td>
+
             </tr>
+
         `;
 
+
         return;
+
     }
 
 
-    menus.forEach(menu => {
+    filteredMenus.forEach(
+        menu => {
 
-        const row =
-            document.createElement("tr");
-
-
-        row.innerHTML = `
-            <td>
-                ${menu.code}
-            </td>
-
-            <td>
-                ${menu.name}
-            </td>
-
-            <td>
-                ${menu.category}
-            </td>
-
-            <td>
-                ${formatRupiah(menu.price)}
-            </td>
-
-            <td>
-                ${formatPortion(menu.portionUsage)} Porsi
-            </td>
-
-            <td>
-                <span
-                    class="status ${
-                        menu.status === "TERSEDIA"
-                            ? "available"
-                            : "unavailable"
-                    }"
-                >
-                    ${menu.status}
-                </span>
-            </td>
-
-            <td>
-                <button
-                    type="button"
-                    class="edit-button"
-                    onclick="editMenu(${menu.id})"
-                >
-                    Edit
-                </button>
-            </td>
-        `;
+            const row =
+                document.createElement(
+                    "tr"
+                );
 
 
-        menuTable.appendChild(
-            row
-        );
-    });
+            const status =
+                String(
+                    menu.status ||
+                    "TERSEDIA"
+                )
+                    .toUpperCase();
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${menu.code}
+                </td>
+
+                <td>
+                    ${menu.name}
+                </td>
+
+                <td>
+                    ${menu.category}
+                </td>
+
+                <td>
+                    ${formatRupiah(
+                        menu.price
+                    )}
+                </td>
+
+                <td>
+                    ${formatPortion(
+                        menu.portionUsage
+                    )} Porsi
+                </td>
+
+                <td>
+
+                    <span
+                        class="status ${
+                            status ===
+                            "TERSEDIA"
+
+                                ? "available"
+
+                                : "unavailable"
+                        }"
+                    >
+                        ${status}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="edit-button"
+                        onclick="editMenu(${menu.id})"
+                    >
+                        Edit
+                    </button>
+
+                </td>
+
+            `;
+
+
+            menuTable.appendChild(
+                row
+            );
+
+        }
+    );
+
 }
 
 
-// ==========================================
-// AUDIT LOG
-// ==========================================
+/* =========================================
+   SIMPAN MENU MYSQL
+========================================= */
 
-function addAudit(
-    action,
-    description,
-    userId
-) {
-
-    db.auditLogs.push({
-
-        id:
-            Date.now(),
-
-        userId:
-            userId,
-
-        action:
-            action,
-
-        description:
-            description,
-
-        createdAt:
-            new Date().toISOString()
-
-    });
-}
-
-
-// ==========================================
-// SIMPAN MENU
-// ==========================================
-
-function saveMenu(event) {
+async function saveMenu(event) {
 
     event.preventDefault();
 
 
     const menuId =
         document
-            .getElementById("menuId")
+            .getElementById(
+                "menuId"
+            )
             .value;
 
 
     const menuCode =
         document
-            .getElementById("menuCode")
+            .getElementById(
+                "menuCode"
+            )
             .value
             .trim();
 
 
     const menuName =
         document
-            .getElementById("menuName")
+            .getElementById(
+                "menuName"
+            )
             .value
             .trim();
 
 
     const menuCategory =
         document
-            .getElementById("menuCategory")
+            .getElementById(
+                "menuCategory"
+            )
             .value;
 
 
     const menuPrice =
         Number(
             document
-                .getElementById("menuPrice")
+                .getElementById(
+                    "menuPrice"
+                )
                 .value
         );
 
@@ -451,14 +603,18 @@ function saveMenu(event) {
     const portionUsage =
         Number(
             document
-                .getElementById("portionUsage")
+                .getElementById(
+                    "portionUsage"
+                )
                 .value
         );
 
 
     const menuStatus =
         document
-            .getElementById("menuStatus")
+            .getElementById(
+                "menuStatus"
+            )
             .value;
 
 
@@ -466,7 +622,13 @@ function saveMenu(event) {
         !menuCode ||
         !menuName ||
         !menuCategory ||
+        Number.isNaN(
+            menuPrice
+        ) ||
         menuPrice < 0 ||
+        Number.isNaN(
+            portionUsage
+        ) ||
         portionUsage < 0
     ) {
 
@@ -474,294 +636,424 @@ function saveMenu(event) {
             "Lengkapi data menu dengan benar."
         );
 
+
         return;
+
     }
 
 
-    const duplicate =
-        db.menus.find(
-            item =>
-                item.code.toLowerCase() ===
-                    menuCode.toLowerCase()
-                &&
-                Number(item.id) !==
-                    Number(menuId)
+    const payload = {
+
+        code:
+            menuCode,
+
+        name:
+            menuName,
+
+        category:
+            menuCategory,
+
+        price:
+            menuPrice,
+
+        portionUsage:
+            portionUsage,
+
+        status:
+            menuStatus,
+
+        actorUserId:
+            Number(
+                currentUser.id
+            )
+
+    };
+
+
+    const saveButton =
+        document.querySelector(
+            ".save-button"
         );
 
 
-    if (duplicate) {
-
-        alert(
-            "Kode menu sudah digunakan."
-        );
-
-        return;
-    }
+    const originalText =
+        saveButton
+            ? saveButton.textContent
+            : "";
 
 
-    if (menuId) {
+    try {
 
-        const menu =
-            db.menus.find(
-                item =>
-                    Number(item.id) ===
-                    Number(menuId)
-            );
+        if (saveButton) {
 
+            saveButton.disabled =
+                true;
 
-        if (!menu) {
-            return;
+            saveButton.textContent =
+                "Menyimpan...";
+
         }
 
 
-        menu.code =
-            menuCode;
+        if (menuId) {
 
-        menu.name =
-            menuName;
+            await apiRequest(
+                `/api/menus/${menuId}`,
+                {
 
-        menu.category =
-            menuCategory;
+                    method:
+                        "PATCH",
 
-        menu.price =
-            menuPrice;
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
 
-        menu.portionUsage =
-            portionUsage;
-
-        menu.status =
-            menuStatus;
-
-
-        addAudit(
-            "UPDATE MENU",
-            `Mengubah menu ${menuName}`,
-            currentUser.id
-        );
+                }
+            );
 
 
-        alert(
-            "Menu berhasil diperbarui."
-        );
+            alert(
+                "Menu berhasil diperbarui."
+            );
 
-    } else {
+        }
 
-        const menu = {
+        else {
 
-            id:
-                Date.now(),
+            await apiRequest(
+                "/api/menus",
+                {
 
-            code:
-                menuCode,
+                    method:
+                        "POST",
 
-            name:
-                menuName,
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
 
-            category:
-                menuCategory,
-
-            price:
-                menuPrice,
-
-            portionUsage:
-                portionUsage,
-
-            status:
-                menuStatus
-
-        };
+                }
+            );
 
 
-        db.menus.push(
-            menu
-        );
+            alert(
+                "Menu berhasil ditambahkan."
+            );
+
+        }
 
 
-        addAudit(
-            "TAMBAH MENU",
-            `Menambahkan menu ${menuName}`,
-            currentUser.id
-        );
+        await loadMenus();
 
 
-        alert(
-            "Menu berhasil ditambahkan."
-        );
+        resetForm();
+
     }
 
+    catch (error) {
 
-    saveDB();
+        console.error(
+            "❌ Simpan Menu Error:",
+            error
+        );
 
-    resetForm();
 
-    renderSummary();
+        alert(
+            error.message ||
+            "Gagal menyimpan menu."
+        );
 
-    renderMenuTable();
+    }
+
+    finally {
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                false;
+
+            saveButton.textContent =
+                originalText;
+
+        }
+
+    }
+
 }
 
 
-// ==========================================
-// EDIT MENU
-// ==========================================
+/* =========================================
+   EDIT MENU
+========================================= */
 
 function editMenu(menuId) {
 
     const menu =
-        db.menus.find(
+        menus.find(
             item =>
-                Number(item.id) ===
-                Number(menuId)
+                Number(
+                    item.id
+                )
+                ===
+                Number(
+                    menuId
+                )
         );
 
 
     if (!menu) {
+
+        alert(
+            "Menu tidak ditemukan."
+        );
+
+
         return;
+
     }
 
 
     document
-        .getElementById("menuId")
+        .getElementById(
+            "menuId"
+        )
         .value =
         menu.id;
 
 
     document
-        .getElementById("menuCode")
+        .getElementById(
+            "menuCode"
+        )
         .value =
         menu.code;
 
 
     document
-        .getElementById("menuName")
+        .getElementById(
+            "menuName"
+        )
         .value =
         menu.name;
 
 
     document
-        .getElementById("menuCategory")
+        .getElementById(
+            "menuCategory"
+        )
         .value =
         menu.category;
 
 
     document
-        .getElementById("menuPrice")
+        .getElementById(
+            "menuPrice"
+        )
         .value =
         menu.price;
 
 
     document
-        .getElementById("portionUsage")
+        .getElementById(
+            "portionUsage"
+        )
         .value =
         menu.portionUsage;
 
 
     document
-        .getElementById("menuStatus")
+        .getElementById(
+            "menuStatus"
+        )
         .value =
         menu.status;
 
 
-    document
-        .getElementById("formTitle")
-        .textContent =
-        "Edit Menu";
+    const formTitle =
+        document.getElementById(
+            "formTitle"
+        );
 
 
-    document
-        .getElementById("cancelButton")
-        .style.display =
-        "inline-block";
+    if (formTitle) {
+
+        formTitle.textContent =
+            "Edit Menu";
+
+    }
+
+
+    const cancelButton =
+        document.getElementById(
+            "cancelButton"
+        );
+
+
+    if (cancelButton) {
+
+        cancelButton.style.display =
+            "inline-block";
+
+    }
 
 
     window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+
+        top:
+            0,
+
+        behavior:
+            "smooth"
+
     });
+
 }
 
 
-// ==========================================
-// RESET FORM
-// ==========================================
+/* =========================================
+   RESET FORM
+========================================= */
 
 function resetForm() {
 
-    document
-        .getElementById("menuForm")
-        .reset();
+    const form =
+        document.getElementById(
+            "menuForm"
+        );
 
 
-    document
-        .getElementById("menuId")
-        .value =
-        "";
+    if (form) {
+
+        form.reset();
+
+    }
 
 
-    document
-        .getElementById("formTitle")
-        .textContent =
-        "Tambah Menu";
+    const menuId =
+        document.getElementById(
+            "menuId"
+        );
 
 
-    document
-        .getElementById("menuStatus")
-        .value =
-        "TERSEDIA";
+    if (menuId) {
+
+        menuId.value =
+            "";
+
+    }
 
 
-    document
-        .getElementById("cancelButton")
-        .style.display =
-        "none";
+    const formTitle =
+        document.getElementById(
+            "formTitle"
+        );
+
+
+    if (formTitle) {
+
+        formTitle.textContent =
+            "Tambah Menu";
+
+    }
+
+
+    const status =
+        document.getElementById(
+            "menuStatus"
+        );
+
+
+    if (status) {
+
+        status.value =
+            "TERSEDIA";
+
+    }
+
+
+    const cancelButton =
+        document.getElementById(
+            "cancelButton"
+        );
+
+
+    if (cancelButton) {
+
+        cancelButton.style.display =
+            "none";
+
+    }
+
 }
 
 
-// ==========================================
-// BATAL EDIT
-// ==========================================
+/* =========================================
+   CANCEL EDIT
+========================================= */
 
 function cancelEdit() {
 
     resetForm();
+
 }
 
 
-// ==========================================
-// SEARCH
-// ==========================================
+/* =========================================
+   SEARCH
+========================================= */
 
 const searchMenu =
-    document.getElementById("searchMenu");
+    document.getElementById(
+        "searchMenu"
+    );
 
 
-searchMenu.addEventListener(
-    "input",
-    function () {
+if (searchMenu) {
 
-        renderMenuTable(
-            this.value
-        );
-    }
-);
+    searchMenu.addEventListener(
+
+        "input",
+
+        function () {
+
+            renderMenuTable(
+                this.value
+            );
+
+        }
+
+    );
+
+}
 
 
-// ==========================================
-// FORM
-// ==========================================
+/* =========================================
+   FORM
+========================================= */
 
 const menuForm =
-    document.getElementById("menuForm");
+    document.getElementById(
+        "menuForm"
+    );
 
 
-menuForm.addEventListener(
-    "submit",
-    saveMenu
-);
+if (menuForm) {
+
+    menuForm.addEventListener(
+
+        "submit",
+
+        saveMenu
+
+    );
+
+}
 
 
-// ==========================================
-// LOGOUT
-// ==========================================
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
@@ -772,21 +1064,41 @@ function logout() {
 
     window.location.href =
         "../index.html";
+
 }
 
 
-// ==========================================
-// JALANKAN HALAMAN
-// ==========================================
+/* =========================================
+   INITIALIZE
+========================================= */
 
-document
-    .getElementById("cancelButton")
-    .style.display =
-    "none";
+async function initializeMenuPage() {
+
+    renderUser();
 
 
-renderUser();
+    const cancelButton =
+        document.getElementById(
+            "cancelButton"
+        );
 
-renderSummary();
 
-renderMenuTable();
+    if (cancelButton) {
+
+        cancelButton.style.display =
+            "none";
+
+    }
+
+
+    await loadMenus();
+
+
+    console.log(
+        "✅ MENU MYSQL SIAP"
+    );
+
+}
+
+
+initializeMenuPage();

@@ -1,274 +1,793 @@
-const STORAGE_KEY = "umkmControlDataV1";
-const SESSION_KEY = "umkmControlSessionV1";
+const SESSION_KEY =
+    "umkmControlSessionV1";
 
-let currentUser =
-    JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-
-let db =
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+const API_URL =
+    "http://localhost:3000";
 
 
-// ==========================================
-// CEK LOGIN
-// ==========================================
+/* =========================================
+   SESSION
+========================================= */
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem(
+            SESSION_KEY
+        ) || "null"
+    );
+
 
 if (!currentUser) {
-    window.location.href = "../index.html";
+
+    window.location.href =
+        "../index.html";
+
 }
 
 
-// ==========================================
-// CEK ROLE
-// ==========================================
+if (
+    currentUser &&
+    currentUser.role !== "OWNER"
+) {
 
-if (currentUser && currentUser.role !== "OWNER") {
-    window.location.href = "../pos/index.html";
+    window.location.href =
+        "../pos/index.html";
+
 }
 
 
-// ==========================================
-// SIAPKAN DATABASE
-// ==========================================
+/* =========================================
+   DATA MYSQL
+========================================= */
 
-db.users = db.users || [];
-db.menus = db.menus || [];
-db.production = db.production || [];
-db.transactions = db.transactions || [];
-db.waste = db.waste || [];
-db.stockOpnames = db.stockOpnames || [];
-db.closings = db.closings || [];
-db.auditLogs = db.auditLogs || [];
+const db = {
+
+    users: [],
+
+    menus: [],
+
+    production: [],
+
+    transactions: [],
+
+    waste: [],
+
+    stockOpnames: [],
+
+    closings: []
+
+};
 
 
-// ==========================================
-// TANGGAL HARI INI
-// ==========================================
+/* =========================================
+   API
+========================================= */
+
+async function apiRequest(url) {
+
+    const response =
+        await fetch(
+            `${API_URL}${url}`
+        );
+
+
+    const result =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !result.success
+    ) {
+
+        throw new Error(
+            result.message ||
+            "Gagal mengambil data."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================
+   LOAD USERS
+========================================= */
+
+async function loadUsers() {
+
+    const result =
+        await apiRequest(
+            "/api/users"
+        );
+
+
+    db.users =
+        (result.data || [])
+            .map(
+                user => ({
+
+                    ...user,
+
+                    id:
+                        Number(
+                            user.id
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD MENUS
+========================================= */
+
+async function loadMenus() {
+
+    const result =
+        await apiRequest(
+            "/api/menus"
+        );
+
+
+    db.menus =
+        (result.data || [])
+            .map(
+                menu => ({
+
+                    ...menu,
+
+                    id:
+                        Number(
+                            menu.id
+                        ),
+
+                    price:
+                        Number(
+                            menu.price || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            menu.portionUsage || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD PRODUCTION
+========================================= */
+
+async function loadProduction() {
+
+    const result =
+        await apiRequest(
+            "/api/production"
+        );
+
+
+    db.production =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    stockWeight:
+                        Number(
+                            item.stockWeight || 0
+                        ),
+
+                    estimatedPortion:
+                        Number(
+                            item.estimatedPortion || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD TRANSACTIONS
+========================================= */
+
+async function loadTransactions() {
+
+    const result =
+        await apiRequest(
+            "/api/transactions"
+        );
+
+
+    db.transactions =
+        (result.data || [])
+            .map(
+                transaction => ({
+
+                    ...transaction,
+
+                    id:
+                        Number(
+                            transaction.id
+                        ),
+
+                    cashierId:
+                        Number(
+                            transaction.cashierId
+                        ),
+
+                    total:
+                        Number(
+                            transaction.total || 0
+                        ),
+
+                    items:
+                        (
+                            transaction.items || []
+                        )
+                            .map(
+                                item => ({
+
+                                    ...item,
+
+                                    menuId:
+                                        Number(
+                                            item.menuId
+                                        ),
+
+                                    quantity:
+                                        Number(
+                                            item.quantity || 0
+                                        ),
+
+                                    price:
+                                        Number(
+                                            item.price || 0
+                                        ),
+
+                                    subtotal:
+                                        Number(
+                                            item.subtotal || 0
+                                        ),
+
+                                    portionUsageAtSale:
+                                        Number(
+                                            item.portionUsageAtSale || 0
+                                        )
+
+                                })
+                            )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD WASTE
+========================================= */
+
+async function loadWaste() {
+
+    const result =
+        await apiRequest(
+            "/api/waste"
+        );
+
+
+    db.waste =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    quantity:
+                        Number(
+                            item.quantity || 0
+                        ),
+
+                    portionUsage:
+                        Number(
+                            item.portionUsage || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD STOCK OPNAME
+========================================= */
+
+async function loadStockOpnames() {
+
+    const result =
+        await apiRequest(
+            "/api/stock-opnames"
+        );
+
+
+    db.stockOpnames =
+        (result.data || [])
+            .map(
+                item => ({
+
+                    ...item,
+
+                    id:
+                        Number(
+                            item.id
+                        ),
+
+                    expectedStock:
+                        Number(
+                            item.expectedStock || 0
+                        ),
+
+                    physicalStock:
+                        Number(
+                            item.physicalStock || 0
+                        ),
+
+                    difference:
+                        Number(
+                            item.difference || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   LOAD CLOSINGS
+========================================= */
+
+async function loadClosings() {
+
+    const result =
+        await apiRequest(
+            "/api/closings"
+        );
+
+
+    db.closings =
+        (result.data || [])
+            .map(
+                closing => ({
+
+                    ...closing,
+
+                    id:
+                        Number(
+                            closing.id
+                        ),
+
+                    cashierId:
+                        Number(
+                            closing.cashierId
+                        ),
+
+                    transactionCount:
+                        Number(
+                            closing.transactionCount || 0
+                        ),
+
+                    voidCount:
+                        Number(
+                            closing.voidCount || 0
+                        ),
+
+                    cashSales:
+                        Number(
+                            closing.cashSales || 0
+                        ),
+
+                    nonCashSales:
+                        Number(
+                            closing.nonCashSales || 0
+                        ),
+
+                    systemCash:
+                        Number(
+                            closing.systemCash || 0
+                        ),
+
+                    actualCash:
+                        Number(
+                            closing.actualCash || 0
+                        ),
+
+                    cashDifference:
+                        Number(
+                            closing.cashDifference || 0
+                        )
+
+                })
+            );
+
+}
+
+
+/* =========================================
+   DATE
+========================================= */
 
 function todayISO() {
 
     const now =
         new Date();
 
+
     const year =
         now.getFullYear();
 
+
     const month =
-        String(now.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
-        String(now.getDate())
-            .padStart(2, "0");
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     return `${year}-${month}-${day}`;
+
 }
 
 
-// ==========================================
-// FORMAT RUPIAH
-// ==========================================
+function selectedDate() {
+
+    return document
+        .getElementById(
+            "reportDate"
+        )
+        .value;
+
+}
+
+
+/* =========================================
+   FORMAT
+========================================= */
 
 function formatRupiah(value) {
 
     return new Intl.NumberFormat(
         "id-ID",
         {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0
+
+            style:
+                "currency",
+
+            currency:
+                "IDR",
+
+            minimumFractionDigits:
+                0
+
         }
     ).format(
-        Number(value || 0)
+        Number(
+            value || 0
+        )
     );
+
 }
 
-
-// ==========================================
-// FORMAT PORSI
-// ==========================================
 
 function formatPortion(value) {
 
     const number =
-        Number(value || 0);
+        Number(
+            value || 0
+        );
 
-    if (Number.isInteger(number)) {
+
+    if (
+        Number.isInteger(
+            number
+        )
+    ) {
+
         return number;
+
     }
 
+
     return number
-        .toFixed(2)
-        .replace(/0+$/, "")
-        .replace(/\.$/, "");
+        .toFixed(
+            2
+        )
+        .replace(
+            /0+$/,
+            ""
+        )
+        .replace(
+            /\.$/,
+            ""
+        );
+
 }
 
 
-// ==========================================
-// AMBIL USER
-// ==========================================
+/* =========================================
+   USER & MENU
+========================================= */
 
 function getUser(userId) {
 
     return db.users.find(
+
         user =>
-            Number(user.id) ===
-            Number(userId)
+            Number(
+                user.id
+            )
+            ===
+            Number(
+                userId
+            )
+
     );
+
 }
 
-
-// ==========================================
-// AMBIL MENU
-// ==========================================
 
 function getMenu(menuId) {
 
     return db.menus.find(
+
         menu =>
-            Number(menu.id) ===
-            Number(menuId)
+            Number(
+                menu.id
+            )
+            ===
+            Number(
+                menuId
+            )
+
     );
+
 }
 
 
-// ==========================================
-// TANGGAL LAPORAN
-// ==========================================
-
-function selectedDate() {
-
-    return document
-        .getElementById("reportDate")
-        .value;
-}
-
-
-// ==========================================
-// TRANSAKSI BERDASARKAN TANGGAL
-// ==========================================
+/* =========================================
+   TRANSACTIONS PER DATE
+========================================= */
 
 function transactionsByDate(date) {
 
     return db.transactions.filter(
+
         transaction =>
-            transaction.date === date
+            transaction.date ===
+            date
+
     );
+
 }
 
-
-// ==========================================
-// TRANSAKSI VALID
-// ==========================================
 
 function validTransactions(date) {
 
-    return transactionsByDate(date)
+    return transactionsByDate(
+        date
+    )
         .filter(
+
             transaction =>
-                transaction.status !== "VOID"
+                transaction.status !==
+                "VOID"
+
         );
+
 }
 
-
-// ==========================================
-// TRANSAKSI VOID
-// ==========================================
 
 function voidTransactions(date) {
 
-    return transactionsByDate(date)
+    return transactionsByDate(
+        date
+    )
         .filter(
+
             transaction =>
-                transaction.status === "VOID"
+                transaction.status ===
+                "VOID"
+
         );
+
 }
 
 
-// ==========================================
-// OMZET
-// ==========================================
+/* =========================================
+   SALES
+========================================= */
 
 function calculateOmzet(date) {
 
-    return validTransactions(date)
+    return validTransactions(
+        date
+    )
         .reduce(
-            (total, transaction) =>
-                total +
-                Number(transaction.total || 0),
+
+            (
+                total,
+                transaction
+            ) =>
+
+                total
+                +
+                Number(
+                    transaction.total || 0
+                ),
+
             0
+
         );
+
 }
 
-
-// ==========================================
-// PENJUALAN TUNAI
-// ==========================================
 
 function calculateCashSales(date) {
 
-    return validTransactions(date)
+    return validTransactions(
+        date
+    )
         .filter(
+
             transaction =>
-                transaction.paymentMethod === "TUNAI"
+                String(
+                    transaction.paymentMethod
+                )
+                    .toUpperCase()
+                ===
+                "TUNAI"
+
         )
         .reduce(
-            (total, transaction) =>
-                total +
-                Number(transaction.total || 0),
+
+            (
+                total,
+                transaction
+            ) =>
+
+                total
+                +
+                Number(
+                    transaction.total || 0
+                ),
+
             0
+
         );
+
 }
 
-
-// ==========================================
-// PENJUALAN NON TUNAI
-// ==========================================
 
 function calculateNonCashSales(date) {
 
-    return validTransactions(date)
+    return validTransactions(
+        date
+    )
         .filter(
+
             transaction =>
-                transaction.paymentMethod !== "TUNAI"
+                String(
+                    transaction.paymentMethod
+                )
+                    .toUpperCase()
+                !==
+                "TUNAI"
+
         )
         .reduce(
-            (total, transaction) =>
-                total +
-                Number(transaction.total || 0),
+
+            (
+                total,
+                transaction
+            ) =>
+
+                total
+                +
+                Number(
+                    transaction.total || 0
+                ),
+
             0
+
         );
+
 }
 
 
-// ==========================================
-// PRODUKSI
-// ==========================================
+/* =========================================
+   PRODUCTION
+========================================= */
 
 function productionPortions(date) {
 
     return db.production
+
         .filter(
+
             item =>
-                item.date === date
+                item.date ===
+                date
+
         )
+
         .reduce(
-            (total, item) =>
-                total +
-                Number(item.estimatedPortion || 0),
+
+            (
+                total,
+                item
+            ) =>
+
+                total
+                +
+                Number(
+                    item.estimatedPortion || 0
+                ),
+
             0
+
         );
+
 }
 
 
-// ==========================================
-// PORSI TERJUAL
-// ==========================================
+/* =========================================
+   SOLD PORTIONS
+========================================= */
 
 function soldPortions(date) {
 
-    return validTransactions(date)
+    return validTransactions(
+        date
+    )
         .reduce(
-            (total, transaction) => {
+
+            (
+                total,
+                transaction
+            ) => {
 
                 const items =
                     transaction.items || [];
@@ -276,172 +795,312 @@ function soldPortions(date) {
 
                 const portions =
                     items.reduce(
-                        (subtotal, item) => {
+
+                        (
+                            subtotal,
+                            item
+                        ) => {
 
                             const menu =
-                                getMenu(item.menuId);
+                                getMenu(
+                                    item.menuId
+                                );
 
 
                             const portionUsage =
                                 Number(
-                                    item.portionUsageAtSale ??
-                                    menu?.portionUsage ??
+
+                                    item.portionUsageAtSale
+
+                                    ??
+
+                                    menu?.portionUsage
+
+                                    ??
+
                                     0
+
                                 );
 
 
-                            return subtotal +
+                            return (
+
+                                subtotal
+
+                                +
+
                                 (
-                                    Number(item.quantity || 0)
+                                    Number(
+                                        item.quantity || 0
+                                    )
+
                                     *
+
                                     portionUsage
-                                );
+                                )
+
+                            );
+
                         },
+
                         0
+
                     );
 
 
-                return total +
-                    portions;
+                return (
+                    total +
+                    portions
+                );
+
             },
+
             0
+
         );
+
 }
 
 
-// ==========================================
-// WASTE
-// ==========================================
+/* =========================================
+   WASTE
+========================================= */
 
 function wastePortions(date) {
 
     return db.waste
-        .filter(item => {
 
-            if (item.date) {
-                return item.date === date;
+        .filter(
+
+            item => {
+
+                if (
+                    item.date
+                ) {
+
+                    return (
+                        item.date ===
+                        date
+                    );
+
+                }
+
+
+                if (
+                    item.createdAt
+                ) {
+
+                    return (
+                        item.createdAt
+                            .substring(
+                                0,
+                                10
+                            )
+                        ===
+                        date
+                    );
+
+                }
+
+
+                return false;
+
             }
 
+        )
 
-            if (item.createdAt) {
-
-                return (
-                    item.createdAt.substring(0, 10)
-                    === date
-                );
-            }
-
-
-            return false;
-        })
         .reduce(
-            (total, item) =>
-                total +
+
+            (
+                total,
+                item
+            ) =>
+
+                total
+
+                +
+
                 (
-                    Number(item.quantity || 0)
+                    Number(
+                        item.quantity || 0
+                    )
+
                     *
-                    Number(item.portionUsage ?? 1)
+
+                    Number(
+                        item.portionUsage || 0
+                    )
                 ),
+
             0
+
         );
+
 }
 
 
-// ==========================================
-// STOK SISTEM
-// ==========================================
+/* =========================================
+   SYSTEM STOCK
+========================================= */
 
 function systemStock(date) {
 
     return (
-        productionPortions(date)
+
+        productionPortions(
+            date
+        )
+
         -
-        soldPortions(date)
+
+        soldPortions(
+            date
+        )
+
         -
-        wastePortions(date)
+
+        wastePortions(
+            date
+        )
+
     );
+
 }
 
 
-// ==========================================
-// SELISIH STOCK OPNAME
-// ==========================================
+/* =========================================
+   STOCK OPNAME DIFFERENCE
+========================================= */
 
 function stockDifference(date) {
 
-    const opname =
-        [...db.stockOpnames]
-            .reverse()
-            .find(
+    const records =
+        db.stockOpnames
+
+            .filter(
+
                 item =>
-                    item.date === date
+                    item.date ===
+                    date
+
+            )
+
+            .sort(
+
+                (
+                    a,
+                    b
+                ) =>
+
+                    Number(
+                        b.id
+                    )
+                    -
+                    Number(
+                        a.id
+                    )
+
             );
 
 
-    if (!opname) {
+    if (
+        records.length ===
+        0
+    ) {
+
         return 0;
+
     }
 
 
     return Number(
-        opname.difference || 0
+        records[0]
+            .difference || 0
     );
+
 }
 
 
-// ==========================================
-// SELISIH KAS
-// ==========================================
+/* =========================================
+   CASH DIFFERENCE
+========================================= */
 
 function cashDifference(date) {
 
-    const closing =
-        [...db.closings]
-            .reverse()
-            .find(
+    const records =
+        db.closings
+
+            .filter(
+
                 item =>
-                    item.date === date
+                    item.date ===
+                    date
+
+            )
+
+            .sort(
+
+                (
+                    a,
+                    b
+                ) =>
+
+                    Number(
+                        b.id
+                    )
+                    -
+                    Number(
+                        a.id
+                    )
+
             );
 
 
-    if (!closing) {
+    if (
+        records.length ===
+        0
+    ) {
+
         return 0;
+
     }
 
 
     return Number(
-        closing.cashDifference || 0
+        records[0]
+            .cashDifference || 0
     );
+
 }
 
 
-// ==========================================
-// RENDER USER
-// ==========================================
+/* =========================================
+   RENDER USER
+========================================= */
 
 function renderUser() {
 
-    if (!currentUser) {
-        return;
-    }
-
-
     document
-        .getElementById("namaUser")
+        .getElementById(
+            "namaUser"
+        )
         .textContent =
         currentUser.name;
 
 
     document
-        .getElementById("sidebarUser")
+        .getElementById(
+            "sidebarUser"
+        )
         .textContent =
         currentUser.name;
+
 }
 
 
-// ==========================================
-// RENDER SUMMARY
-// ==========================================
+/* =========================================
+   SUMMARY
+========================================= */
 
 function renderSummary() {
 
@@ -450,69 +1109,102 @@ function renderSummary() {
 
 
     document
-        .getElementById("totalOmzet")
+        .getElementById(
+            "totalOmzet"
+        )
         .textContent =
         formatRupiah(
-            calculateOmzet(date)
+            calculateOmzet(
+                date
+            )
         );
 
 
     document
-        .getElementById("totalTransaksi")
+        .getElementById(
+            "totalTransaksi"
+        )
         .textContent =
-        validTransactions(date).length;
+        validTransactions(
+            date
+        ).length;
 
 
     document
-        .getElementById("penjualanTunai")
+        .getElementById(
+            "penjualanTunai"
+        )
         .textContent =
         formatRupiah(
-            calculateCashSales(date)
+            calculateCashSales(
+                date
+            )
         );
 
 
     document
-        .getElementById("penjualanNonTunai")
+        .getElementById(
+            "penjualanNonTunai"
+        )
         .textContent =
         formatRupiah(
-            calculateNonCashSales(date)
+            calculateNonCashSales(
+                date
+            )
         );
 
 
     document
-        .getElementById("totalVoid")
+        .getElementById(
+            "totalVoid"
+        )
         .textContent =
-        voidTransactions(date).length;
+        voidTransactions(
+            date
+        ).length;
 
 
     document
-        .getElementById("porsiTerjual")
+        .getElementById(
+            "porsiTerjual"
+        )
         .textContent =
-        formatPortion(
-            soldPortions(date)
-        ) + " Porsi";
+        `${formatPortion(
+            soldPortions(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("totalWaste")
+        .getElementById(
+            "totalWaste"
+        )
         .textContent =
-        formatPortion(
-            wastePortions(date)
-        ) + " Porsi";
+        `${formatPortion(
+            wastePortions(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("stokSistem")
+        .getElementById(
+            "stokSistem"
+        )
         .textContent =
-        formatPortion(
-            systemStock(date)
-        ) + " Porsi";
+        `${formatPortion(
+            systemStock(
+                date
+            )
+        )} Porsi`;
+
 }
 
 
-// ==========================================
-// RENDER STOK
-// ==========================================
+/* =========================================
+   STOCK REPORT
+========================================= */
 
 function renderStockReport() {
 
@@ -521,57 +1213,82 @@ function renderStockReport() {
 
 
     document
-        .getElementById("stokProduksi")
+        .getElementById(
+            "stokProduksi"
+        )
         .textContent =
-        formatPortion(
-            productionPortions(date)
-        ) + " Porsi";
+        `${formatPortion(
+            productionPortions(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("stokTerjual")
+        .getElementById(
+            "stokTerjual"
+        )
         .textContent =
-        formatPortion(
-            soldPortions(date)
-        ) + " Porsi";
+        `${formatPortion(
+            soldPortions(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("stokWaste")
+        .getElementById(
+            "stokWaste"
+        )
         .textContent =
-        formatPortion(
-            wastePortions(date)
-        ) + " Porsi";
+        `${formatPortion(
+            wastePortions(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("stokAkhir")
+        .getElementById(
+            "stokAkhir"
+        )
         .textContent =
-        formatPortion(
-            systemStock(date)
-        ) + " Porsi";
+        `${formatPortion(
+            systemStock(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("selisihStok")
+        .getElementById(
+            "selisihStok"
+        )
         .textContent =
-        formatPortion(
-            stockDifference(date)
-        ) + " Porsi";
+        `${formatPortion(
+            stockDifference(
+                date
+            )
+        )} Porsi`;
 
 
     document
-        .getElementById("selisihKas")
+        .getElementById(
+            "selisihKas"
+        )
         .textContent =
         formatRupiah(
-            cashDifference(date)
+            cashDifference(
+                date
+            )
         );
+
 }
 
 
-// ==========================================
-// RENDER TRANSAKSI
-// ==========================================
+/* =========================================
+   TRANSACTION TABLE
+========================================= */
 
 function renderTransactionTable() {
 
@@ -590,115 +1307,203 @@ function renderTransactionTable() {
 
 
     const transactions =
-        transactionsByDate(date);
+        transactionsByDate(
+            date
+        );
 
 
-    if (transactions.length === 0) {
+    if (
+        transactions.length ===
+        0
+    ) {
 
         table.innerHTML = `
+
             <tr>
-                <td colspan="7">
+
+                <td
+                    colspan="7"
+                    style="
+                        text-align:center;
+                        color:#9ca3af;
+                    "
+                >
                     Belum ada transaksi pada tanggal ini.
                 </td>
+
             </tr>
+
         `;
 
+
         return;
+
     }
 
 
     const data =
-        [...transactions].reverse();
+        [...transactions]
+            .sort(
 
+                (
+                    a,
+                    b
+                ) =>
 
-    data.forEach(transaction => {
+                    Number(
+                        b.id
+                    )
+                    -
+                    Number(
+                        a.id
+                    )
 
-        const user =
-            getUser(
-                transaction.cashierId
             );
 
 
-        let time =
-            "-";
+    data.forEach(
 
+        transaction => {
 
-        if (transaction.createdAt) {
-
-            time =
-                new Date(
-                    transaction.createdAt
-                ).toLocaleTimeString(
-                    "id-ID",
-                    {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    }
+            const user =
+                getUser(
+                    transaction.cashierId
                 );
+
+
+            let time =
+                "-";
+
+
+            if (
+                transaction.createdAt
+            ) {
+
+                const created =
+                    new Date(
+                        transaction.createdAt
+                    );
+
+
+                if (
+                    !Number.isNaN(
+                        created.getTime()
+                    )
+                ) {
+
+                    time =
+                        created
+                            .toLocaleTimeString(
+                                "id-ID",
+                                {
+
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+
+                                }
+                            );
+
+                }
+
+            }
+
+
+            const totalItem =
+                (
+                    transaction.items ||
+                    []
+                )
+                    .reduce(
+
+                        (
+                            total,
+                            item
+                        ) =>
+
+                            total
+                            +
+                            Number(
+                                item.quantity || 0
+                            ),
+
+                        0
+
+                    );
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${
+                        transaction.transactionCode
+                        ||
+                        transaction.code
+                        ||
+                        "-"
+                    }
+                </td>
+
+                <td>
+                    ${time}
+                </td>
+
+                <td>
+                    ${user?.name || "-"}
+                </td>
+
+                <td>
+                    ${totalItem}
+                </td>
+
+                <td>
+                    ${transaction.paymentMethod || "-"}
+                </td>
+
+                <td>
+                    ${formatRupiah(
+                        transaction.total
+                    )}
+                </td>
+
+                <td
+                    class="${
+                        transaction.status ===
+                        "VOID"
+                            ?
+                            "status-void"
+                            :
+                            "status-valid"
+                    }"
+                >
+                    ${transaction.status || "-"}
+                </td>
+
+            `;
+
+
+            table.appendChild(
+                row
+            );
+
         }
 
+    );
 
-        const totalItem =
-            (transaction.items || [])
-                .reduce(
-                    (total, item) =>
-                        total +
-                        Number(item.quantity || 0),
-                    0
-                );
-
-
-        const row =
-            document.createElement("tr");
-
-
-        row.innerHTML = `
-            <td>
-                ${transaction.code || "-"}
-            </td>
-
-            <td>
-                ${time}
-            </td>
-
-            <td>
-                ${user?.name || "-"}
-            </td>
-
-            <td>
-                ${totalItem}
-            </td>
-
-            <td>
-                ${transaction.paymentMethod || "-"}
-            </td>
-
-            <td>
-                ${formatRupiah(transaction.total)}
-            </td>
-
-            <td
-                class="${
-                    transaction.status === "VOID"
-                        ? "status-void"
-                        : "status-valid"
-                }"
-            >
-                ${transaction.status || "-"}
-            </td>
-        `;
-
-
-        table.appendChild(
-            row
-        );
-    });
 }
 
 
-// ==========================================
-// JUDUL LAPORAN
-// ==========================================
+/* =========================================
+   REPORT TITLE
+========================================= */
 
 function renderReportTitle() {
 
@@ -707,33 +1512,46 @@ function renderReportTitle() {
 
 
     if (!date) {
+
         return;
+
     }
 
 
     const formatted =
         new Date(
-            date + "T00:00:00"
-        ).toLocaleDateString(
-            "id-ID",
-            {
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            }
-        );
+            `${date}T00:00:00`
+        )
+            .toLocaleDateString(
+                "id-ID",
+                {
+
+                    day:
+                        "2-digit",
+
+                    month:
+                        "long",
+
+                    year:
+                        "numeric"
+
+                }
+            );
 
 
     document
-        .getElementById("reportDateTitle")
+        .getElementById(
+            "reportDateTitle"
+        )
         .textContent =
         formatted;
+
 }
 
 
-// ==========================================
-// RENDER SEMUA
-// ==========================================
+/* =========================================
+   RENDER ALL
+========================================= */
 
 function renderReport() {
 
@@ -744,22 +1562,24 @@ function renderReport() {
     renderTransactionTable();
 
     renderReportTitle();
+
 }
 
 
-// ==========================================
-// CETAK
-// ==========================================
+/* =========================================
+   PRINT
+========================================= */
 
 function printReport() {
 
     window.print();
+
 }
 
 
-// ==========================================
-// LOGOUT
-// ==========================================
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout() {
 
@@ -770,35 +1590,105 @@ function logout() {
 
     window.location.href =
         "../index.html";
+
 }
 
 
-// ==========================================
-// EVENT
-// ==========================================
+/* =========================================
+   EVENT
+========================================= */
 
 document
-    .getElementById("reportDate")
+    .getElementById(
+        "reportDate"
+    )
     .addEventListener(
         "change",
         renderReport
     );
 
 
-// ==========================================
-// DEFAULT TANGGAL
-// ==========================================
+/* =========================================
+   INITIALIZE
+========================================= */
 
-document
-    .getElementById("reportDate")
-    .value =
-    todayISO();
+async function initializeReport() {
+
+    document
+        .getElementById(
+            "reportDate"
+        )
+        .value =
+        todayISO();
 
 
-// ==========================================
-// JALANKAN
-// ==========================================
+    renderUser();
 
-renderUser();
 
-renderReport();
+    try {
+
+        await Promise.all([
+
+            loadUsers(),
+
+            loadMenus(),
+
+            loadProduction(),
+
+            loadTransactions(),
+
+            loadWaste(),
+
+            loadStockOpnames(),
+
+            loadClosings()
+
+        ]);
+
+
+        console.log(
+            "✅ LAPORAN MYSQL SIAP"
+        );
+
+
+        console.log(
+            "Transactions:",
+            db.transactions
+        );
+
+
+        console.log(
+            "Production:",
+            db.production
+        );
+
+
+        console.log(
+            "Waste:",
+            db.waste
+        );
+
+
+        renderReport();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Laporan Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Gagal memuat laporan."
+        );
+
+    }
+
+}
+
+
+initializeReport();
